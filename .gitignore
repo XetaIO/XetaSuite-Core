@@ -7,6 +7,7 @@
 .phpunit.result.cache
 /.fleet
 /.idea
+/.junie
 /.nova
 /.phpunit.cache
 /.vscode
@@ -23,3 +24,4 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 composer.lock
+boost.json
