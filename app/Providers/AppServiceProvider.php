@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Providers;
+declare(strict_types=1);
+
+namespace XetaSuite\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

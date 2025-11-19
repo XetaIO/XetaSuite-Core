@@ -1,6 +1,6 @@
 <?php
 
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
+    XetaSuite\Providers\AppServiceProvider::class,
+    XetaSuite\Providers\FortifyServiceProvider::class,
 ];

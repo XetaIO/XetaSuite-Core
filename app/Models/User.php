@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+declare(strict_types=1);
+
+namespace XetaSuite\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Database\Factories\Users\UserFactory> */
     use HasFactory, Notifiable;
 
     /**

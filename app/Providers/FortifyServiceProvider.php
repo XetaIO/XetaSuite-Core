@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Providers;
+declare(strict_types=1);
 
-use App\Actions\Fortify\CreateNewUser;
-use App\Actions\Fortify\ResetUserPassword;
-use App\Actions\Fortify\UpdateUserPassword;
-use App\Actions\Fortify\UpdateUserProfileInformation;
+namespace XetaSuite\Providers;
+
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -13,6 +11,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
+use XetaSuite\Actions\Fortify\CreateNewUser;
+use XetaSuite\Actions\Fortify\ResetUserPassword;
+use XetaSuite\Actions\Fortify\UpdateUserPassword;
+use XetaSuite\Actions\Fortify\UpdateUserProfileInformation;
 
 class FortifyServiceProvider extends ServiceProvider
 {

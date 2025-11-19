@@ -1,13 +1,16 @@
 <?php
 
-namespace Database\Factories;
+declare(strict_types=1);
+
+namespace Database\Factories\Users;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use XetaSuite\Models\User;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\XetaSuite\Models\User>
  */
 class UserFactory extends Factory
 {
@@ -40,5 +43,12 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    public function admin(): self
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('admin');
+        });
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Actions\Fortify;
+declare(strict_types=1);
 
-use App\Models\User;
+namespace XetaSuite\Actions\Fortify;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
+use XetaSuite\Models\User;
 
 class ResetUserPassword implements ResetsUserPasswords
 {

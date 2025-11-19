@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Actions\Fortify;
+declare(strict_types=1);
+
+namespace XetaSuite\Actions\Fortify;
 
 use Illuminate\Validation\Rules\Password;
 
