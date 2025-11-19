@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [env('SPA_URL', 'https://xetasuite.test')],
 
     'allowed_origins_patterns' => [],
 
