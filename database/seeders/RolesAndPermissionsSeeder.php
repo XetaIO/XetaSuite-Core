@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use XetaSuite\Models\Permission;
+use XetaSuite\Models\Role;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -36,8 +36,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'incidents.view', 'incidents.update', 'maintenance.view',
             ],
 
-            'viewer' => [
-                'incidents.view', 'materials.view', 'parts.view',
+            'operator' => [
+                'incidents.view', 'materials.view', 'items.view',
             ],
         ];
 

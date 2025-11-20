@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Http\Controllers;
+namespace XetaSuite\Http\Controllers\V1;
 
 abstract class Controller
 {
