@@ -15,17 +15,16 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('site_user', function (Blueprint $table) {
-            $table->boolean('manager')->default(false);
-            $table->timestamps();
-        });
-
-        Schema::table('site_user', function (Blueprint $table) {
             $table->foreignIdFor(User::class)
                 ->constrained()
                 ->cascadeOnDelete();
+
             $table->foreignIdFor(Site::class)
                 ->constrained()
                 ->cascadeOnDelete();
+
+            $table->boolean('manager')->default(false);
+            $table->timestamps();
 
             $table->primary(['user_id', 'site_id']);
         });

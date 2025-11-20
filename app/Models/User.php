@@ -24,7 +24,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
-use XetaSuite\Http\Controllers\V1\Auth\Traits\MustSetupPassword;
+use XetaSuite\Http\Controllers\Api\V1\Auth\Traits\MustSetupPassword;
 use XetaSuite\Models\Presenters\UserPresenter;
 use XetaSuite\Observers\UserObserver;
 

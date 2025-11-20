@@ -22,7 +22,10 @@ return new class extends Migration
             $table->foreignIdFor(Material::class)
                 ->nullable()
                 ->constrained()
-                ->cascadeOnDelete();
+                ->nullOnDelete();
+            $table->string('material_name', 100)
+                ->nullable()
+                ->comment('The name of the material if the material is deleted.');
 
             $table->foreignIdFor(User::class, 'created_by_id')
                 ->nullable()
@@ -33,12 +36,8 @@ return new class extends Migration
                 ->comment('The name of the user who created the cleaning if the user is deleted.');
 
             $table->foreignIdFor(Site::class)
-                ->nullable()
                 ->constrained()
-                ->nullOnDelete();
-            $table->string('site_name', 150)
-                ->nullable()
-                ->comment('The name of the site if the site is deleted.');
+                ->restrictOnDelete();
 
             $table->foreignIdFor(User::class, 'edited_user_id')
                 ->nullable()

@@ -20,12 +20,8 @@ return new class extends Migration
             $table->id();
 
             $table->foreignIdFor(Site::class)
-                ->nullable()
                 ->constrained()
-                ->nullOnDelete();
-            $table->string('site_name', 150)
-                ->nullable()
-                ->comment('The name of the site if the site is deleted.');
+                ->restrictOnDelete();
 
             $table->foreignIdFor(User::class, 'created_by_id')
                 ->nullable()
@@ -39,6 +35,12 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
+            $table->string('supplier_name', 150)
+                ->nullable()
+                ->comment('The name of the supplier who supplied the item if the supplier is deleted.');
+            $table->string('supplier_reference', 100)
+                ->nullable()
+                ->comment('The supplier reference for this item.');
 
             $table->foreignIdFor(User::class, 'edited_user_id')
                 ->nullable()
@@ -48,12 +50,15 @@ return new class extends Migration
             $table->string('name')->index();
             $table->text('description')->nullable();
             $table->string('reference')->nullable()->index();
-            $table->decimal('price', 10)->default(0.00);
+            $table->decimal('purchase_price', 10, 2)->default(0.00)
+                ->comment('Current purchase price from supplier');
+            $table->string('currency', 3)->default('EUR');
 
             $table->unsignedInteger('item_entry_total')->default(0);
             $table->unsignedInteger('item_exit_total')->default(0);
             $table->unsignedInteger('item_entry_count')->default(0);
             $table->unsignedInteger('item_exit_count')->default(0);
+
             $table->unsignedInteger('material_count')->default(0);
             $table->unsignedInteger('qrcode_flash_count')->default(0);
 

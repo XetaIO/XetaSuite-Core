@@ -20,12 +20,12 @@ return new class extends Migration
 
             $table->foreignIdFor(Site::class)
                 ->constrained()
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
             $table->foreignIdFor(Zone::class, 'parent_id')
                 ->nullable()
                 ->constrained('zones')
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
             $table->string('name');
             $table->boolean('allow_material')->default(true);

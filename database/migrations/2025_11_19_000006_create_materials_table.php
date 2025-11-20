@@ -27,12 +27,8 @@ return new class extends Migration
                 ->comment('The name of the user who created the material if the user is deleted.');
 
             $table->foreignIdFor(Zone::class)
-                ->nullable()
                 ->constrained()
-                ->nullOnDelete();
-            $table->string('zone_name', 100)
-                ->nullable()
-                ->comment('The name of the zone if the zone is deleted.');
+                ->restrictOnDelete();
 
             $table->string('name');
             $table->text('description')->nullable();

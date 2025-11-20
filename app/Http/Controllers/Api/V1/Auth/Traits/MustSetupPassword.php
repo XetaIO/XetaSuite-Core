@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Http\Controllers\V1\Auth\Traits;
+namespace XetaSuite\Http\Controllers\Api\V1\Auth\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
