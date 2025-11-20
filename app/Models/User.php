@@ -29,20 +29,17 @@ use XetaSuite\Models\Presenters\UserPresenter;
 use XetaSuite\Observers\UserObserver;
 
 #[ObservedBy([UserObserver::class])]
-class User extends Model implements
-    AuthenticatableContract,
-    AuthorizableContract,
-    CanResetPasswordContract
+class User extends Model implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
     use Authenticatable;
     use Authorizable;
     use CanResetPassword;
     use HasFactory;
-    use MustSetupPassword;
     use HasRoles;
+    use MustSetupPassword;
     use Notifiable;
-    use UserPresenter;
     use SoftDeletes;
+    use UserPresenter;
 
     /**
      * The attributes that are mass assignable.
@@ -58,7 +55,7 @@ class User extends Model implements
         'office_phone',
         'cell_phone',
         'end_employment_contract',
-        'current_site_id'
+        'current_site_id',
     ];
 
     /**
@@ -74,7 +71,7 @@ class User extends Model implements
         'online',
 
         // Role Model
-        'level'
+        'level',
     ];
 
     /**
@@ -89,8 +86,6 @@ class User extends Model implements
 
     /**
      * The attributes that should be cast.
-     *
-     * @return array
      */
     protected function casts(): array
     {
@@ -98,14 +93,12 @@ class User extends Model implements
             'password_setup_at' => 'datetime',
             'password' => 'hashed',
             'last_login_date' => 'datetime',
-            'end_employment_contract' => 'datetime'
+            'end_employment_contract' => 'datetime',
         ];
     }
 
     /**
      * Get the cleanings created by the user.
-     *
-     * @return HasMany
      */
     public function cleanings(): HasMany
     {
@@ -114,8 +107,6 @@ class User extends Model implements
 
     /**
      * Get the incidents created by the user.
-     *
-     * @return HasMany
      */
     public function incidents(): HasMany
     {
@@ -124,8 +115,6 @@ class User extends Model implements
 
     /**
      * Get the maintenances created by the user.
-     *
-     * @return HasMany
      */
     public function maintenances(): HasMany
     {
@@ -134,8 +123,6 @@ class User extends Model implements
 
     /**
      * Get the maintenances assigned to user thought operators
-     *
-     * @return BelongsToMany
      */
     public function maintenancesOperators(): BelongsToMany
     {
@@ -145,8 +132,6 @@ class User extends Model implements
 
     /**
      * Get the settings for the user.
-     *
-     * @return MorphMany
      */
     public function settings(): MorphMany
     {
@@ -155,8 +140,6 @@ class User extends Model implements
 
     /**
      * Get the sites assigned to users.
-     *
-     * @return BelongsToMany
      */
     public function sites(): BelongsToMany
     {
@@ -166,8 +149,6 @@ class User extends Model implements
 
     /**
      * Get the user that deleted the user.
-     *
-     * @return HasOne
      */
     public function deletedUser(): HasOne
     {
@@ -176,8 +157,6 @@ class User extends Model implements
 
     /**
      * Return the first site id of the user or null if no site.
-     *
-     * @return null|int
      */
     public function getFirstSiteId(): ?int
     {
@@ -192,8 +171,6 @@ class User extends Model implements
 
     /**
      * Get the notifications for the user.
-     *
-     * @return MorphMany
      */
     public function notifications(): MorphMany
     {
@@ -204,11 +181,6 @@ class User extends Model implements
 
     /**
      * Function to assign the given roles to the given sites
-     *
-     * @param BackedEnum|int|array|string|Collection|Role $roles
-     * @param array|int $sites
-     *
-     * @return User
      */
     public function assignRolesToSites(BackedEnum|Collection|int|array|string|Role $roles, array|int $sites): self
     {
@@ -231,11 +203,6 @@ class User extends Model implements
 
     /**
      * Function to assign the given roles to the given sites
-     *
-     * @param BackedEnum|int|array|string|Collection|Permission $permissions
-     * @param array|int $sites
-     *
-     * @return User
      */
     public function assignPermissionsToSites(BackedEnum|Collection|int|array|string|Permission $permissions, array|int $sites): self
     {

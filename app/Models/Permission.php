@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
-use \Spatie\Permission\Models\Permission as SpatiePermission;
+use Spatie\Permission\Models\Permission as SpatiePermission;
 
-class Permission extends SpatiePermission
-{
-
-}
+class Permission extends SpatiePermission {}

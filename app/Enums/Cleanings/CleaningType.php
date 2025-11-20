@@ -23,7 +23,7 @@ enum CleaningType: string
 
     public function nextCleaningDate(Carbon $lastCleaning): Carbon
     {
-        return match($this) {
+        return match ($this) {
             self::DAILY => $lastCleaning->addDay(),
             self::WEEKLY => $lastCleaning->addWeek(),
             self::MONTHLY => $lastCleaning->addMonth(),
@@ -32,7 +32,7 @@ enum CleaningType: string
 
     public function frequencyInDays(): int
     {
-        return match($this) {
+        return match ($this) {
             self::DAILY => 1,
             self::WEEKLY => 7,
             self::MONTHLY => 30,

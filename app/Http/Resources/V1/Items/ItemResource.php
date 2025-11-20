@@ -30,7 +30,7 @@ class ItemResource extends JsonResource
             'currency' => $this->currency,
 
             // Relations (only if loaded)
-            'site' => $this->whenLoaded('site', fn() => [
+            'site' => $this->whenLoaded('site', fn () => [
                 'id' => $this->site->id,
                 'name' => $this->site->name,
             ]),

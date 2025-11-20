@@ -126,5 +126,5 @@ return [
     'company.export' => 'Export companies',
 
     // Special Permissions
-    'bypass.login' => 'Can bypass login when disabled'
+    'bypass.login' => 'Can bypass login when disabled',
 ];

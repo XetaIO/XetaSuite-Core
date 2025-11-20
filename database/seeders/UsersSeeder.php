@@ -13,7 +13,7 @@ class UsersSeeder extends Seeder
     {
         // Admin
         User::factory()->admin()->create([
-            'email' => 'admin@xetasuite.test'
+            'email' => 'admin@xetasuite.test',
         ]);
 
         // Staff

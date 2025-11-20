@@ -52,13 +52,11 @@ class Item extends Model
         'number_warning_enabled' => 'boolean',
         'number_warning_minimum' => 'integer',
         'number_critical_enabled' => 'boolean',
-        'number_critical_minimum' => 'integer'
+        'number_critical_minimum' => 'integer',
     ];
 
     /**
      * Get the site that owns the item.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -67,8 +65,6 @@ class Item extends Model
 
     /**
      * Get the supplier for the item.
-     *
-     * @return BelongsTo
      */
     public function supplier(): BelongsTo
     {
@@ -77,8 +73,6 @@ class Item extends Model
 
     /**
      * Get the materials for the item.
-     *
-     * @return BelongsToMany
      */
     public function materials(): BelongsToMany
     {
@@ -107,8 +101,6 @@ class Item extends Model
 
     /**
      * Get the recipients that will get the alert for the item.
-     *
-     * @return BelongsToMany
      */
     public function recipients(): BelongsToMany
     {
@@ -118,8 +110,6 @@ class Item extends Model
 
     /**
      * Get the user that created the item.
-     *
-     * @return BelongsTo
      */
     public function createdBy(): BelongsTo
     {
@@ -128,8 +118,6 @@ class Item extends Model
 
     /**
      * Get the user that edited the part.
-     *
-     * @return HasOne
      */
     public function editedBy(): HasOne
     {
@@ -138,10 +126,6 @@ class Item extends Model
 
     /**
      * Get the current price for the item, optionally filtered by supplier.
-     *
-     * @param int|null $supplierId
-     *
-     * @return ItemPrice|null
      */
     public function getCurrentPrice(?int $supplierId = null): ?ItemPrice
     {

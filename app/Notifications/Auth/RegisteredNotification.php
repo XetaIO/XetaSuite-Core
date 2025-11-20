@@ -20,7 +20,6 @@ class RegisteredNotification extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param User $notifiable
      *
      * @return array<int, string>
      */
@@ -31,31 +30,23 @@ class RegisteredNotification extends Notification
 
     /**
      * Build the mail representation of the notification.
-     *
-     * @param User $notifiable
-     *
-     * @return MailMessage
      */
     public function toMail(User $notifiable): MailMessage
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
-        return (new MailMessage())
-            ->greeting(new HtmlString('<strong>Welcome to the ' . config('APP_NAME') . ', ' . $notifiable->full_name . ' !</strong>'))
-            ->line(new HtmlString('Your account has just been created on the website ' . config('APP_NAME') . ' .'))
+        return (new MailMessage)
+            ->greeting(new HtmlString('<strong>Welcome to the '.config('APP_NAME').', '.$notifiable->full_name.' !</strong>'))
+            ->line(new HtmlString('Your account has just been created on the website '.config('APP_NAME').' .'))
             ->line(new HtmlString('Before you can log in to the site, you must create a password for your account.'))
             ->action('Create my password', $verificationUrl)
             ->level('primary')
             ->line(new HtmlString('<strong>Note: Never share your password with anyone. The IT team does not need your password to interact with your account if they need to.</strong>'))
-            ->subject('Welcome to the ' . config('APP_NAME') . ', ' . $notifiable->full_name . ' !');
+            ->subject('Welcome to the '.config('APP_NAME').', '.$notifiable->full_name.' !');
     }
 
     /**
      * Get the verification URL for the given notifiable.
-     *
-     * @param User $notifiable
-     *
-     * @return string
      */
     protected function verificationUrl(User $notifiable): string
     {

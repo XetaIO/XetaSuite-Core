@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace XetaSuite\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use XetaSuite\Http\Resources\V1\Items\ItemResource;
-use XetaSuite\Http\Resources\V1\Items\ItemDetailResource;
 use XetaSuite\Http\Resources\V1\Items\ItemDashboardResource;
+use XetaSuite\Http\Resources\V1\Items\ItemDetailResource;
+use XetaSuite\Http\Resources\V1\Items\ItemResource;
 use XetaSuite\Models\Item;
 
 /**
@@ -17,7 +17,6 @@ use XetaSuite\Models\Item;
  * GET /api/items/{id}                ItemDetailResource            All the details
  * GET /api/dashboard/items    ItemDashboardResource    Alerts + key stats
  */
-
 class ItemController extends Controller
 {
     /**
@@ -40,8 +39,8 @@ class ItemController extends Controller
             'site',
             'supplier',
             'createdBy',
-            'prices' => fn($q) => $q->limit(10),
-            'movements' => fn($q) => $q->limit(20),
+            'prices' => fn ($q) => $q->limit(10),
+            'movements' => fn ($q) => $q->limit(20),
             'materials',
         ]);
 
@@ -54,11 +53,11 @@ class ItemController extends Controller
     public function dashboard(): AnonymousResourceCollection
     {
         $items = Item::with('site')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('number_warning_enabled', true)
                     ->whereRaw('(item_entry_total - item_exit_total) <= number_warning_minimum');
             })
-            ->orWhere(function($query) {
+            ->orWhere(function ($query) {
                 $query->where('number_critical_enabled', true)
                     ->whereRaw('(item_entry_total - item_exit_total) <= number_critical_minimum');
             })

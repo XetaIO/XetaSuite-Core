@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
-use \Spatie\Permission\Models\Role as SpatieRole;
+use Spatie\Permission\Models\Role as SpatieRole;
 use XetaSuite\Models\Presenters\RolePresenter;
 
 class Role extends SpatieRole
@@ -19,5 +19,4 @@ class Role extends SpatieRole
     protected $appends = [
         'formatted_color',
     ];
-
 }

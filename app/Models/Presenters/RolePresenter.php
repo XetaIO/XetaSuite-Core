@@ -10,15 +10,11 @@ trait RolePresenter
 {
     /**
      * The default color used for a role without color.
-     *
-     * @var string
      */
     protected string $defaultColor = '';
 
     /**
      * Get the color of the role.
-     *
-     * @return Attribute
      */
     protected function formattedColor(): Attribute
     {
@@ -26,7 +22,7 @@ trait RolePresenter
             get: function () {
                 $color = $this->color ?: $this->defaultColor;
 
-                return 'color:' . $color . ';';
+                return 'color:'.$color.';';
             }
         );
     }

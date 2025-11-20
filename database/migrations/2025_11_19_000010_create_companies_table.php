@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use XetaSuite\Models\User;
 
 return new class extends Migration
@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('created_by_name', 100)
                 ->nullable()
                 ->comment('The name of the user who created the company if the user is deleted.');
-
 
             $table->string('name')->unique();
             $table->text('description')->nullable();

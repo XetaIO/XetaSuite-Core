@@ -11,18 +11,16 @@ use XetaSuite\Http\Resources\V1\Users\UserResource;
  | API Routes
  |--------------------------------------------------------------------------
  */
-Route::group(['prefix'    => 'v1', 'middleware' => 'auth:sanctum'], function() {
+Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
-        // Get authenticated user
-        Route::get('/auth/user', function (Request $request) {
-            return new UserResource($request->user());
-        });
+    // Get authenticated user
+    Route::get('/auth/user', function (Request $request) {
+        return new UserResource($request->user());
+    });
 
-        // Incidents
-        //Route::middleware('auth:sanctum')->apiResource('incidents', \App\Http\Controllers\Api\V1\IncidentController::class);
+    // Incidents
+    // Route::middleware('auth:sanctum')->apiResource('incidents', \App\Http\Controllers\Api\V1\IncidentController::class);
 
-        // ...
+    // ...
 
 });
-
-

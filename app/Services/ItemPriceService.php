@@ -71,7 +71,7 @@ class ItemPriceService
             ->where('effective_date', '<=', $endDate)
             ->first();
 
-        if (!$startPrice || !$endPrice) {
+        if (! $startPrice || ! $endPrice) {
             return [
                 'start_price' => $startPrice?->price ?? 0,
                 'end_price' => $endPrice?->price ?? 0,

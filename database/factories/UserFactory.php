@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use XetaSuite\Models\Cleaning;
 use XetaSuite\Models\Maintenance;
-use XetaSuite\Models\User;
 use XetaSuite\Models\Site;
+use XetaSuite\Models\User;
 
 class UserFactory extends Factory
 {
@@ -33,7 +33,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
             'office_phone' => $this->faker->optional()->phoneNumber(),
-            'cell_phone'   => $this->faker->optional()->phoneNumber(),
+            'cell_phone' => $this->faker->optional()->phoneNumber(),
             'remember_token' => Str::random(10),
             'current_site_id' => null,
             'end_employment_contract' => null,

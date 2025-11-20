@@ -3,7 +3,6 @@
 namespace XetaSuite\Models\Presenters;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use XetaSuite\Models\ItemPrice;
 
 trait ItemPresenter
 {
@@ -78,7 +77,7 @@ trait ItemPresenter
     protected function stockStatusColor(): Attribute
     {
         return Attribute::make(
-            get: fn () => match($this->stock_status) {
+            get: fn () => match ($this->stock_status) {
                 'critical' => 'red',
                 'warning' => 'orange',
                 'empty' => 'gray',
@@ -94,7 +93,7 @@ trait ItemPresenter
     protected function stockStatusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => match ($this->stock_status) {
+            get: fn () => match ($this->stock_status) {
                 'critical' => 'Stock critical',
                 'warning' => 'Stock low',
                 'empty' => 'Out of stock',
@@ -142,7 +141,7 @@ trait ItemPresenter
     protected function formattedPrice(): Attribute
     {
         return Attribute::make(
-            get: fn () => number_format($this->purchase_price, 2, ',', ' ') . ' €'
+            get: fn () => number_format($this->purchase_price, 2, ',', ' ').' €'
         );
     }
 
@@ -152,7 +151,7 @@ trait ItemPresenter
     protected function formattedStockValue(): Attribute
     {
         return Attribute::make(
-            get: fn () => number_format($this->stock_value, 2, ',', ' ') . ' €'
+            get: fn () => number_format($this->stock_value, 2, ',', ' ').' €'
         );
     }
 
@@ -163,7 +162,7 @@ trait ItemPresenter
     {
         return Attribute::make(
             get: function () {
-                if (!$this->number_warning_enabled) {
+                if (! $this->number_warning_enabled) {
                     return 0;
                 }
 

@@ -2,15 +2,14 @@
 
 namespace XetaSuite\Services;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Supplier;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 /**
- *
  * // 1. Changement de prix
  * $priceService = app(ItemPriceService::class);
  * $priceService->updatePrice(
@@ -64,7 +63,6 @@ use Carbon\Carbon;
  * );
  * // Résultat : ['start_price' => 20.00, 'end_price' => 25.50, 'variation' => 5.50, 'variation_percent' => 27.5]
  */
-
 class ItemMovementService
 {
     /**
@@ -107,13 +105,13 @@ class ItemMovementService
 
             // Si le prix a changé, créer un nouvel historique de prix
             $currentPrice = $item->getCurrentPrice($supplier?->id);
-            if (!$currentPrice || $currentPrice->price != $unitPrice) {
+            if (! $currentPrice || $currentPrice->price != $unitPrice) {
                 app(ItemPriceService::class)->updatePrice(
                     $item,
                     $unitPrice,
                     $supplier,
                     $movementDate?->toDateString(),
-                    "Prix mis à jour suite à une entrée de stock"
+                    'Prix mis à jour suite à une entrée de stock'
                 );
             }
 
@@ -215,7 +213,7 @@ class ItemMovementService
     {
         $currentStock = $item->getCurrentStock();
 
-        return match($method) {
+        return match ($method) {
             // Méthode du prix actuel
             'current' => $currentStock * ($item->getCurrentPrice()?->price ?? 0),
 
