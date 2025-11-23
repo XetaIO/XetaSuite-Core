@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace XetaSuite\Models\Presenters;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;

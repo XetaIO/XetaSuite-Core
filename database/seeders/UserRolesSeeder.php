@@ -73,4 +73,3 @@ class UserRolesSeeder extends Seeder
         $this->command->info('User roles assigned successfully!');*/
     }
 }
-

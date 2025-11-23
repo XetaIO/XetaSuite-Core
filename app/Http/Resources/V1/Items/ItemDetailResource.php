@@ -81,15 +81,21 @@ class ItemDetailResource extends JsonResource
             ]),
 
             // Price history (if loaded)
-            'price_history' => $this->whenLoaded('prices', fn () => ItemPriceResource::collection($this->prices)
+            'price_history' => $this->whenLoaded(
+                'prices',
+                fn () => ItemPriceResource::collection($this->prices)
             ),
 
             // History of movements
-            'movement_history' => $this->whenLoaded('movements', fn () => ItemMovementResource::collection($this->movements)
+            'movement_history' => $this->whenLoaded(
+                'movements',
+                fn () => ItemMovementResource::collection($this->movements)
             ),
 
             // Linked materials
-            'materials' => $this->whenLoaded('materials', fn () => $this->materials->map(fn ($material) => [
+            'materials' => $this->whenLoaded(
+                'materials',
+                fn () => $this->materials->map(fn ($material) => [
                 'id' => $material->id,
                 'name' => $material->name,
             ])

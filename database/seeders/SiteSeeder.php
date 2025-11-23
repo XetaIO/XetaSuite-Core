@@ -19,4 +19,3 @@ class SiteSeeder extends Seeder
         Site::factory()->count(5)->create();
     }
 }
-

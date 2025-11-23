@@ -10,8 +10,7 @@ use XetaSuite\Models\Material;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('item_movements', function (Blueprint $table) {

@@ -55,7 +55,7 @@ class MaintenanceFactory extends Factory
             'status' => $this->faker->randomElement(MaintenanceStatus::cases())->value,
 
             'started_at' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
-            'resolved_at'=> $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
+            'resolved_at' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
 
             'incident_count' => $this->faker->numberBetween(0, 5),
             'company_count'  => $this->faker->numberBetween(0, 3)

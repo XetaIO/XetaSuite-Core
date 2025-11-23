@@ -16,7 +16,6 @@ use XetaSuite\Observers\MaterialObserver;
 #[ObservedBy([MaterialObserver::class])]
 class Material extends Model
 {
-
     use HasFactory;
 
     /**
@@ -70,7 +69,7 @@ class Material extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class,'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'id', 'created_by_id');
     }
 
     /**

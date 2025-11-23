@@ -87,7 +87,7 @@ class Incident extends Model
      */
     public function reporter(): BelongsTo
     {
-        return $this->belongsTo(User::class,'id', 'reported_by_id');
+        return $this->belongsTo(User::class, 'id', 'reported_by_id');
     }
 
     /**

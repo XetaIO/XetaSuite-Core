@@ -16,7 +16,6 @@ use XetaSuite\Enums\Maintenances\MaintenanceStatus;
 use XetaSuite\Enums\Maintenances\MaintenanceType;
 use XetaSuite\Observers\MaintenanceObserver;
 
-
 #[ObservedBy([MaintenanceObserver::class])]
 class Maintenance extends Model
 {
@@ -96,7 +95,7 @@ class Maintenance extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class,'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'id', 'created_by_id');
     }
 
     /**

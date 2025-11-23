@@ -9,8 +9,7 @@ use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */

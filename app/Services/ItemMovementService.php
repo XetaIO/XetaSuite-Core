@@ -79,7 +79,14 @@ class ItemMovementService
         ?Carbon $movementDate = null
     ): ItemMovement {
         return DB::transaction(function () use (
-            $item, $quantity, $unitPrice, $supplier, $invoiceNumber, $invoiceDate, $notes, $movementDate
+            $item,
+            $quantity,
+            $unitPrice,
+            $supplier,
+            $invoiceNumber,
+            $invoiceDate,
+            $notes,
+            $movementDate
         ) {
             $totalPrice = $quantity * $unitPrice;
 
@@ -131,7 +138,12 @@ class ItemMovementService
         ?Carbon $movementDate = null
     ): ItemMovement {
         return DB::transaction(function () use (
-            $item, $quantity, $material, $relatedModel, $notes, $movementDate
+            $item,
+            $quantity,
+            $material,
+            $relatedModel,
+            $notes,
+            $movementDate
         ) {
             // Vérifier le stock disponible
             if ($item->current_stock < $quantity) {

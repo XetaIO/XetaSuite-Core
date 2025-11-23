@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace XetaSuite\Observers;
 
-use Illuminate\Support\Facades\Auth;
 use XetaSuite\Models\Cleaning;
-use XetaSuite\Models\Material;
 
 class CleaningObserver
 {

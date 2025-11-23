@@ -9,8 +9,7 @@ use XetaSuite\Models\Site;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */

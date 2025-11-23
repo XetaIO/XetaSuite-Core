@@ -35,7 +35,7 @@ class RegisteredNotification extends Notification
     {
         $verificationUrl = $this->verificationUrl($notifiable);
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->greeting(new HtmlString('<strong>Welcome to the '.config('APP_NAME').', '.$notifiable->full_name.' !</strong>'))
             ->line(new HtmlString('Your account has just been created on the website '.config('APP_NAME').' .'))
             ->line(new HtmlString('Before you can log in to the site, you must create a password for your account.'))

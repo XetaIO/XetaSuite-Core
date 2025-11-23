@@ -40,7 +40,7 @@ trait MustSetupPassword
      */
     public function sendEmailRegisteredNotification()
     {
-        $this->notify(new RegisteredNotification);
+        $this->notify(new RegisteredNotification());
     }
 
     /**

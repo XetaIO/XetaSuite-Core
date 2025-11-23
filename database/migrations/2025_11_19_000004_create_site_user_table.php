@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */

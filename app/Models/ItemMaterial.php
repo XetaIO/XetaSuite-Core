@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ItemMaterial extends Pivot
 {
-
     /**
      * Get the material that owns the ItemMaterial
      *

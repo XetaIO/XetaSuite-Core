@@ -50,7 +50,7 @@ class Site extends Model
     {
         return $this->belongsToMany(User::class)
             ->withPivot('manager')
-            ->where('manager',true)
+            ->where('manager', true)
             ->withTrashed();
     }
 

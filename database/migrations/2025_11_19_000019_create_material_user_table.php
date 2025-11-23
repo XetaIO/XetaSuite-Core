@@ -8,7 +8,7 @@ use Illuminate\Database\Migrations\Migration;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\User;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */

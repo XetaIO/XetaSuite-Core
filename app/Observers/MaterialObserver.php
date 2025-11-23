@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace XetaSuite\Observers;
 
 use Exception;
-use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Material;
 
 class MaterialObserver
@@ -19,10 +18,10 @@ class MaterialObserver
      */
     public function deleting(Material $material): void
     {
-         if ($material->cleanings()->exists()
-             || $material->incidents()->exists()
-             || $material->maintenances()->exists()) {
-             throw new Exception('It is impossible to delete the material as long as it has linked records.');
+        if ($material->cleanings()->exists()
+            || $material->incidents()->exists()
+            || $material->maintenances()->exists()) {
+            throw new Exception('It is impossible to delete the material as long as it has linked records.');
         }
     }
 
