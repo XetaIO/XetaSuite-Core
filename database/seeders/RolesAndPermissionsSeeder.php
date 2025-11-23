@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use XetaSuite\Models\Permission;
 use XetaSuite\Models\Role;
+use XetaSuite\Models\Site;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         $permissions = require database_path('seeders/data/permissions.php');
 
-        // Create / sync permissions
+        // Create / sync permissions (global, not team-specific)
         foreach ($permissions as $name => $description) {
             Permission::updateOrCreate(
                 ['name' => $name, 'guard_name' => 'web'],
@@ -22,31 +23,42 @@ class RolesAndPermissionsSeeder extends Seeder
             );
         }
 
-        // Define roles
-        $roles = [
+        // Define roles and their permissions
+        $rolesDefinition = [
             'admin' => array_keys($permissions),
 
             'manager' => [
-                'users.view', 'materials.view', 'incidents.view',
-                'incidents.update', 'incidents.close',
-                'maintenance.view',
+                'user.view', 'material.view', 'incident.view',
+                'incident.update', 'maintenance.view',
             ],
 
             'technician' => [
-                'incidents.view', 'incidents.update', 'maintenance.view',
+                'incident.view', 'incident.update', 'maintenance.view',
             ],
 
             'operator' => [
-                'incidents.view', 'materials.view', 'items.view',
+                'incident.view', 'material.view', 'item.view',
             ],
         ];
 
-        foreach ($roles as $roleName => $rolePermissions) {
-            $role = Role::firstOrCreate(
-                ['name' => $roleName, 'guard_name' => 'web']
-            );
+        // Get all sites
+        $sites = Site::all();
 
-            $role->syncPermissions($rolePermissions);
+        // Create roles for each site
+        foreach ($sites as $site) {
+            foreach ($rolesDefinition as $roleName => $rolePermissions) {
+                $role = Role::updateOrCreate(
+                    [
+                        'name' => $roleName,
+                        'site_id' => $roleName === 'admin' ? null : $site->id,
+                        'guard_name' => 'web',
+                    ],
+                    ['description' => ucfirst($roleName) . ' role for ' . $site->name]
+                );
+
+                // Sync permissions for this role and site
+                $role->syncPermissions($rolePermissions);
+            }
         }
     }
 }

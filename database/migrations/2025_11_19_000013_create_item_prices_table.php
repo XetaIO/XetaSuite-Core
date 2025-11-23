@@ -39,7 +39,6 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Index to get the price fast
             $table->index(['item_id', 'effective_date']);
         });
     }

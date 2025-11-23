@@ -22,15 +22,15 @@ return new class extends Migration
             $table->foreignIdFor(Site::class)
                 ->nullable()
                 ->constrained()
-                ->nullOnDelete();
-            $table->string('site_name', 150)
-                ->nullable()
-                ->comment('The name of the site if the site is deleted.');
+                ->restrictOnDelete();
 
             $table->foreignIdFor(Material::class)
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
+            $table->string('material_name', 100)
+                ->nullable()
+                ->comment('The name of the material if the material is deleted.');
 
             $table->foreignIdFor(User::class, 'reported_by_id')
                 ->nullable()
@@ -40,7 +40,7 @@ return new class extends Migration
                 ->nullable()
                 ->comment('The name of the user who reported the incident if the user is deleted.');
 
-            $table->foreignIdFor(User::class, 'edited_user_id')
+            $table->foreignIdFor(User::class, 'edited_by_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();

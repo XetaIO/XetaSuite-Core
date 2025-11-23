@@ -40,7 +40,9 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            $table->string('material_name', 100)->nullable();
+            $table->string('material_name', 100)
+                ->nullable()
+                ->comment('The name of the material if the material is deleted.');
 
             // For linking to maintenance
             $table->nullableMorphs('movable'); // movable_type, movable_id

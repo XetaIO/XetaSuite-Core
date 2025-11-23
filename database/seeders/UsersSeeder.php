@@ -17,6 +17,6 @@ class UsersSeeder extends Seeder
         ]);
 
         // Staff
-        User::factory()->count(20)->create();
+        User::factory()->count(3)->create();
     }
 }

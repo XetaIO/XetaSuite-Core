@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -29,9 +30,11 @@ return new class extends Migration
             $table->string('country', 100)->nullable();
 
             $table->timestamps();
-
-            $table->unique(['is_headquarters'])->where('is_headquarters', true); // Ensure only one headquarters site exists
         });
+
+        // Create a partial unique index on is_headquarters where is_headquarters = true
+        // This ensures only one headquarters site exists
+        DB::statement('CREATE UNIQUE INDEX unique_headquarters ON sites (is_headquarters) WHERE is_headquarters = true');
     }
 
     /**

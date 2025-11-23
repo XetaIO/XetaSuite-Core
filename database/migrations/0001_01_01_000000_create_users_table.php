@@ -5,8 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-// use XetaSuite\Models\User; // inutile ici, on référence la table directement
+use XetaSuite\Models\User;
 
 return new class extends Migration
 {
@@ -41,9 +40,9 @@ return new class extends Migration
             $table->dateTime('last_login_date')->nullable();
             $table->timestamp('password_setup_at')->nullable();
 
-            $table->foreignId('deleted_user_id')
+            $table->foreignIdFor(User::class, 'deleted_by_id')
                 ->nullable()
-                ->constrained('users')
+                ->constrained()
                 ->nullOnDelete();
 
             $table->timestamps();

@@ -14,6 +14,8 @@ use XetaSuite\Models\User;
 
 class UserFactory extends Factory
 {
+    protected $model = User::class;
+
     /**
      * The current password being used by the factory.
      */
@@ -22,15 +24,15 @@ class UserFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function definition(): array
     {
         return [
-            'username' => fake()->unique()->userName(),
-            'first_name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
-            'email' => fake()->unique()->safeEmail(),
+            'username' => $this->faker->unique()->userName(),
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'email' => $this->faker->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
             'office_phone' => $this->faker->optional()->phoneNumber(),
             'cell_phone' => $this->faker->optional()->phoneNumber(),
@@ -43,6 +45,8 @@ class UserFactory extends Factory
 
     /**
      * Indicate that the model's password should be unset.
+     *
+     * @return UserFactory
      */
     public function unset(): static
     {
@@ -53,30 +57,38 @@ class UserFactory extends Factory
 
     /**
      * Assign a role after creation (state for admin users)
+     *
+     * @return UserFactory
      */
     public function admin(): static
     {
         return $this->afterCreating(function (User $user) {
             if (method_exists($user, 'assignRole')) {
-                $user->assignRole('admin');
+                $user->assignRolesToSites('admin', Site::all()->pluck('id')->toArray());
             }
         });
     }
 
     /**
-     * State : User with a current site
+     * Forces the use of an existing site (or site ID).
+     *
+     * @param Site|int $site
+     *
+     * @return UserFactory
      */
-    public function withCurrentSite(): static
+    public function withSite(Site|int $site): static
     {
-        return $this->state(function () {
-            return [
-                'current_site_id' => Site::factory(),
-            ];
-        });
+        $siteId = $site instanceof Site ? $site->id : $site;
+
+        return $this->state(fn () => [
+            'current_site_id' => $siteId,
+        ]);
     }
 
     /**
-     * State : User soft deleted
+     * User soft deleted
+     *
+     * @return UserFactory
      */
     public function deleted(): static
     {
@@ -89,6 +101,10 @@ class UserFactory extends Factory
 
     /**
      * State : User with cleanings
+     *
+     * @param int $count
+     *
+     * @return UserFactory
      */
     public function withCleanings(int $count = 5): static
     {
@@ -101,6 +117,10 @@ class UserFactory extends Factory
 
     /**
      * State : User with incidents created by him
+     *
+     * @param int $count
+     *
+     * @return UserFactory
      */
     public function withIncidents(int $count = 3): static
     {
@@ -113,6 +133,10 @@ class UserFactory extends Factory
 
     /**
      * State : User with maintenances created by him
+     *
+     * @param int $count
+     *
+     * @return UserFactory
      */
     public function withMaintenances(int $count = 3): static
     {
@@ -125,6 +149,10 @@ class UserFactory extends Factory
 
     /**
      * State : User acting as operator (many-to-many)
+     *
+     * @param int $count
+     *
+     * @return UserFactory
      */
     public function withMaintenanceOperators(int $count = 3): static
     {
@@ -136,6 +164,10 @@ class UserFactory extends Factory
 
     /**
      * State : User assigned to multiple sites (BelongsToMany)
+     *
+     * @param int $count
+     *
+     * @return UserFactory
      */
     public function withSites(int $count = 2): static
     {

@@ -15,7 +15,7 @@ class UserObserver
     public function deleting(User $user): void
     {
         if (Auth::check()) {
-            $user->deleted_user_id = Auth::id();
+            $user->deleted_by_id = Auth::id();
             $user->saveQuietly();
         }
     }
@@ -25,7 +25,7 @@ class UserObserver
      */
     public function restoring(User $user): void
     {
-        $user->deleted_user_id = null;
+        $user->deleted_by_id = null;
         $user->saveQuietly();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
@@ -18,6 +19,10 @@ return new class extends Migration
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
 
+            $table->foreignIdFor(Site::class)
+                ->constrained()
+                ->restrictOnDelete();
+
             $table->foreignIdFor(User::class, 'created_by_id')
                 ->nullable()
                 ->constrained('users')
@@ -30,8 +35,8 @@ return new class extends Migration
                 ->constrained()
                 ->restrictOnDelete();
 
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('name')->index();
+            $table->text('description')->index()->nullable();
 
             $table->unsignedInteger('qrcode_flash_count')->default(0);
             $table->unsignedInteger('incident_count')->default(0);
@@ -42,9 +47,9 @@ return new class extends Migration
             $table->boolean('cleaning_alert')->default(false);
             $table->boolean('cleaning_alert_email')->default(false);
             $table->tinyInteger('cleaning_alert_frequency_repeatedly')->default(1);
+            $table->string('cleaning_alert_frequency_type', 50)->default('daily');
             $table->timestamp('last_cleaning_at')->nullable();
             $table->timestamp('last_cleaning_alert_send_at')->nullable();
-            $table->string('cleaning_alert_frequency_type', 50)->default('daily');
 
             $table->timestamps();
 

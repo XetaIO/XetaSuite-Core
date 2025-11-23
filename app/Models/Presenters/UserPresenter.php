@@ -60,16 +60,4 @@ trait UserPresenter
             }
         );
     }
-
-    /**
-     * Get the user show url.
-     */
-    public function getShowUrlAttribute(): string
-    {
-        if ($this->getKey() === null) {
-            return '';
-        }
-
-        return route('users.show', $this);
-    }
 }

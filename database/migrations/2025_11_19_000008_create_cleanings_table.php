@@ -19,6 +19,10 @@ return new class extends Migration
         Schema::create('cleanings', function (Blueprint $table) {
             $table->id();
 
+            $table->foreignIdFor(Site::class)
+                ->constrained()
+                ->restrictOnDelete();
+
             $table->foreignIdFor(Material::class)
                 ->nullable()
                 ->constrained()
@@ -34,10 +38,6 @@ return new class extends Migration
             $table->string('created_by_name', 100)
                 ->nullable()
                 ->comment('The name of the user who created the cleaning if the user is deleted.');
-
-            $table->foreignIdFor(Site::class)
-                ->constrained()
-                ->restrictOnDelete();
 
             $table->foreignIdFor(User::class, 'edited_user_id')
                 ->nullable()

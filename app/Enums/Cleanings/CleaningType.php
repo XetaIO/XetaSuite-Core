@@ -4,38 +4,28 @@ declare(strict_types=1);
 
 namespace XetaSuite\Enums\Cleanings;
 
-use Illuminate\Support\Carbon;
-
 enum CleaningType: string
 {
     case DAILY = 'daily';
     case WEEKLY = 'weekly';
+    case BIMONTHLY = 'bimonthly';
     case MONTHLY = 'monthly';
+    case QUARTERLY = 'quarterly';
+    case BIANNUAL = 'biannual';
+    case ANNUEL = 'annual';
+    case CASUAL = 'casual';
 
     public function label(): string
     {
         return match ($this) {
             self::DAILY => 'Daily',
             self::WEEKLY => 'Weekly',
-            self::MONTHLY => 'Monthly'
-        };
-    }
-
-    public function nextCleaningDate(Carbon $lastCleaning): Carbon
-    {
-        return match ($this) {
-            self::DAILY => $lastCleaning->addDay(),
-            self::WEEKLY => $lastCleaning->addWeek(),
-            self::MONTHLY => $lastCleaning->addMonth(),
-        };
-    }
-
-    public function frequencyInDays(): int
-    {
-        return match ($this) {
-            self::DAILY => 1,
-            self::WEEKLY => 7,
-            self::MONTHLY => 30,
+            self::BIMONTHLY => 'Bi-monthly',
+            self::MONTHLY => 'Monthly',
+            self::QUARTERLY => 'Quarterly',
+            self::BIANNUAL => 'Bi-annual',
+            self::ANNUEL => 'Annual',
+            self::CASUAL => 'Casual',
         };
     }
 }

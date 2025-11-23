@@ -42,7 +42,7 @@ return new class extends Migration
                 ->nullable()
                 ->comment('The supplier reference for this item.');
 
-            $table->foreignIdFor(User::class, 'edited_user_id')
+            $table->foreignIdFor(User::class, 'edited_by_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();

@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class ItemMovement extends Model
 {
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'item_id',
         'type',
@@ -30,6 +38,11 @@ class ItemMovement extends Model
         'movement_date',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
     protected $casts = [
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
@@ -38,29 +51,65 @@ class ItemMovement extends Model
         'movement_date' => 'datetime',
     ];
 
+    /**
+     * Get the item associated with the item movement.
+     *
+     * @return BelongsTo
+     */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
 
+    /**
+     * Get the supplier associated with the item movement. (Entries)
+     *
+     * @return BelongsTo
+     */
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
     }
 
+    /**
+     * Get the material associated with the item movement.
+     *
+     * @return BelongsTo
+     */
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class);
     }
 
+    /**
+     * The movable model associated with the item movement.
+     *
+     * @return MorphTo
+     */
     public function movable(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo(); // Maintenance
     }
 
-    public function createdBy(): BelongsTo
+    /**
+     * The creator of the item movement.
+     *
+     * @return BelongsTo
+     */
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id');
+        return $this->belongsTo(User::class, 'id', 'created_by_id');
+    }
+
+    /**
+     * Get the maintenance associated with the item movement. (Exits)
+     *
+     * @return BelongsTo
+     */
+    public function maintenance(): BelongsTo
+    {
+        return $this->belongsTo(Maintenance::class, 'movable_id')
+            ->where('movable_type', Maintenance::class);
     }
 
     // Scopes

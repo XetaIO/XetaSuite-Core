@@ -59,25 +59,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
-    protected $appends = [
-        'avatar',
-        'full_name',
-
-        // Session Model
-        'online',
-
-        // Role Model
-        'level',
-    ];
-
-    /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array
      */
     protected $hidden = [
         'password',
@@ -86,19 +70,20 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * The attributes that should be cast.
+     *
+     * @var array
      */
-    protected function casts(): array
-    {
-        return [
-            'password_setup_at' => 'datetime',
-            'password' => 'hashed',
-            'last_login_date' => 'datetime',
-            'end_employment_contract' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'password_setup_at' => 'datetime',
+        'password' => 'hashed',
+        'last_login_date' => 'datetime',
+        'end_employment_contract' => 'datetime'
+    ];
 
     /**
      * Get the cleanings created by the user.
+     *
+     * @return HasMany
      */
     public function cleanings(): HasMany
     {
@@ -107,6 +92,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the incidents created by the user.
+     *
+     * @return HasMany
      */
     public function incidents(): HasMany
     {
@@ -115,6 +102,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the maintenances created by the user.
+     *
+     * @return HasMany
      */
     public function maintenances(): HasMany
     {
@@ -122,7 +111,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Get the maintenances assigned to user thought operators
+     * Get the maintenance's operators for the user.
+     *
+     * @return BelongsToMany
      */
     public function maintenancesOperators(): BelongsToMany
     {
@@ -132,6 +123,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the settings for the user.
+     *
+     * @return MorphMany
      */
     public function settings(): MorphMany
     {
@@ -139,7 +132,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Get the sites assigned to users.
+     * Get the sites for the user.
+     *
+     * @return BelongsToMany
      */
     public function sites(): BelongsToMany
     {
@@ -148,15 +143,31 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Get the user that deleted the user.
+     * Get the user who deleted the user.
+     *
+     * @return HasOne
      */
-    public function deletedUser(): HasOne
+    public function deleter(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'deleted_user_id')->withTrashed();
+        return $this->hasOne(User::class, 'id', 'deleted_by_id')->withTrashed();
     }
 
     /**
-     * Return the first site id of the user or null if no site.
+     * Get the notifications for the user.
+     *
+     * @return MorphMany
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->orderBy('read_at', 'asc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the first site ID for the user.
+     *
+     * @return int|null
      */
     public function getFirstSiteId(): ?int
     {
@@ -170,17 +181,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Get the notifications for the user.
-     */
-    public function notifications(): MorphMany
-    {
-        return $this->morphMany(DatabaseNotification::class, 'notifiable')
-            ->orderBy('read_at', 'asc')
-            ->orderBy('created_at', 'desc');
-    }
-
-    /**
      * Function to assign the given roles to the given sites
+     *
+     * @param BackedEnum|Collection|int|array|string|Role $roles
+     * @param array|int $sites
+     *
+     * @return $this
      */
     public function assignRolesToSites(BackedEnum|Collection|int|array|string|Role $roles, array|int $sites): self
     {
@@ -202,7 +208,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Function to assign the given roles to the given sites
+     * Function to assign the given permissions to the given sites
+     *
+     * @param BackedEnum|Collection|int|array|string|Permission $permissions
+     * @param array|int $sites
+     *
+     * @return $this
      */
     public function assignPermissionsToSites(BackedEnum|Collection|int|array|string|Permission $permissions, array|int $sites): self
     {

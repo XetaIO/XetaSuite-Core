@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Models;
 
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,12 +17,13 @@ use XetaSuite\Observers\ItemObserver;
 #[ObservedBy([ItemObserver::class])]
 class Item extends Model
 {
+    use HasFactory;
     use ItemPresenter;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'site_id',
@@ -45,7 +47,7 @@ class Item extends Model
     /**
      * The attributes that should be cast.
      *
-     * @return array
+     * @var array
      */
     protected $casts = [
         'purchase_price' => 'decimal:2',
@@ -57,6 +59,8 @@ class Item extends Model
 
     /**
      * Get the site that owns the item.
+     *
+     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -64,7 +68,9 @@ class Item extends Model
     }
 
     /**
-     * Get the supplier for the item.
+     * Get the supplier that owns the item.
+     *
+     * @return BelongsTo
      */
     public function supplier(): BelongsTo
     {
@@ -72,17 +78,21 @@ class Item extends Model
     }
 
     /**
-     * Get the materials for the item.
+     * The materials that belong to the item.
+     *
+     * @return BelongsToMany
      */
     public function materials(): BelongsToMany
     {
         return $this->belongsToMany(Material::class)
-            ->using(MaterialItem::class)
+            ->using(ItemMaterial::class)
             ->withTimestamps();
     }
 
     /**
-     * Get the movement history for the item.
+     * Get the item movements for the item.
+     *
+     * @return HasMany
      */
     public function movements(): HasMany
     {
@@ -91,7 +101,9 @@ class Item extends Model
     }
 
     /**
-     * Get the price history for the item.
+     * Get the item prices for the item.
+     *
+     * @return HasMany
      */
     public function prices(): HasMany
     {
@@ -100,7 +112,9 @@ class Item extends Model
     }
 
     /**
-     * Get the recipients that will get the alert for the item.
+     * Get the recipients for the item.
+     *
+     * @return BelongsToMany
      */
     public function recipients(): BelongsToMany
     {
@@ -109,23 +123,31 @@ class Item extends Model
     }
 
     /**
-     * Get the user that created the item.
+     * The creator of the item.
+     *
+     * @return BelongsTo
      */
-    public function createdBy(): BelongsTo
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id');
+        return $this->belongsTo(User::class,'id', 'created_by_id');
     }
 
     /**
-     * Get the user that edited the part.
+     * The editor of the item.
+     *
+     * @return HasOne
      */
-    public function editedBy(): HasOne
+    public function editor(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'edited_user_id');
+        return $this->hasOne(User::class, 'id', 'edited_by_id');
     }
 
     /**
      * Get the current price for the item, optionally filtered by supplier.
+     *
+     * @param int|null $supplierId
+     *
+     * @return ItemPrice|null
      */
     public function getCurrentPrice(?int $supplierId = null): ?ItemPrice
     {
@@ -133,7 +155,7 @@ class Item extends Model
             return $this->current_price;
         }
 
-        // Sinon, query avec filtre
+        // Else, query with filter
         return $this->prices()
             ->where('effective_date', '<=', now())
             ->where('supplier_id', $supplierId)

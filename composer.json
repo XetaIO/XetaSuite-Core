@@ -34,6 +34,9 @@
         "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
+        "files": [
+            "app/helpers.php"
+        ],
         "psr-4": {
             "XetaSuite\\": "app/",
             "Database\\Factories\\": "database/factories/",
