@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use XetaSuite\Models\Supplier;
-use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 
 class SupplierFactory extends Factory
