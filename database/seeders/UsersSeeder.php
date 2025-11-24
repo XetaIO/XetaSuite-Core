@@ -16,7 +16,7 @@ class UsersSeeder extends Seeder
             'email' => 'admin@xetasuite.test',
         ]);
 
-        // Staff
+        // Other users
         User::factory()->count(3)->create();
     }
 }

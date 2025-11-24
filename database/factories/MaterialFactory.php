@@ -22,16 +22,11 @@ class MaterialFactory extends Factory
      */
     public function definition(): array
     {
-        $site = Site::factory()->create();
-        $zone = Zone::factory()
-            ->forSite($site)
-            ->create();
-
         return [
-            'site_id' => $site->id,
-            'zone_id' => $zone->id,
+            'site_id' => null,
+            'zone_id' => null,
 
-            'created_by_id' => User::factory()->create()->id,
+            'created_by_id' => null,
             'created_by_name' => null,
 
             'name' => $this->faker->unique()->word(),

@@ -30,25 +30,25 @@ class ZoneFactory extends Factory
     public function definition(): array
     {
         return [
-            'site_id' => Site::factory()->create()->id,
+            'site_id' => null,
             'parent_id' => null,
             'name' => $this->faker->unique()->word(),
-            'allow_material' => $this->faker->boolean(),
-            'material_count' => $this->faker->numberBetween(0, 50),
+            'allow_material' => false,
+            'material_count' => 0,
         ];
     }
 
     /**
      * Create a unique name for the site.
      *
-     * @param int $siteId
+     * @param Site|int $site
      *
      * @return ZoneFactory
      */
-    public function uniqueForSite(int $siteId): static
+    public function uniqueForSite(Site|int $site): static
     {
         return $this->state(fn () => [
-            'site_id' => $siteId,
+            'site_id' => $site instanceof Site ? $site->id : $site,
             'name' => $this->faker->unique()->word(),
         ]);
     }
@@ -68,8 +68,20 @@ class ZoneFactory extends Factory
     {
         return $this->state(fn () => [
             'parent_id' => $parent->id,
-            // Le parent et l’enfant partagent le même site.
+            // Parent and child share the same site.
             'site_id'   => $parent->site_id,
+        ]);
+    }
+
+    /**
+     * Enables the ability to add materials to this zone.
+     *
+     * @return ZoneFactory
+     */
+    public function withAllowMaterial(): static
+    {
+        return $this->state(fn () => [
+            'allow_material' => true
         ]);
     }
 
