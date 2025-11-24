@@ -19,27 +19,21 @@ class ZonesSeeder extends Seeder
 
         foreach ($sites as $site) {
             // Parent Zones
-            $site->zones()->createMany(
-                Zone::factory()
-                    ->forSite($site)
-                    ->count(random_int(1, 3))
-                    ->make()
-                    ->toArray()
-            );
+            Zone::factory()
+                ->forSite($site)
+                ->count(random_int(1, 3))
+                ->create();
 
             $site->refresh();
 
             // Child Zones
-            foreach (Zone::whereNull('parent_id')->where('site_id', $site->id)->get() as $parent) {
-                $site->zones()->createMany(
-                    Zone::factory()
-                        ->forSite($site)
-                        ->withParent($parent)
-                        ->withAllowMaterial()
-                        ->count(random_int(1, 3))
-                        ->make()
-                        ->toArray()
-                );
+            foreach ($site->zones()->whereNull('parent_id')->get() as $parent) {
+                Zone::factory()
+                    ->forSite($site)
+                    ->withParent($parent)
+                    ->withAllowMaterial()
+                    ->count(random_int(1, 3))
+                    ->create();
             }
         }
     }
