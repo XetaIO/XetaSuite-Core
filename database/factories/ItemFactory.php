@@ -44,7 +44,7 @@ class ItemFactory extends Factory
             'supplier_id' => $supplier->id,
             'supplier_name' => $supplier->name,
             'supplier_reference' => $this->faker->optional()->word(),
-            'edited_user_id' => User::factory()->create()->id,
+            'edited_by_id' => User::factory()->create()->id,
 
             'name' => $this->faker->unique()->word(),
             'description' => $this->faker->optional()->paragraph(),

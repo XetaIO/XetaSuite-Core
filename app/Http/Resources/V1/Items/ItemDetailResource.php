@@ -29,8 +29,7 @@ class ItemDetailResource extends JsonResource
                 'status_label' => $this->stock_status_label,
                 'in_stock' => $this->in_stock,
                 'value' => $this->stock_value,
-                'formatted_value' => $this->formatted_stock_value,
-                'percentage' => $this->stock_percentage,
+                'formatted_value' => $this->formatted_stock_value
             ],
 
             // Alertes
@@ -59,8 +58,7 @@ class ItemDetailResource extends JsonResource
                 'entry_count' => $this->item_entry_count,
                 'exit_count' => $this->item_exit_count,
                 'average_entry' => $this->average_entry_quantity,
-                'average_exit' => $this->average_exit_quantity,
-                'turnover_rate' => $this->turnover_rate,
+                'average_exit' => $this->average_exit_quantity
             ],
 
             // Relations

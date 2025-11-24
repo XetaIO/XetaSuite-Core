@@ -21,7 +21,6 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
-            'site_id' => Site::factory(),
             'name' => $this->faker->unique()->company(),
             'description' => $this->faker->optional()->sentence(),
             'created_by_id' => User::factory()->create()->id,
@@ -29,26 +28,7 @@ class SupplierFactory extends Factory
     }
 
     /**
-     * Forces the use of an existing site (or site ID).
-     *
-     * Example:
-     *     Supplier::factory()->forSite($site)->create();
-     *
-     * @param Site|int $site
-     *
-     * @return SupplierFactory
-     */
-    public function forSite(Site|int $site): static
-    {
-        $siteId = $site instanceof Site ? $site->id : $site;
-
-        return $this->state(fn () => [
-            'site_id' => $siteId,
-        ]);
-    }
-
-    /**
-     * Attributes a specific creator.
+     * Define a specific creator.
      *
      * Example:
      *     Supplier::factory()->createdBy($user)->create();

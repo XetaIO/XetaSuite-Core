@@ -34,7 +34,7 @@ class ItemDashboardResource extends JsonResource
             'quantity_to_warning_level' => $this->quantity_to_warning_level,
 
             // Stats clés
-            'turnover_rate' => $this->turnover_rate,
+            'average_entry_quantity' => $this->average_entry_quantity,
             'average_exit_quantity' => $this->average_exit_quantity,
 
             'site' => [

@@ -20,7 +20,7 @@ return [
     'user.update' => 'Update existing users',
     'user.delete' => 'Delete users',
     'user.restore' => 'Restore deleted users',
-    'user.assignDirectPermissions' => 'Assign direst permissions to users',
+    'user.assignDirectPermissions' => 'Assign direct permissions to users',
     'user.assignSites' => 'Assign sites to users',
 
     // Materials

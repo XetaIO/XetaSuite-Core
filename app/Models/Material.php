@@ -35,8 +35,7 @@ class Material extends Model
         'cleaning_alert_frequency_repeatedly',
         'cleaning_alert_frequency_type',
         'last_cleaning_at',
-        'last_cleaning_alert_send_at',
-        ''
+        'last_cleaning_alert_send_at'
     ];
 
     /**

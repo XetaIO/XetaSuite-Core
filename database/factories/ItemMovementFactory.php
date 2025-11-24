@@ -146,7 +146,7 @@ class ItemMovementFactory extends Factory
      *
      * @return ItemMovementFactory
      */
-    public function withSupplier(Supplier|int$supplier): static
+    public function withSupplier(Supplier|int $supplier): static
     {
         $supplierId = $supplier instanceof Supplier ? $supplier->id : $supplier;
 
