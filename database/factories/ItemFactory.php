@@ -34,21 +34,18 @@ class ItemFactory extends Factory
      */
     public function definition(): array
     {
-        $site      = Site::factory()->create();
-        $supplier  = Supplier::factory()->forSite($site)->create();
-
         return [
-            'site_id' => $site->id,
-            'created_by_id' => User::factory()->create()->id,
+            'site_id' => null,
+            'created_by_id' => null,
             'created_by_name' => null,
-            'supplier_id' => $supplier->id,
-            'supplier_name' => $supplier->name,
+            'supplier_id' => null,
+            'supplier_name' => null,
             'supplier_reference' => $this->faker->optional()->word(),
-            'edited_by_id' => User::factory()->create()->id,
+            'edited_by_id' => null,
 
-            'name' => $this->faker->unique()->word(),
+            'name' => $this->faker->unique()->name(),
             'description' => $this->faker->optional()->paragraph(),
-            'reference' => $this->faker->optional()->unique()->bothify('REF-####'),
+            'reference' => $this->faker->unique()->bothify('REF-####'),
             'purchase_price' => $this->faker->randomFloat(2, 0, 5000),
             'currency' => $this->faker->currencyCode,
 
@@ -57,42 +54,30 @@ class ItemFactory extends Factory
             'item_entry_count' => 0,
             'item_exit_count' => 0,
 
-            'material_count' => $this->faker->numberBetween(0, 20),
+            'material_count' => 0,
             'qrcode_flash_count' => $this->faker->numberBetween(0, 10),
 
-            'number_warning_enabled' => $this->faker->boolean(),
-            'number_warning_minimum' => $this->faker->numberBetween(0, 100),
-            'number_critical_enabled' => $this->faker->boolean(),
-            'number_critical_minimum' => $this->faker->numberBetween(0, 50)
+            'number_warning_enabled' => false,
+            'number_warning_minimum' => 0,
+            'number_critical_enabled' => false,
+            'number_critical_minimum' => 0
         ];
     }
 
     /**
-     * Forces the use of an existing site (or site ID).
+     * Forces the use of an existing site (or site ID) & Forces the use of an existing supplier (or supplier ID).
      *
      * @param Site|int $site
-     *
-     * @return ItemFactory
-     */
-    public function forSite(Site|int $site): static
-    {
-        return $this->state(fn () => [
-            'site_id' => $site instanceof Site ? $site->id : $site
-        ]);
-    }
-
-    /**
-     * Forces the use of an existing supplier (or supplier ID).
-     *
      * @param Supplier|int $supplier
      *
      * @return ItemFactory
      */
-    public function forSupplier(Supplier|int $supplier): static
+    public function forSiteWithSupplier(Site|int $site, Supplier|int $supplier): static
     {
-        $supplierId = $supplier instanceof Supplier ? $supplier->id : $supplier;
-
-        return $this->state(fn () => ['supplier_id' => $supplierId]);
+        return $this->state(fn () => [
+            'site_id' => $site instanceof Site ? $site->id : $site,
+            'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
+        ]);
     }
 
     /**
@@ -132,7 +117,10 @@ class ItemFactory extends Factory
      */
     public function withMaterials(array $materialIds): static
     {
-        return $this->hasAttached(Material::class, $materialIds, 'materials');
+        return $this->hasAttached($materialIds, [], 'materials')
+            ->state(fn () => [
+                'material_count' => count($materialIds)
+            ]);
     }
 
     /**

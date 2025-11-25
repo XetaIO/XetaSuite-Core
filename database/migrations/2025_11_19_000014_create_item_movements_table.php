@@ -34,15 +34,6 @@ return new class () extends Migration {
             $table->string('supplier_invoice_number', 100)->nullable();
             $table->date('invoice_date')->nullable();
 
-            // Exits
-            $table->foreignIdFor(Material::class)
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
-            $table->string('material_name', 100)
-                ->nullable()
-                ->comment('The name of the material if the material is deleted.');
-
             // For linking to maintenance
             $table->nullableMorphs('movable'); // movable_type, movable_id
 
@@ -59,7 +50,6 @@ return new class () extends Migration {
 
             // Index pour les rapports
             $table->index(['item_id', 'type', 'movement_date']);
-            $table->index(['material_id', 'movement_date']);
         });
     }
 

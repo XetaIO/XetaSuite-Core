@@ -31,19 +31,18 @@ class MaintenanceFactory extends Factory
     /**
      * Define the model's default state.
      *
-     * @return array<string,mixed>
+     * @return array
      */
     public function definition(): array
     {
-        $site = Site::factory()->create();
-        $material = Material::factory()->forSite($site)->create();
+        $status = $this->faker->randomElement(MaintenanceStatus::cases());
 
         return [
-            'site_id' => $site->id,
-            'material_id' => $material->id,
+            'site_id' => null,
+            'material_id' => null,
             'material_name' => null,
 
-            'created_by_id' => User::factory()->create()->id,
+            'created_by_id' => null,
             'created_by_name' => null,
             'edited_by_id' => null,
 
@@ -52,13 +51,16 @@ class MaintenanceFactory extends Factory
 
             'type' => $this->faker->randomElement(MaintenanceType::cases())->value,
             'realization' => $this->faker->randomElement(MaintenanceRealization::cases())->value,
-            'status' => $this->faker->randomElement(MaintenanceStatus::cases())->value,
+            'status' => $status->value,
 
-            'started_at' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
-            'resolved_at' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
+            'started_at' => $status === MaintenanceStatus::IN_PROGRESS || $status === MaintenanceStatus::COMPLETED
+                ? $this->faker->dateTimeBetween('-3 months', '-1 month')
+                : null,
+            'resolved_at' => $status === MaintenanceStatus::COMPLETED
+                ? $this->faker->dateTimeBetween('-1 month', 'now')
+                : null,
 
-            'incident_count' => $this->faker->numberBetween(0, 5),
-            'company_count'  => $this->faker->numberBetween(0, 3)
+            'incident_count' => 0
         ];
     }
 
@@ -75,10 +77,8 @@ class MaintenanceFactory extends Factory
      */
     public function forSite(Site|int $site): static
     {
-        $siteId = $site instanceof Site ? $site->id : $site;
-
         return $this->state(fn () => [
-            'site_id' => $siteId,
+            'site_id' => $site instanceof Site ? $site->id : $site,
         ]);
     }
 
@@ -98,12 +98,9 @@ class MaintenanceFactory extends Factory
             ]);
         }
 
-        $materialId   = $material instanceof Material ? $material->id : $material;
-        $materialName = $material instanceof Material ? $material->name : null;
-
         return $this->state(fn () => [
-            'material_id'   => $materialId,
-            'material_name' => $materialName,
+            'material_id'   => $material instanceof Material ? $material->id : $material,
+            'material_name' => null,
         ]);
     }
 
@@ -198,7 +195,7 @@ class MaintenanceFactory extends Factory
      */
     public function withOperators(array $userIds): static
     {
-        return $this->hasAttached(User::class, $userIds, 'operators');
+        return $this->hasAttached($userIds, [], 'operators');
     }
 
     /**
@@ -210,6 +207,6 @@ class MaintenanceFactory extends Factory
      */
     public function withCompanies(array $companyIds): static
     {
-        return $this->hasAttached(Company::class, $companyIds, 'companies');
+        return $this->hasAttached($companyIds, [], 'companies');
     }
 }

@@ -28,8 +28,6 @@ class ItemMovement extends Model
         'supplier_name',
         'supplier_invoice_number',
         'invoice_date',
-        'material_id',
-        'material_name',
         'movable_type',
         'movable_id',
         'created_by_id',
@@ -69,16 +67,6 @@ class ItemMovement extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
-    }
-
-    /**
-     * Get the material associated with the item movement.
-     *
-     * @return BelongsTo
-     */
-    public function material(): BelongsTo
-    {
-        return $this->belongsTo(Material::class);
     }
 
     /**

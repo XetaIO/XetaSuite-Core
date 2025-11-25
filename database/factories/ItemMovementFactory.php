@@ -41,64 +41,38 @@ class ItemMovementFactory extends Factory
      */
     public function definition(): array
     {
-        $item = Item::factory()->create();
-        $creator = User::factory()->create();
-
         // By default, an "entry" movement is generated. The `exit()` state can change this.
         $type = 'entry';
 
-        $quantity = $this->faker->numberBetween(1, 100);
-        $unitPrice = $this->faker->randomFloat(2, 0.5, 5000);
-        $totalPrice = $quantity * $unitPrice;
-
-        // Data linked to entries (supplier)
-        $supplierId  = null;
         $invoiceNumber = null;
         $invoiceDate   = null;
 
-        // Data linked to exits (material)
-        $materialId  = null;
-        $materialName = null;
-
         // Entry movement
         if ($type === 'entry') {
-            $supplier = Supplier::factory()->create();
-            $supplierId = $supplier->id;
             $invoiceNumber = $this->faker->optional()->bothify('INV-####');
             $invoiceDate   = $this->faker->optional()->date();
         }
 
-        // Exit movement
-        if ($type === 'exit') {
-            $material = Material::factory()->create();
-            $materialId = $material->id;
-            $materialName = $material->name;
-        }
-
         return [
-            'item_id'   => $item->id,
+            'item_id' => null,
 
-            'type'      => $type,
+            'type' => $type,
 
-            'quantity'      => $quantity,
-            'unit_price'    => $unitPrice,
-            'total_price'   => $totalPrice,
+            'quantity' => 0,
+            'unit_price' => 0,
+            'total_price'   => 0,
 
             // Entry (supplier)
-            'supplier_id' => $supplierId,
+            'supplier_id' => null,
             'supplier_name' => null,
             'supplier_invoice_number' => $invoiceNumber,
             'invoice_date' => $invoiceDate,
-
-            // Exit (material)
-            'material_id' => $materialId,
-            'material_name' => $materialName,
 
             // Polymorph (maintenance)
             'movable_type' => null,
             'movable_id' => null,
 
-            'created_by_id' => $creator->id,
+            'created_by_id' => null,
             'created_by_name' => null,
 
             'notes' => $this->faker->optional()->sentence(),
@@ -116,8 +90,6 @@ class ItemMovementFactory extends Factory
     {
         return $this->state(fn () => ['type' => 'entry'])
             ->afterMaking(function (ItemMovement $movement) {
-                $movement->material_id = null;
-                $movement->material_name = null;
                 $movement->movable_type = null;
                 $movement->movable_id = null;
             });
@@ -140,6 +112,20 @@ class ItemMovementFactory extends Factory
     }
 
     /**
+     * Associates an Item to the movement.
+     *
+     * @param Item|int $item
+     *
+     * @return ItemMovementFactory
+     */
+    public function forItem(Item|int $item): static
+    {
+        return $this->state(fn () => [
+            'item_id'   => $item instanceof Item ? $item->id : $item,
+        ]);
+    }
+
+    /**
      * Associates a Supplier to the movement. (For Entries)
      *
      * @param Supplier|int $supplier
@@ -148,33 +134,15 @@ class ItemMovementFactory extends Factory
      */
     public function withSupplier(Supplier|int $supplier): static
     {
-        $supplierId = $supplier instanceof Supplier ? $supplier->id : $supplier;
-
         return $this->state(fn () => [
-            'supplier_id' => $supplierId,
+            'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
             'supplier_invoice_number' => $this->faker->bothify('INV-####'),
             'invoice_date' => $this->faker->date(),
         ]);
     }
 
     /**
-     * Associates a Material to the movement. (For Exits)
-     *
-     * @param Material|int $material
-     *
-     * @return ItemMovementFactory
-     */
-    public function withMaterial(Material|int $material): static
-    {
-        $materialId   = $material instanceof Material ? $material->id : $material;
-
-        return $this->state(fn () => [
-            'material_id'   => $materialId
-        ]);
-    }
-
-    /**
-     * Link the movement to a Maintenance via the polymorphic column.
+     * Link the movement to a Maintenance via the polymorphic column. (For Exits)
      *
      * @param Maintenance|int $maintenance
      *
@@ -182,11 +150,28 @@ class ItemMovementFactory extends Factory
      */
     public function withMaintenance(Maintenance|int $maintenance): static
     {
-        $maintenanceId = $maintenance instanceof Maintenance ? $maintenance->id : $maintenance;
-
         return $this->state(fn () => [
             'movable_type' => Maintenance::class,
-            'movable_id'   => $maintenanceId,
+            'movable_id'   => $maintenance instanceof Maintenance ? $maintenance->id : $maintenance,
+        ]);
+    }
+
+    /**
+     * Defines quantity and unit price for the movement.
+     *
+     * @param int   $quantity
+     * @param float $unitPrice
+     *
+     * @return ItemMovementFactory
+     */
+    public function withQuantity(int $quantity, float $unitPrice): static
+    {
+        $totalPrice = $quantity * $unitPrice;
+
+        return $this->state(fn () => [
+            'quantity'   => $quantity,
+            'unit_price'   => $unitPrice,
+            'total_price'   => $totalPrice,
         ]);
     }
 

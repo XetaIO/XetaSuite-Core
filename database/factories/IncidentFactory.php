@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use XetaSuite\Models\Incident;
+use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
@@ -17,71 +18,49 @@ class IncidentFactory extends Factory
     protected $model = Incident::class;
 
     /**
-     * Define the model's default state.
-     *
-     * @return array<string,mixed>
+     * Configure the model factory.
      */
-    public function definition(): array
+    public function configure(): static
     {
-        $site = Site::factory()->create();
-        $material = Material::factory()->forSite($site)->create();
-
-        return [
-            'site_id' => $site->id,
-            'material_id' => $material->id,
-            'material_name' => null,
-
-            'reported_by_id' => User::factory()->create()->id,
-            'reported_by_name' => null,
-
-            'edited_by_id' => $this->faker->optional(0.5)->randomElement(User::pluck('id')),
-
-            'description' => $this->faker->paragraph(),
-            'started_at' => $this->faker->optional(0.7)->dateTimeBetween('-6 months', 'now'),
-            'resolved_at' => null,
-
-            'status' => $this->faker->randomElement(IncidentStatus::cases())->value,
-            'severity' => $this->faker->randomElement(IncidentSeverity::cases())->value,
-        ];
-    }
-
-    /**
-     * Force the status of an incident (open, in_progress, resolved, closed).
-     *
-     * @param IncidentStatus|string $status
-     *
-     * @return IncidentFactory
-     */
-    public function withStatus(IncidentStatus|string $status): static
-    {
-        $value = $status instanceof IncidentStatus
-            ? $status->value
-            : (string) $status;
-
-        return $this->state(function (array $attributes) use ($value) {
-            return [
-                'status' => $value,
-                'resolved_at' => $value === IncidentStatus::RESOLVED->value ? $this->faker->dateTimeBetween($attributes['started_at'], 'now') : null
-            ];
+        return $this->afterCreating(function (Incident $incident) {
+            $incident->maintenance()->increment('incident_count');
         });
     }
 
     /**
-     * Force the severity of an incident (open, in_progress, resolved, closed).
+     * Define the model's default state.
      *
-     * @param IncidentSeverity|string $status
-     *
-     * @return IncidentFactory
+     * @return array
      */
-    public function withSeverity(IncidentSeverity|string $status): static
+    public function definition(): array
     {
-        $value = $status instanceof IncidentSeverity
-            ? $status->value
-            : (string) $status;
+        $status = $this->faker->randomElement(IncidentStatus::cases());
 
-        return $this->state(fn () => [
-            'severity' => $value,
-        ]);
+        return [
+            'site_id' => null,
+            'material_id' => null,
+            'material_name' => null,
+
+            'reported_by_id' => null,
+            'reported_by_name' => null,
+
+            'edited_by_id' => null,
+
+            'description' => $this->faker->paragraph(),
+            'started_at' => $status === IncidentStatus::OPEN
+                || $status === IncidentStatus::IN_PROGRESS
+                || $status === IncidentStatus::RESOLVED
+                ? $this->faker->dateTimeBetween('-3 months', '-1 month')
+                : null,
+            'resolved_at' => $status === IncidentStatus::RESOLVED
+                ? $this->faker->dateTimeBetween('-1 month', 'now')
+                : null,
+
+            'status' => $status->value,
+            'severity' => $this->faker->randomElement(IncidentSeverity::cases())->value,
+
+            'maintenance_id' => null
+        ];
     }
 
     /**
@@ -109,6 +88,57 @@ class IncidentFactory extends Factory
     {
         return $this->state(fn () => [
             'material_id' => $material instanceof Material ? $material->id : $material
+        ]);
+    }
+
+    /**
+     * Indicate that the incident is associated with a specific maintenance.
+     *
+     * @param Maintenance|int $maintenance
+     *
+     * @return IncidentFactory
+     */
+    public function withMaintenance(Maintenance|int $maintenance): static
+    {
+        return $this->state(fn () => [
+            'maintenance_id' => $maintenance instanceof Maintenance ? $maintenance->id : $maintenance
+        ]);
+    }
+
+    /**
+     * Force the status of an incident (open, in_progress, resolved, closed).
+     *
+     * @param IncidentStatus|string $status
+     *
+     * @return IncidentFactory
+     */
+    public function withStatus(IncidentStatus|string $status): static
+    {
+        $value = $status instanceof IncidentStatus
+            ? $status->value
+            : (string) $status;
+
+        return $this->state(function (array $attributes) use ($value) {
+            return [
+                'status' => $value,
+                'resolved_at' => $value === IncidentStatus::RESOLVED->value
+                    ? $this->faker->dateTimeBetween($attributes['started_at'], 'now')
+                    : null
+            ];
+        });
+    }
+
+    /**
+     * Force the severity of an incident (low, medium, high, critical).
+     *
+     * @param IncidentSeverity|string $severity
+     *
+     * @return IncidentFactory
+     */
+    public function withSeverity(IncidentSeverity|string $severity): static
+    {
+        return $this->state(fn () => [
+            'severity' => $severity instanceof IncidentSeverity ? $severity->value : (string) $severity,
         ]);
     }
 

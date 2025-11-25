@@ -22,7 +22,7 @@ class SupplierFactory extends Factory
         return [
             'name' => $this->faker->unique()->company(),
             'description' => $this->faker->optional()->sentence(),
-            'created_by_id' => User::factory()->create()->id,
+            'created_by_id' => null,
         ];
     }
 
@@ -38,10 +38,8 @@ class SupplierFactory extends Factory
      */
     public function createdBy(User|int $user): static
     {
-        $userId = $user instanceof User ? $user->id : $user;
-
         return $this->state(fn () => [
-            'created_by_id' => $userId,
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 }

@@ -16,6 +16,16 @@ class MaterialFactory extends Factory
     protected $model = Material::class;
 
     /**
+     * Configure the model factory.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Material $material) {
+            $material->zone()->increment('material_count');
+        });
+    }
+
+    /**
      * Define the model's default state.
      *
      * @return array
@@ -33,15 +43,14 @@ class MaterialFactory extends Factory
             'description' => $this->faker->optional()->sentence(),
 
             'qrcode_flash_count' => $this->faker->numberBetween(0, 10),
-            'incident_count' => $this->faker->numberBetween(0, 5),
-            'item_count' => $this->faker->numberBetween(0, 20),
-            'maintenance_count' => $this->faker->numberBetween(0, 5),
-            'cleaning_count' => $this->faker->numberBetween(0, 3),
+            'incident_count' => 0,
+            'item_count' => 0,
+            'maintenance_count' => 0,
+            'cleaning_count' => 0,
 
-            'cleaning_alert' => $this->faker->boolean(),
-            'cleaning_alert_email' => $this->faker->boolean(),
-            'cleaning_alert_frequency_repeatedly' => $this->faker->numberBetween(1, 7),
-
+            'cleaning_alert' => false,
+            'cleaning_alert_email' => false,
+            'cleaning_alert_frequency_repeatedly' => 0,
             'cleaning_alert_frequency_type' => $this->faker->randomElement(
                 CleaningFrequency::cases()
             )->value,
@@ -79,12 +88,9 @@ class MaterialFactory extends Factory
      */
     public function inSiteAndZone(Site|int $site, Zone|int $zone): static
     {
-        $siteId = $site instanceof Site ? $site->id : $site;
-        $zoneId = $zone instanceof Zone ? $zone->id : $zone;
-
         return $this->state(fn () => [
-            'site_id' => $siteId,
-            'zone_id' => $zoneId,
+            'site_id' => $site instanceof Site ? $site->id : $site,
+            'zone_id' => $zone instanceof Zone ? $zone->id : $zone,
         ]);
     }
 

@@ -54,7 +54,6 @@ return new class () extends Migration {
             $table->timestamp('resolved_at')->nullable();
 
             $table->integer('incident_count')->default(0);
-            $table->integer('company_count')->default(0);
 
             $table->timestamps();
         });

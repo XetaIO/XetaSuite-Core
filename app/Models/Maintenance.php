@@ -40,8 +40,7 @@ class Maintenance extends Model
         'status',
         'started_at',
         'resolved_at',
-        'incident_count',
-        'company_count'
+        'incident_count'
     ];
 
     /**

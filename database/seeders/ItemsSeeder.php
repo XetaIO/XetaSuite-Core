@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use XetaSuite\Models\Item;
 use XetaSuite\Models\Material;
+use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
-use XetaSuite\Models\Zone;
 
-class MaterialsSeeder extends Seeder
+class ItemsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $zones = Zone::where('allow_material', true)->get();
+        $materials = Material::all();
         $user = User::firstWhere('email', 'admin@xetasuite.test');
 
-        foreach ($zones as $zone) {
-            Material::factory()
-                    ->inSiteAndZone($zone->site_id, $zone)
+        foreach ($materials as $material) {
+            Item::factory()
+                    ->forSiteWithSupplier($material->site_id, Supplier::factory()->createdBy($user)->create())
+                    ->withMaterials([$material->id])
                     ->createdBy($user)
                     ->count(random_int(2, 4))
                     ->create();

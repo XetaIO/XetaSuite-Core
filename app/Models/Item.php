@@ -32,7 +32,7 @@ class Item extends Model
         'supplier_id',
         'supplier_name',
         'supplier_reference',
-        'edited_user_id',
+        'edited_by_id',
         'name',
         'description',
         'reference',
@@ -129,7 +129,7 @@ class Item extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
     }
 
     /**
