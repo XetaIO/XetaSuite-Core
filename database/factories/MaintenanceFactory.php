@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use XetaSuite\Models\Company;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\Material;

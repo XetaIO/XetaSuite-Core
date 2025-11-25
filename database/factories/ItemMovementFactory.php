@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\Supplier;
-use XetaSuite\Models\Material;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Maintenance;
 

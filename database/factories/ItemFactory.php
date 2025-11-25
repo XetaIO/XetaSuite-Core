@@ -9,7 +9,6 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
-use XetaSuite\Models\Material;
 
 class ItemFactory extends Factory
 {
