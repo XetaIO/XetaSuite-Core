@@ -26,9 +26,11 @@ class ItemMovementFactory extends Factory
             if ($movement->type === 'entry') {
                 $item->increment('item_entry_total', $movement->quantity);
                 $item->increment('item_entry_count');
+                $movement->creator()->increment('item_entry_count');
             } else {
                 $item->increment('item_exit_total', $movement->quantity);
                 $item->increment('item_exit_count');
+                $movement->creator()->increment('item_exit_count');
             }
         });
     }

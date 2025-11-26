@@ -24,6 +24,7 @@ class MaintenanceFactory extends Factory
     {
         return $this->afterCreating(function (Maintenance $maintenance) {
             $maintenance->material()->increment('maintenance_count');
+            $maintenance->creator()->increment('maintenance_count');
         });
     }
 

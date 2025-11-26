@@ -38,7 +38,7 @@ return new class () extends Migration {
                 ->nullable()
                 ->comment('The name of the user who created the cleaning if the user is deleted.');
 
-            $table->foreignIdFor(User::class, 'edited_user_id')
+            $table->foreignIdFor(User::class, 'edited_by_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();

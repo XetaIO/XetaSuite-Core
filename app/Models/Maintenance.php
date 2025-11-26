@@ -32,7 +32,7 @@ class Maintenance extends Model
         'material_name',
         'created_by_id',
         'created_by_name',
-        'edited_user_id',
+        'edited_by_id',
         'description',
         'reason',
         'type',
@@ -94,7 +94,7 @@ class Maintenance extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
     }
 
     /**
@@ -104,7 +104,7 @@ class Maintenance extends Model
      */
     public function editor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'edited_by_id');
+        return $this->belongsTo(User::class, 'edited_by_id', 'id');
     }
 
     /**

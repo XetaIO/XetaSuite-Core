@@ -16,17 +16,17 @@ class IncidentsSeeder extends Seeder
      */
     public function run(): void
     {
-        $maintenances = Maintenance::all();
+        $maintenances = Maintenance::with('material')->get();
         $user = User::firstWhere('email', 'admin@xetasuite.test');
 
         foreach ($maintenances as $maintenance) {
-            $incidents = Incident::factory()
-                    ->forSite($maintenance->site_id)
-                    ->forMaterial($maintenance->material_id)
-                    ->withMaintenance($maintenance)
-                    ->reportedBy($user)
-                    ->count(random_int(1, 2))
-                    ->create();
+            Incident::factory()
+                ->forSite($maintenance->site_id)
+                ->forMaterial($maintenance->material_id)
+                ->withMaintenance($maintenance)
+                ->reportedBy($user)
+                ->count(random_int(1, 2))
+                ->create();
         }
     }
 }

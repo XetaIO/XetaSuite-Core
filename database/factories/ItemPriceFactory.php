@@ -22,11 +22,11 @@ class ItemPriceFactory extends Factory
     public function definition(): array
     {
         return [
-            'item_id' => Item::factory()->create()->id,
+            'item_id' => null,
 
-            'supplier_id' => Supplier::factory()->create()->id,
+            'supplier_id' => null,
             'supplier_name' => null,
-            'created_by_id' => User::factory(),
+            'created_by_id' => null,
             'created_by_name' => null,
 
             'price' => $this->faker->randomFloat(2, 0.5, 5000),
@@ -45,9 +45,9 @@ class ItemPriceFactory extends Factory
      */
     public function forItem(Item|int $item): static
     {
-        $itemId = $item instanceof Item ? $item->id : $item;
-
-        return $this->state(fn () => ['item_id' => $itemId]);
+        return $this->state(fn () => [
+            'item_id' => $item instanceof Item ? $item->id : $item
+        ]);
     }
 
     /**
@@ -66,10 +66,8 @@ class ItemPriceFactory extends Factory
             ]);
         }
 
-        $supplierId = $supplier instanceof Supplier ? $supplier->id : $supplier;
-
         return $this->state(fn () => [
-            'supplier_id'   => $supplierId,
+            'supplier_id'   => $supplier instanceof Supplier ? $supplier->id : $supplier,
         ]);
     }
 
@@ -114,13 +112,24 @@ class ItemPriceFactory extends Factory
     /**
      * Force the price.
      *
-     * @param float $price
+     * @param float $price The base price to set.
+     * @param bool $variation Whether to apply a random variation to the price (negative or positive)
      *
      * @return ItemPriceFactory
      */
-    public function withPrice(float $price): static
+    public function withPrice(float $price, bool $variation = false): static
     {
-        return $this->state(fn () => ['price' => $price]);
+        if ($variation) {
+            $priceChoices = [
+                'positive' => $price * random_int(10, 50) / 100,
+                'negative' => $price * random_int(-50, -10) / 100,
+            ];
+            $price = $price + $priceChoices[array_rand($priceChoices, 1)];
+        }
+
+        return $this->state(fn () => [
+            'price' => $price
+        ]);
     }
 
     /**

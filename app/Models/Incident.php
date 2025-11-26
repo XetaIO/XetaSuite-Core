@@ -87,7 +87,7 @@ class Incident extends Model
      */
     public function reporter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'reported_by_id');
+        return $this->belongsTo(User::class, 'reported_by_id', 'id');
     }
 
     /**
@@ -97,6 +97,6 @@ class Incident extends Model
      */
     public function editor(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'edited_by_id');
+        return $this->hasOne(User::class, 'edited_by_id', 'id');
     }
 }

@@ -28,7 +28,7 @@ class Cleaning extends Model
         'material_name',
         'created_by_id',
         'created_by_name',
-        'edited_user_id',
+        'edited_by_id',
         'description',
         'type'
     ];
@@ -67,9 +67,9 @@ class Cleaning extends Model
      *
      * @return BelongsTo
      */
-    public function user(): BelongsTo
+    public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
     }
 
     /**
@@ -77,8 +77,8 @@ class Cleaning extends Model
      *
      * @return HasOne
      */
-    public function editedUser(): HasOne
+    public function editor(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'edited_user_id')->withTrashed();
+        return $this->hasOne(User::class, 'edited_by_id', 'id');
     }
 }

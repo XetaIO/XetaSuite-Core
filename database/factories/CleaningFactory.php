@@ -10,11 +10,21 @@ use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 use XetaSuite\Enums\Cleanings\CleaningType;
-use XetaSuite\Models\Zone;
 
 class CleaningFactory extends Factory
 {
     protected $model = Cleaning::class;
+
+    /**
+     * Configure the model factory.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Cleaning $cleaning) {
+            $cleaning->material()->increment('cleaning_count');
+            $cleaning->creator()->increment('cleaning_count');
+        });
+    }
 
     /**
      * Define the model's default state.
@@ -23,18 +33,14 @@ class CleaningFactory extends Factory
      */
     public function definition(): array
     {
-        $site = Site::factory()->create();
-        $zone = Zone::factory()->forSite($site)->create();
-        $material = Material::factory()->inSiteAndZone($site, $zone)->create();
-
         return [
-            'site_id' => $site->id,
-            'material_id' => $material->id,
+            'site_id' => null,
+            'material_id' => null,
             'material_name' => null,
 
-            'created_by_id' => User::factory()->create()->id,
+            'created_by_id' => null,
             'created_by_name' => null,
-            'edited_user_id' => null,
+            'edited_by_id' => null,
 
             'description' => $this->faker->paragraph(),
             'type' => $this->faker->randomElement(CleaningType::cases())->value,
@@ -65,7 +71,7 @@ class CleaningFactory extends Factory
     public function editedBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'edited_user_id' => $user instanceof User ? $user->id : $user
+            'edited_by_id' => $user instanceof User ? $user->id : $user
         ]);
     }
 
@@ -106,10 +112,8 @@ class CleaningFactory extends Factory
      */
     public function withType(CleaningType|string $type): static
     {
-        return $this->state(function (array $attributes) use ($type) {
-            return [
-                'type' => $type instanceof CleaningType ? $type->value : $type,
-            ];
-        });
+        return $this->state(fn () => [
+            'type' => $type instanceof CleaningType ? $type->value : $type
+        ]);
     }
 }

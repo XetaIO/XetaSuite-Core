@@ -149,7 +149,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function deleter(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'deleted_by_id')->withTrashed();
+        return $this->hasOne(User::class, 'deleted_by_id', 'id')->withTrashed();
     }
 
     /**

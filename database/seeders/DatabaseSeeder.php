@@ -26,8 +26,11 @@ class DatabaseSeeder extends Seeder
             MaterialsSeeder::class,
             ItemsSeeder::class,
             ItemMovementsSeeder::class,
+            ItemPricesSeeder::class,
             MaintenancesSeeder::class,
             IncidentsSeeder::class,
+            CompaniesSeeder::class,
+            CleaningsSeeder::class,
         ]);
     }
 }

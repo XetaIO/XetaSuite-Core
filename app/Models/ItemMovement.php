@@ -86,7 +86,7 @@ class ItemMovement extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id', 'created_by_id');
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
     }
 
     /**

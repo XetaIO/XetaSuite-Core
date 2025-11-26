@@ -24,6 +24,8 @@ class IncidentFactory extends Factory
     {
         return $this->afterCreating(function (Incident $incident) {
             $incident->maintenance()->increment('incident_count');
+            $incident->maintenance->material()->increment('incident_count');
+            $incident->reporter()->increment('incident_count');
         });
     }
 

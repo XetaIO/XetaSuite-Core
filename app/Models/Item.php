@@ -139,7 +139,7 @@ class Item extends Model
      */
     public function editor(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'edited_by_id');
+        return $this->hasOne(User::class, 'edited_by_id', 'id');
     }
 
     /**

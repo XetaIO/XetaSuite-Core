@@ -20,10 +20,11 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'created_by_id' => User::factory()->create()->id,
+            'created_by_id' => null,
             'created_by_name' => null,
             'name' => $this->faker->unique()->company(),
             'description' => $this->faker->optional(0.7)->paragraph(),
+            'maintenance_count' => 0,
         ];
     }
 
