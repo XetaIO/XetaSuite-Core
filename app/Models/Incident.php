@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use XetaSuite\Enums\Incidents\IncidentSeverity;
 use XetaSuite\Enums\Incidents\IncidentStatus;
 use XetaSuite\Observers\IncidentObserver;
@@ -87,16 +86,16 @@ class Incident extends Model
      */
     public function reporter(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'reported_by_id', 'id');
+        return $this->belongsTo(User::class, 'reported_by_id');
     }
 
     /**
      * Get the user that edited the incident.
      *
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function editor(): HasOne
+    public function editor(): BelongsTo
     {
-        return $this->hasOne(User::class, 'edited_by_id', 'id');
+        return $this->belongsTo(User::class, 'edited_by_id');
     }
 }

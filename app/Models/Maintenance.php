@@ -94,7 +94,7 @@ class Maintenance extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id', 'id');
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 
     /**
@@ -104,7 +104,7 @@ class Maintenance extends Model
      */
     public function editor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'edited_by_id', 'id');
+        return $this->belongsTo(User::class, 'edited_by_id');
     }
 
     /**

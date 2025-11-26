@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use XetaSuite\Enums\Cleanings\CleaningType;
 use XetaSuite\Observers\CleaningObserver;
 
@@ -69,16 +68,16 @@ class Cleaning extends Model
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id', 'id');
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 
     /**
      * Get the user that edited the cleaning.
      *
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function editor(): HasOne
+    public function editor(): BelongsTo
     {
-        return $this->hasOne(User::class, 'edited_by_id', 'id');
+        return $this->belongsTo(User::class, 'edited_by_id');
     }
 }

@@ -12,9 +12,9 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -145,11 +145,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * Get the user who deleted the user.
      *
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function deleter(): HasOne
+    public function deleter(): BelongsTo
     {
-        return $this->hasOne(User::class, 'deleted_by_id', 'id')->withTrashed();
+        return $this->belongsTo(User::class, 'deleted_by_id')->withTrashed();
     }
 
     /**

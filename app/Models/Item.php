@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use XetaSuite\Models\Presenters\ItemPresenter;
 use XetaSuite\Observers\ItemObserver;
 
@@ -135,11 +134,11 @@ class Item extends Model
     /**
      * The editor of the item.
      *
-     * @return HasOne
+     * @return BelongsTo
      */
-    public function editor(): HasOne
+    public function editor(): BelongsTo
     {
-        return $this->hasOne(User::class, 'edited_by_id', 'id');
+        return $this->belongsTo(User::class, 'edited_by_id');
     }
 
     /**
