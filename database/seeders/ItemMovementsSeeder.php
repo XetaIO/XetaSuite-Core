@@ -16,7 +16,7 @@ class ItemMovementsSeeder extends Seeder
      */
     public function run(): void
     {
-        $items = Item::inRandomOrder()->limit(5)->get();
+        $items = Item::with('supplier')->inRandomOrder()->limit(5)->get();
         $user = User::firstWhere('email', 'admin@xetasuite.test');
 
         foreach ($items as $item) {
