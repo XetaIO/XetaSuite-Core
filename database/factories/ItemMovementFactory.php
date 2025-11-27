@@ -108,7 +108,7 @@ class ItemMovementFactory extends Factory
      *
      * @return ItemMovementFactory
      */
-    public function withSupplier(Supplier|int $supplier): static
+    public function fromSupplier(Supplier|int $supplier): static
     {
         return $this->state(fn () => [
             'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
@@ -123,7 +123,7 @@ class ItemMovementFactory extends Factory
      *
      * @return ItemMovementFactory
      */
-    public function withMaintenance(Maintenance|int $maintenance): static
+    public function forMaintenance(Maintenance|int $maintenance): static
     {
         return $this->state(fn () => [
             'movable_type' => Maintenance::class,

@@ -57,7 +57,7 @@ class ItemPriceFactory extends Factory
      *
      * @return ItemPriceFactory
      */
-    public function withSupplier(Supplier|int|null $supplier = null): static
+    public function fromSupplier(Supplier|int|null $supplier = null): static
     {
         if (is_null($supplier)) {
             return $this->state(fn () => [

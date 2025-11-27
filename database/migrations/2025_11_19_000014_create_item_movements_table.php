@@ -17,7 +17,7 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Item::class)
                 ->constrained()
-                ->cascadeOnDelete();
+                ->restrictOnDelete(); // Keep item if movements exist (stock history protection)
 
             $table->enum('type', ['entry', 'exit']);
             $table->integer('quantity'); // Positive or negative regarding the type

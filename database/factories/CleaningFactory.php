@@ -35,32 +35,6 @@ class CleaningFactory extends Factory
     }
 
     /**
-     * Indicate that the cleaning was created by a specific user.
-     *
-     *
-     * @return CleaningFactory
-     */
-    public function createdBy(User|int $user): static
-    {
-        return $this->state(fn () => [
-            'created_by_id' => $user instanceof User ? $user->id : $user,
-        ]);
-    }
-
-    /**
-     * Indicate that the cleaning was edited by a specific user.
-     *
-     *
-     * @return CleaningFactory
-     */
-    public function editedBy(User|int $user): static
-    {
-        return $this->state(fn () => [
-            'edited_by_id' => $user instanceof User ? $user->id : $user,
-        ]);
-    }
-
-    /**
      * Forces the use of an existing site (or site ID).
      *
      *
@@ -96,6 +70,32 @@ class CleaningFactory extends Factory
     {
         return $this->state(fn () => [
             'type' => $type instanceof CleaningType ? $type->value : $type,
+        ]);
+    }
+
+    /**
+     * Indicate that the cleaning was created by a specific user.
+     *
+     *
+     * @return CleaningFactory
+     */
+    public function createdBy(User|int $user): static
+    {
+        return $this->state(fn () => [
+            'created_by_id' => $user instanceof User ? $user->id : $user,
+        ]);
+    }
+
+    /**
+     * Indicate that the cleaning was edited by a specific user.
+     *
+     *
+     * @return CleaningFactory
+     */
+    public function editedBy(User|int $user): static
+    {
+        return $this->state(fn () => [
+            'edited_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 }

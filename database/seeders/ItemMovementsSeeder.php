@@ -24,7 +24,7 @@ class ItemMovementsSeeder extends Seeder
             ItemMovement::factory()
                 ->entry()
                 ->forItem($item)
-                ->withSupplier($item->supplier->id)
+                ->fromSupplier($item->supplier->id)
                 ->withQuantity(random_int(10, 50), (float) $item->purchase_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))

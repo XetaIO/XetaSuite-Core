@@ -49,33 +49,27 @@ class MaterialFactory extends Factory
     }
 
     /**
-     * Forces the presence of a cleaning alert (and its sending by email).
+     * Defines a site (Site).
+     *
      *
      * @return MaterialFactory
      */
-    public function withCleaningAlert(): static
+    public function forSite(Site|int $site): static
     {
         return $this->state(fn () => [
-            'cleaning_alert' => true,
-            'cleaning_alert_email' => true,
+            'site_id' => $site instanceof Site ? $site->id : $site,
         ]);
     }
 
     /**
-     * Defines the area and site explicitly.
-     *
-     * Example:
-     *     $site = Site::factory()->create();
-     *     $zone = Zone::factory()->forSite($site)->create();
-     *     Material::factory()->inSiteAndZone($site, $zone)->create();
+     * Defines a zone (Zone).
      *
      *
      * @return MaterialFactory
      */
-    public function inSiteAndZone(Site|int $site, Zone|int $zone): static
+    public function forZone(Zone|int $zone): static
     {
         return $this->state(fn () => [
-            'site_id' => $site instanceof Site ? $site->id : $site,
             'zone_id' => $zone instanceof Zone ? $zone->id : $zone,
         ]);
     }
@@ -90,6 +84,19 @@ class MaterialFactory extends Factory
     {
         return $this->state(fn () => [
             'created_by_id' => $user instanceof User ? $user->id : $user,
+        ]);
+    }
+
+    /**
+     * Forces the presence of a cleaning alert (and its sending by email).
+     *
+     * @return MaterialFactory
+     */
+    public function withCleaningAlert(): static
+    {
+        return $this->state(fn () => [
+            'cleaning_alert' => true,
+            'cleaning_alert_email' => true,
         ]);
     }
 }

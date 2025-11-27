@@ -74,7 +74,7 @@ class MaintenanceFactory extends Factory
      *
      * @return MaintenanceFactory
      */
-    public function withMaterial(Material|int|null $material = null): static
+    public function forMaterial(Material|int|null $material = null): static
     {
         if (is_null($material)) {
             return $this->state(fn () => [

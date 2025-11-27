@@ -21,7 +21,8 @@ class MaterialsSeeder extends Seeder
 
         foreach ($zones as $zone) {
             Material::factory()
-                    ->inSiteAndZone($zone->site_id, $zone)
+                    ->forSite($zone->site_id)
+                    ->forZone($zone)
                     ->createdBy($user)
                     ->count(random_int(2, 4))
                     ->create();

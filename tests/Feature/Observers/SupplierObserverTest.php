@@ -11,29 +11,28 @@ use XetaSuite\Models\Supplier;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->site = Site::factory()->create();
+    $this->supplier = Supplier::factory()->create(['name' => 'Acme Corp']);
+    $this->item = Item::factory()->forSite($this->site)->fromSupplier($this->supplier)->create();
+});
+
 it('saves supplier_name in items when supplier is deleted', function () {
-    $site = Site::factory()->create();
-    $supplier = Supplier::factory()->create(['name' => 'Acme Corp']);
-    $item = Item::factory()->for($site)->for($supplier)->create();
+    expect($this->item->supplier_name)->toBeNull();
 
-    expect($item->supplier_name)->toBeNull();
+    $this->supplier->delete();
 
-    $supplier->delete();
-
-    $item->refresh();
-    expect($item->supplier_id)->toBeNull();
-    expect($item->supplier_name)->toBe('Acme Corp');
+    $this->item->refresh();
+    expect($this->item->supplier_id)->toBeNull();
+    expect($this->item->supplier_name)->toBe('Acme Corp');
 });
 
 it('saves supplier_name in item_movements when supplier is deleted', function () {
-    $site = Site::factory()->create();
-    $supplier = Supplier::factory()->create(['name' => 'Acme Corp']);
-    $item = Item::factory()->for($site)->create();
-    $movement = ItemMovement::factory()->for($item)->for($supplier)->create();
+    $movement = ItemMovement::factory()->forItem($this->item)->fromSupplier($this->supplier)->create();
 
     expect($movement->supplier_name)->toBeNull();
 
-    $supplier->delete();
+    $this->supplier->delete();
 
     $movement->refresh();
     expect($movement->supplier_id)->toBeNull();
@@ -41,14 +40,11 @@ it('saves supplier_name in item_movements when supplier is deleted', function ()
 });
 
 it('saves supplier_name in item_prices when supplier is deleted', function () {
-    $site = Site::factory()->create();
-    $supplier = Supplier::factory()->create(['name' => 'Acme Corp']);
-    $item = Item::factory()->for($site)->create();
-    $price = ItemPrice::factory()->for($item)->for($supplier)->create();
+    $price = ItemPrice::factory()->forItem($this->item)->fromSupplier($this->supplier)->create();
 
     expect($price->supplier_name)->toBeNull();
 
-    $supplier->delete();
+    $this->supplier->delete();
 
     $price->refresh();
     expect($price->supplier_id)->toBeNull();

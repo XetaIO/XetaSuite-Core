@@ -12,15 +12,21 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->site = Site::factory()->create();
+    $this->zone = Zone::factory()->forSite($this->site)->withAllowMaterial()->create();
+    $this->material = Material::factory()
+        ->forSite($this->site)
+        ->forZone($this->zone)
+        ->create(['name' => 'Machine A']);
+});
+
 it('saves material_name in cleanings when material is deleted', function () {
-    $site = Site::factory()->create();
-    $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
-    $material = Material::factory()->inSiteAndZone($site, $zone)->create(['name' => 'Machine A']);
-    $cleaning = Cleaning::factory()->for($site)->for($material)->create();
+    $cleaning = Cleaning::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($cleaning->material_name)->toBeNull();
 
-    $material->delete();
+    $this->material->delete();
 
     $cleaning->refresh();
     expect($cleaning->material_id)->toBeNull();
@@ -28,14 +34,11 @@ it('saves material_name in cleanings when material is deleted', function () {
 });
 
 it('saves material_name in incidents when material is deleted', function () {
-    $site = Site::factory()->create();
-    $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
-    $material = Material::factory()->inSiteAndZone($site, $zone)->create(['name' => 'Machine A']);
-    $incident = Incident::factory()->for($site)->for($material)->create();
+    $incident = Incident::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($incident->material_name)->toBeNull();
 
-    $material->delete();
+    $this->material->delete();
 
     $incident->refresh();
     expect($incident->material_id)->toBeNull();
@@ -43,14 +46,11 @@ it('saves material_name in incidents when material is deleted', function () {
 });
 
 it('saves material_name in maintenances when material is deleted', function () {
-    $site = Site::factory()->create();
-    $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
-    $material = Material::factory()->inSiteAndZone($site, $zone)->create(['name' => 'Machine A']);
-    $maintenance = Maintenance::factory()->for($site)->for($material)->create();
+    $maintenance = Maintenance::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($maintenance->material_name)->toBeNull();
 
-    $material->delete();
+    $this->material->delete();
 
     $maintenance->refresh();
     expect($maintenance->material_id)->toBeNull();

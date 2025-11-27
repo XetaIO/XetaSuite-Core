@@ -50,15 +50,27 @@ class ItemFactory extends Factory
     }
 
     /**
-     * Forces the use of an existing site (or site ID) & Forces the use of an existing supplier (or supplier ID).
+     * Forces the use of an existing site (or site ID).
      *
      *
      * @return ItemFactory
      */
-    public function forSiteWithSupplier(Site|int $site, Supplier|int $supplier): static
+    public function forSite(Site|int $site): static
     {
         return $this->state(fn () => [
             'site_id' => $site instanceof Site ? $site->id : $site,
+        ]);
+    }
+
+    /**
+     * Forces the use of an existing supplier (or supplier ID).
+     *
+     *
+     * @return ItemFactory
+     */
+    public function fromSupplier(Supplier|int $supplier): static
+    {
+        return $this->state(fn () => [
             'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
         ]);
     }

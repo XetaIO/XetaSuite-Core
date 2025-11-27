@@ -22,7 +22,8 @@ class ItemsSeeder extends Seeder
 
         foreach ($materials as $material) {
             Item::factory()
-                    ->forSiteWithSupplier($material->site_id, Supplier::factory()->createdBy($user)->create())
+                    ->forSite($material->site_id)
+                    ->fromSupplier(Supplier::factory()->createdBy($user)->create())
                     ->withMaterials([$material->id])
                     ->createdBy($user)
                     ->count(random_int(2, 4))
