@@ -10,11 +10,11 @@ use XetaSuite\Models\Site;
 /**
  * Endpoint                                   Resource                              Données retournées
  *
- * GET /api/items                        ItemResource                      Minimalist list
- * GET /api/items/{id}                ItemDetailResource            All the details
- * GET /api/dashboard/items    ItemDashboardResource    Alerts + key stats
+ * GET /api/sites                        ItemResource                      Minimalist list
+ * GET /api/sites/{id}                ItemDetailResource            All the details
+ * GET /api/items    ItemDashboardResource    Alerts + key stats
  */
-class ItemController extends Controller
+class SiteController extends Controller
 {
     public function destroy(Site $site): JsonResponse
     {
