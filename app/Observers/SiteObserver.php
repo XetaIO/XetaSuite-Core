@@ -10,6 +10,14 @@ use XetaSuite\Models\Site;
 class SiteObserver
 {
     /**
+     * Handle the "created" event.
+     */
+    public function created(Site $site): void
+    {
+        event(new SiteCreatedEvent($site));
+    }
+
+    /**
      * Handle the "deleting" event.
      *
      * Prevent deletion if the site has related records.
@@ -17,13 +25,5 @@ class SiteObserver
     public function deleting(Site $site): bool
     {
         return $site->zones()->doesntExist();
-    }
-
-    /**
-     * Handle the "created" event.
-     */
-    public function created(Site $site): void
-    {
-        event(new SiteCreatedEvent($site));
     }
 }
