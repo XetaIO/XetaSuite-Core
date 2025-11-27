@@ -6,13 +6,21 @@ namespace XetaSuite\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Xetaio\Counts\Concerns\HasCounts;
 
 class CompanyMaintenance extends Pivot
 {
+    use HasCounts;
+
+    /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'company' => 'maintenance_count',
+    ];
+
     /**
      * Get the company that owns the CompanyMaintenance
-     *
-     * @return BelongsTo
      */
     public function company(): BelongsTo
     {
@@ -21,12 +29,9 @@ class CompanyMaintenance extends Pivot
 
     /**
      * Get the maintenance that owns the CompanyMaintenance
-     *
-     * @return BelongsTo
      */
     public function maintenance(): BelongsTo
     {
         return $this->belongsTo(Maintenance::class);
     }
-
 }

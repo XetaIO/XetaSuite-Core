@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Item;
+use XetaSuite\Models\ItemMovement;
+use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
-use XetaSuite\Models\Maintenance;
 
 class ItemMovementFactory extends Factory
 {
@@ -18,40 +18,18 @@ class ItemMovementFactory extends Factory
     /**
      * Configure the model factory.
      */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (ItemMovement $movement) {
-            $item = $movement->item;
-
-            if ($movement->type === 'entry') {
-                $item->increment('item_entry_total', $movement->quantity);
-                $item->increment('item_entry_count');
-                $movement->creator()->increment('item_entry_count');
-            } else {
-                $item->increment('item_exit_total', $movement->quantity);
-                $item->increment('item_exit_count');
-                $movement->creator()->increment('item_exit_count');
-            }
-        });
-    }
-
-    /**
-     * Configure the model factory.
-     *
-     * @return array
-     */
     public function definition(): array
     {
         // By default, an "entry" movement is generated. The `exit()` state can change this.
         $type = 'entry';
 
         $invoiceNumber = null;
-        $invoiceDate   = null;
+        $invoiceDate = null;
 
         // Entry movement
         if ($type === 'entry') {
             $invoiceNumber = $this->faker->optional()->bothify('INV-####');
-            $invoiceDate   = $this->faker->optional()->date();
+            $invoiceDate = $this->faker->optional()->date();
         }
 
         return [
@@ -61,7 +39,7 @@ class ItemMovementFactory extends Factory
 
             'quantity' => 0,
             'unit_price' => 0,
-            'total_price'   => 0,
+            'total_price' => 0,
 
             // Entry (supplier)
             'supplier_id' => null,
@@ -80,7 +58,6 @@ class ItemMovementFactory extends Factory
             'movement_date' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];
     }
-
 
     /**
      * For the type of the movement to be an Entry.
@@ -115,21 +92,19 @@ class ItemMovementFactory extends Factory
     /**
      * Associates an Item to the movement.
      *
-     * @param Item|int $item
      *
      * @return ItemMovementFactory
      */
     public function forItem(Item|int $item): static
     {
         return $this->state(fn () => [
-            'item_id'   => $item instanceof Item ? $item->id : $item,
+            'item_id' => $item instanceof Item ? $item->id : $item,
         ]);
     }
 
     /**
      * Associates a Supplier to the movement. (For Entries)
      *
-     * @param Supplier|int $supplier
      *
      * @return ItemMovementFactory
      */
@@ -145,7 +120,6 @@ class ItemMovementFactory extends Factory
     /**
      * Link the movement to a Maintenance via the polymorphic column. (For Exits)
      *
-     * @param Maintenance|int $maintenance
      *
      * @return ItemMovementFactory
      */
@@ -153,15 +127,13 @@ class ItemMovementFactory extends Factory
     {
         return $this->state(fn () => [
             'movable_type' => Maintenance::class,
-            'movable_id'   => $maintenance instanceof Maintenance ? $maintenance->id : $maintenance,
+            'movable_id' => $maintenance instanceof Maintenance ? $maintenance->id : $maintenance,
         ]);
     }
 
     /**
      * Defines quantity and unit price for the movement.
      *
-     * @param int   $quantity
-     * @param float $unitPrice
      *
      * @return ItemMovementFactory
      */
@@ -170,23 +142,22 @@ class ItemMovementFactory extends Factory
         $totalPrice = $quantity * $unitPrice;
 
         return $this->state(fn () => [
-            'quantity'   => $quantity,
-            'unit_price'   => $unitPrice,
-            'total_price'   => $totalPrice,
+            'quantity' => $quantity,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
         ]);
     }
 
     /**
      * Defines a creator (User).
      *
-     * @param User|int $user
      *
      * @return ItemMovementFactory
      */
     public function createdBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 }

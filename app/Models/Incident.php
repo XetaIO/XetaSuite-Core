@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Incidents\IncidentSeverity;
 use XetaSuite\Enums\Incidents\IncidentStatus;
-use XetaSuite\Observers\IncidentObserver;
 
-#[ObservedBy([IncidentObserver::class])]
 class Incident extends Model
 {
+    use HasCounts;
     use HasFactory;
 
     /**
@@ -34,7 +33,7 @@ class Incident extends Model
         'started_at',
         'resolved_at',
         'status',
-        'severity'
+        'severity',
     ];
 
     /**
@@ -46,13 +45,20 @@ class Incident extends Model
         'status' => IncidentStatus::class,
         'severity' => IncidentSeverity::class,
         'started_at' => 'datetime',
-        'resolved_at' => 'datetime'
+        'resolved_at' => 'datetime',
+    ];
+
+    /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'maintenance' => 'incident_count',
+        'material' => 'incident_count',
+        'reporter' => 'incident_count',
     ];
 
     /**
      * Get the site that owns the incident.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -61,8 +67,6 @@ class Incident extends Model
 
     /**
      * Get the material that owns the incident.
-     *
-     * @return BelongsTo
      */
     public function material(): BelongsTo
     {
@@ -71,8 +75,6 @@ class Incident extends Model
 
     /**
      * Get the maintenance that owns the incident.
-     *
-     * @return BelongsTo
      */
     public function maintenance(): BelongsTo
     {
@@ -81,8 +83,6 @@ class Incident extends Model
 
     /**
      * Get the user that reported the incident.
-     *
-     * @return BelongsTo
      */
     public function reporter(): BelongsTo
     {
@@ -91,8 +91,6 @@ class Incident extends Model
 
     /**
      * Get the user that edited the incident.
-     *
-     * @return BelongsTo
      */
     public function editor(): BelongsTo
     {

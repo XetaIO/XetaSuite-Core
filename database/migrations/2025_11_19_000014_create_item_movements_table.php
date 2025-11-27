@@ -9,7 +9,8 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('item_movements', function (Blueprint $table) {
@@ -17,7 +18,7 @@ return new class () extends Migration {
 
             $table->foreignIdFor(Item::class)
                 ->constrained()
-                ->restrictOnDelete();
+                ->cascadeOnDelete();
 
             $table->enum('type', ['entry', 'exit']);
             $table->integer('quantity'); // Positive or negative regarding the type

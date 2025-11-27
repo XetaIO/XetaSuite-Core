@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Materials\CleaningFrequency;
 use XetaSuite\Observers\MaterialObserver;
 
 #[ObservedBy([MaterialObserver::class])]
 class Material extends Model
 {
+    use HasCounts;
     use HasFactory;
 
     /**
@@ -35,7 +37,7 @@ class Material extends Model
         'cleaning_alert_frequency_repeatedly',
         'cleaning_alert_frequency_type',
         'last_cleaning_at',
-        'last_cleaning_alert_send_at'
+        'last_cleaning_alert_send_at',
     ];
 
     /**
@@ -48,13 +50,18 @@ class Material extends Model
         'cleaning_alert' => 'boolean',
         'cleaning_alert_email' => 'boolean',
         'last_cleaning_at' => 'datetime',
-        'last_cleaning_alert_send_at' => 'datetime'
+        'last_cleaning_alert_send_at' => 'datetime',
+    ];
+
+    /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'zone' => 'material_count',
     ];
 
     /**
      * Get the zone that owns the material.
-     *
-     * @return BelongsTo
      */
     public function zone(): BelongsTo
     {
@@ -63,8 +70,6 @@ class Material extends Model
 
     /**
      * Get the user that created the material.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {
@@ -73,8 +78,6 @@ class Material extends Model
 
     /**
      * Get the incidents for the material.
-     *
-     * @return HasMany
      */
     public function incidents(): HasMany
     {
@@ -83,8 +86,6 @@ class Material extends Model
 
     /**
      * Get the maintenances for the material.
-     *
-     * @return HasMany
      */
     public function maintenances(): HasMany
     {
@@ -93,8 +94,6 @@ class Material extends Model
 
     /**
      * The items that belong to the material.
-     *
-     * @return BelongsToMany
      */
     public function items(): BelongsToMany
     {
@@ -105,8 +104,6 @@ class Material extends Model
 
     /**
      * Get the cleanings for the material.
-     *
-     * @return HasMany
      */
     public function cleanings(): HasMany
     {
@@ -115,8 +112,6 @@ class Material extends Model
 
     /**
      * The users that receive notifications for the material.
-     *
-     * @return BelongsToMany
      */
     public function recipients(): BelongsToMany
     {

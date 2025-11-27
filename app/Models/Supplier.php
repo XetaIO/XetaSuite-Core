@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use XetaSuite\Observers\SupplierObserver;
 
+#[ObservedBy([SupplierObserver::class])]
 class Supplier extends Model
 {
     use HasFactory;
@@ -23,13 +26,11 @@ class Supplier extends Model
         'created_by_id',
         'created_by_name',
         'name',
-        'description'
+        'description',
     ];
 
     /**
      * Get all the items from the supplier.
-     *
-     * @return hasMany
      */
     public function items(): HasMany
     {
@@ -38,8 +39,6 @@ class Supplier extends Model
 
     /**
      * Get the user that created the supplier.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {

@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Cleanings\CleaningType;
 use XetaSuite\Observers\CleaningObserver;
 
 #[ObservedBy([CleaningObserver::class])]
 class Cleaning extends Model
 {
+    use HasCounts;
     use HasFactory;
 
     /**
@@ -29,7 +31,7 @@ class Cleaning extends Model
         'created_by_name',
         'edited_by_id',
         'description',
-        'type'
+        'type',
     ];
 
     /**
@@ -42,9 +44,15 @@ class Cleaning extends Model
     ];
 
     /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'material' => 'cleaning_count',
+        'creator' => 'cleaning_count',
+    ];
+
+    /**
      * Get the site where belongs the cleaning.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -53,8 +61,6 @@ class Cleaning extends Model
 
     /**
      * Get the material where belongs the cleaning.
-     *
-     * @return BelongsTo
      */
     public function material(): BelongsTo
     {
@@ -63,8 +69,6 @@ class Cleaning extends Model
 
     /**
      * Get the user that created the cleaning.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {
@@ -73,8 +77,6 @@ class Cleaning extends Model
 
     /**
      * Get the user that edited the cleaning.
-     *
-     * @return BelongsTo
      */
     public function editor(): BelongsTo
     {

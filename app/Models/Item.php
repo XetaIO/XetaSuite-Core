@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Models\Presenters\ItemPresenter;
-use XetaSuite\Observers\ItemObserver;
 
-#[ObservedBy([ItemObserver::class])]
 class Item extends Model
 {
+    use HasCounts;
     use HasFactory;
     use ItemPresenter;
 
@@ -57,9 +56,15 @@ class Item extends Model
     ];
 
     /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'supplier' => 'item_count',
+        'creator' => 'item_count',
+    ];
+
+    /**
      * Get the site that owns the item.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -68,8 +73,6 @@ class Item extends Model
 
     /**
      * Get the supplier that owns the item.
-     *
-     * @return BelongsTo
      */
     public function supplier(): BelongsTo
     {
@@ -78,8 +81,6 @@ class Item extends Model
 
     /**
      * The materials that belong to the item.
-     *
-     * @return BelongsToMany
      */
     public function materials(): BelongsToMany
     {
@@ -90,8 +91,6 @@ class Item extends Model
 
     /**
      * Get the item movements for the item.
-     *
-     * @return HasMany
      */
     public function movements(): HasMany
     {
@@ -101,8 +100,6 @@ class Item extends Model
 
     /**
      * Get the item prices for the item.
-     *
-     * @return HasMany
      */
     public function prices(): HasMany
     {
@@ -112,8 +109,6 @@ class Item extends Model
 
     /**
      * Get the recipients for the item.
-     *
-     * @return BelongsToMany
      */
     public function recipients(): BelongsToMany
     {
@@ -123,18 +118,14 @@ class Item extends Model
 
     /**
      * The creator of the item.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id', 'id');
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 
     /**
      * The editor of the item.
-     *
-     * @return BelongsTo
      */
     public function editor(): BelongsTo
     {
@@ -143,10 +134,6 @@ class Item extends Model
 
     /**
      * Get the current price for the item, optionally filtered by supplier.
-     *
-     * @param int|null $supplierId
-     *
-     * @return ItemPrice|null
      */
     public function getCurrentPrice(?int $supplierId = null): ?ItemPrice
     {

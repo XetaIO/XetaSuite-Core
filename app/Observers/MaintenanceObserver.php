@@ -4,29 +4,11 @@ declare(strict_types=1);
 
 namespace XetaSuite\Observers;
 
-use Illuminate\Support\Facades\Auth;
-use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\ItemMovement;
+use XetaSuite\Models\Maintenance;
 
 class MaintenanceObserver
 {
-    /**
-     * Handle the "creating" event.
-     */
-    public function creating(Maintenance $maintenance): void
-    {
-        $maintenance->user_id = Auth::id();
-        $maintenance->site_id = getPermissionsTeamId();
-    }
-
-    /**
-     * Handle the "updating" event.
-     */
-    public function updating(Maintenance $maintenance): void
-    {
-        $maintenance->edited_by_id = Auth::id();
-    }
-
     /**
      * Handle the "deleted" event.
      */
@@ -44,7 +26,7 @@ class MaintenanceObserver
             ->where('movable_id', $maintenance->id)
             ->update([
                 'movable_type' => null,
-                'movable_id'   => null,
+                'movable_id' => null,
             ]);
     }
 }

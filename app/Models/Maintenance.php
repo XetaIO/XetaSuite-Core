@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Maintenances\MaintenanceRealization;
 use XetaSuite\Enums\Maintenances\MaintenanceStatus;
 use XetaSuite\Enums\Maintenances\MaintenanceType;
@@ -19,6 +20,7 @@ use XetaSuite\Observers\MaintenanceObserver;
 #[ObservedBy([MaintenanceObserver::class])]
 class Maintenance extends Model
 {
+    use HasCounts;
     use HasFactory;
 
     /**
@@ -40,7 +42,7 @@ class Maintenance extends Model
         'status',
         'started_at',
         'resolved_at',
-        'incident_count'
+        'incident_count',
     ];
 
     /**
@@ -53,14 +55,19 @@ class Maintenance extends Model
         'realization' => MaintenanceRealization::class,
         'status' => MaintenanceStatus::class,
         'started_at' => 'datetime',
-        'resolved_at' => 'datetime'
+        'resolved_at' => 'datetime',
     ];
 
+    /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'material' => 'maintenance_count',
+        'creator' => 'maintenance_count',
+    ];
 
     /**
      * Get the site that owns the maintenance.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -69,8 +76,6 @@ class Maintenance extends Model
 
     /**
      * Get the material that owns the maintenance.
-     *
-     * @return BelongsTo
      */
     public function material(): BelongsTo
     {
@@ -79,8 +84,6 @@ class Maintenance extends Model
 
     /**
      * Get the incidents for the maintenance.
-     *
-     * @return HasMany
      */
     public function incidents(): HasMany
     {
@@ -89,8 +92,6 @@ class Maintenance extends Model
 
     /**
      * Get the user that created the maintenance.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {
@@ -99,8 +100,6 @@ class Maintenance extends Model
 
     /**
      * Get the user that edited the maintenance.
-     *
-     * @return BelongsTo
      */
     public function editor(): BelongsTo
     {
@@ -109,8 +108,6 @@ class Maintenance extends Model
 
     /**
      * Get the operators involved in the maintenance.
-     *
-     * @return BelongsToMany
      */
     public function operators(): BelongsToMany
     {
@@ -120,8 +117,6 @@ class Maintenance extends Model
 
     /**
      * Get the companies involved in the maintenance.
-     *
-     * @return BelongsToMany
      */
     public function companies(): BelongsToMany
     {
@@ -132,8 +127,6 @@ class Maintenance extends Model
 
     /**
      * Maintenance-related item movements (outgoing items only).
-     *
-     * @return MorphMany
      */
     public function itemMovements(): MorphMany
     {

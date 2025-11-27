@@ -13,19 +13,7 @@ class ZoneFactory extends Factory
     protected $model = Zone::class;
 
     /**
-     * Configure the model factory.
-     */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Zone $zone) {
-            $zone->site()->increment('zone_count');
-        });
-    }
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -41,7 +29,6 @@ class ZoneFactory extends Factory
     /**
      * Create a unique name for the site.
      *
-     * @param Site|int $site
      *
      * @return ZoneFactory
      */
@@ -60,7 +47,6 @@ class ZoneFactory extends Factory
      *     $parent = Zone::factory()->create();
      *     Zone::factory()->withParent($parent)->create();
      *
-     * @param Zone $parent
      *
      * @return ZoneFactory
      */
@@ -69,7 +55,7 @@ class ZoneFactory extends Factory
         return $this->state(fn () => [
             'parent_id' => $parent->id,
             // Parent and child share the same site.
-            'site_id'   => $parent->site_id,
+            'site_id' => $parent->site_id,
         ]);
     }
 
@@ -81,21 +67,20 @@ class ZoneFactory extends Factory
     public function withAllowMaterial(): static
     {
         return $this->state(fn () => [
-            'allow_material' => true
+            'allow_material' => true,
         ]);
     }
 
     /**
      * Creates a "root" zone (without a parent) in a given site.
      *
-     * @param Site|int $site
      *
      * @return ZoneFactory
      */
     public function forSite(Site|int $site): static
     {
         return $this->state(fn () => [
-            'site_id'   => $site instanceof Site ? $site->id : $site,
+            'site_id' => $site instanceof Site ? $site->id : $site,
         ]);
     }
 }

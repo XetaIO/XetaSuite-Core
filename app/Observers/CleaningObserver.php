@@ -9,14 +9,6 @@ use XetaSuite\Models\Cleaning;
 class CleaningObserver
 {
     /**
-     * Handle the "creating" event.
-     */
-    public function creating(Cleaning $cleaning): void
-    {
-        $cleaning->site_id = getPermissionsTeamId();
-    }
-
-    /**
      * Handle the "created" event.
      */
     public function created(Cleaning $cleaning): void

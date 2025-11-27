@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Xetaio\Counts\Concerns\HasCounts;
+use XetaSuite\Observers\ZoneObserver;
 
+#[ObservedBy([ZoneObserver::class])]
 class Zone extends Model
 {
+    use HasCounts;
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -21,7 +27,7 @@ class Zone extends Model
         'site_id',
         'name',
         'parent_id',
-        'allow_material'
+        'allow_material',
     ];
 
     /**
@@ -30,13 +36,18 @@ class Zone extends Model
      * @var array
      */
     protected $casts = [
-        'allow_material' => 'boolean'
+        'allow_material' => 'boolean',
+    ];
+
+    /**
+     * The relations to be counted.
+     */
+    protected static array $countsConfig = [
+        'site' => 'zone_count',
     ];
 
     /**
      * Get the materials for the zone.
-     *
-     * @return HasMany
      */
     public function materials(): HasMany
     {
@@ -45,8 +56,6 @@ class Zone extends Model
 
     /**
      * Get the site that owns the zone.
-     *
-     * @return BelongsTo
      */
     public function site(): BelongsTo
     {
@@ -55,8 +64,6 @@ class Zone extends Model
 
     /**
      * Get the parent zone for the zone.
-     *
-     * @return BelongsTo
      */
     public function parent(): BelongsTo
     {
@@ -65,8 +72,6 @@ class Zone extends Model
 
     /**
      * Get the child zones for the zone.
-     *
-     * @return HasMany
      */
     public function children(): HasMany
     {
@@ -75,8 +80,6 @@ class Zone extends Model
 
     /**
      * Get all descendant zones for the zone.
-     *
-     * @return HasMany
      */
     public function descendants(): HasMany
     {

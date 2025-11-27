@@ -16,30 +16,16 @@ class UserRolesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Example: Assign roles to users per site
-        // This is a template - modify it according to your needs
-
+        // Assign roles to users per site
         // Get all sites and users
-        $sites = Site::all()->pluck('id')->toArray();
+        $sites = Site::all();
         $users = User::all();
 
-
-        // Example assignment:
+        // Assignment:
         // - First user is admin on all sites
         // - Other users get different roles on different sites
         $firstUser = $users->first();
         $otherUsers = $users->skip(1);
-
-        //$role = Role::where('name', 'admin')->first();
-
-        $firstUser->assignRolesToSites(Role::where('name', 'admin')->first(), $sites);
-        $users->get(1)->assignRolesToSites(Role::where('name', 'manager')->first(), $sites);
-        $users->get(2)->assignRolesToSites(Role::where('name', 'technician')->first(), $sites);
-        $users->get(3)->assignRolesToSites(Role::where('name', 'operator')->first(), $sites);
-
-        /*foreach ($otherUsers as $user) {
-            $user->assignRolesToSites('manager', $sites);
-        }
 
         foreach ($sites as $site) {
             // Assign admin role to the first user on all sites
@@ -48,11 +34,11 @@ class UserRolesSeeder extends Seeder
                 ->first();
 
             if ($adminRole) {
-                $firstUser->assignRole($adminRole);
+                $firstUser->assignRolesToSites($adminRole, [$site->id]);
             }
 
             // Assign different roles to other users
-            $otherUsers->each(function (User $user, int $index) use ($sites, $site) {
+            $otherUsers->each(function (User $user, int $index) use ($site) {
                 if ($site->is_headquarters) {
                     return true;
                 }
@@ -65,11 +51,9 @@ class UserRolesSeeder extends Seeder
                     ->first();
 
                 if ($role) {
-                    $user->assignRole($role);
+                    $user->assignRolesToSites($role, [$site->id]);
                 }
             });
         }
-
-        $this->command->info('User roles assigned successfully!');*/
     }
 }

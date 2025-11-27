@@ -23,15 +23,10 @@ class CompaniesSeeder extends Seeder
 
         foreach ($maintenances as $maintenance) {
             $companies = Company::factory()
-                    ->createdBy($user)
-                    ->count(random_int(1, 2))
-                    ->create();
-
+                ->createdBy($user)
+                ->count(random_int(1, 2))
+                ->create();
             $maintenance->companies()->attach($companies->pluck('id')->toArray());
-
-            $companies->each(function (Company $company) {
-                $company->increment('maintenance_count');
-            });
 
             // Doing the same for operators
             if ($maintenance->realization === MaintenanceRealization::BOTH) {

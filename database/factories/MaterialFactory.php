@@ -5,30 +5,18 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use XetaSuite\Enums\Materials\CleaningFrequency;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
-use XetaSuite\Enums\Materials\CleaningFrequency;
 
 class MaterialFactory extends Factory
 {
     protected $model = Material::class;
 
     /**
-     * Configure the model factory.
-     */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Material $material) {
-            $material->zone()->increment('material_count');
-        });
-    }
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -81,8 +69,6 @@ class MaterialFactory extends Factory
      *     $zone = Zone::factory()->forSite($site)->create();
      *     Material::factory()->inSiteAndZone($site, $zone)->create();
      *
-     * @param Site|int $site
-     * @param Zone|int $zone
      *
      * @return MaterialFactory
      */
@@ -97,14 +83,13 @@ class MaterialFactory extends Factory
     /**
      * Defines a creator (User).
      *
-     * @param User|int $user
      *
      * @return MaterialFactory
      */
     public function createdBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 }

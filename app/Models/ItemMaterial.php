@@ -6,26 +6,33 @@ namespace XetaSuite\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Xetaio\Counts\Concerns\HasCounts;
 
 class ItemMaterial extends Pivot
 {
+    use HasCounts;
+
     /**
-     * Get the material that owns the ItemMaterial
-     *
-     * @return BelongsTo
+     * The relations to be counted.
      */
-    public function material(): BelongsTo
-    {
-        return $this->belongsTo(Material::class);
-    }
+    protected static array $countsConfig = [
+        'item' => 'material_count',
+        'material' => 'item_count',
+    ];
 
     /**
      * Get the item that owns the ItemMaterial.
-     *
-     * @return BelongsTo
      */
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    /**
+     * Get the material that owns the ItemMaterial
+     */
+    public function material(): BelongsTo
+    {
+        return $this->belongsTo(Material::class);
     }
 }

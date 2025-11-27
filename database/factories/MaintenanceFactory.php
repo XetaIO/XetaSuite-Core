@@ -5,33 +5,20 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use XetaSuite\Models\Maintenance;
-use XetaSuite\Models\Site;
-use XetaSuite\Models\Material;
-use XetaSuite\Models\User;
 use XetaSuite\Enums\Maintenances\MaintenanceRealization;
 use XetaSuite\Enums\Maintenances\MaintenanceStatus;
 use XetaSuite\Enums\Maintenances\MaintenanceType;
+use XetaSuite\Models\Maintenance;
+use XetaSuite\Models\Material;
+use XetaSuite\Models\Site;
+use XetaSuite\Models\User;
 
 class MaintenanceFactory extends Factory
 {
     protected $model = Maintenance::class;
 
     /**
-     * Configure the model factory.
-     */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Maintenance $maintenance) {
-            $maintenance->material()->increment('maintenance_count');
-            $maintenance->creator()->increment('maintenance_count');
-        });
-    }
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -60,7 +47,7 @@ class MaintenanceFactory extends Factory
                 ? $this->faker->dateTimeBetween('-1 month', 'now')
                 : null,
 
-            'incident_count' => 0
+            'incident_count' => 0,
         ];
     }
 
@@ -71,7 +58,6 @@ class MaintenanceFactory extends Factory
      *   $site = Site::factory()->create();
      *   Maintenance::factory()->forSite($site)->create();
      *
-     * @param Site|int $site
      *
      * @return MaintenanceFactory
      */
@@ -85,7 +71,6 @@ class MaintenanceFactory extends Factory
     /**
      * Assign a material or reset the fields.
      *
-     * @param Material|int|null $material
      *
      * @return MaintenanceFactory
      */
@@ -93,13 +78,13 @@ class MaintenanceFactory extends Factory
     {
         if (is_null($material)) {
             return $this->state(fn () => [
-                'material_id'   => null,
+                'material_id' => null,
                 'material_name' => null,
             ]);
         }
 
         return $this->state(fn () => [
-            'material_id'   => $material instanceof Material ? $material->id : $material,
+            'material_id' => $material instanceof Material ? $material->id : $material,
             'material_name' => null,
         ]);
     }
@@ -107,21 +92,19 @@ class MaintenanceFactory extends Factory
     /**
      * Defines the creator.
      *
-     * @param User|int $user
      *
      * @return MaintenanceFactory
      */
     public function createdBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 
     /**
      * Defines the editor.
      *
-     * @param User|int $user
      *
      * @return MaintenanceFactory
      */
@@ -135,7 +118,6 @@ class MaintenanceFactory extends Factory
     /**
      * Force the status of a maintenance (planned, in_progress, completed, canceled).
      *
-     * @param MaintenanceStatus|string $status
      *
      * @return MaintenanceFactory
      */
@@ -151,7 +133,6 @@ class MaintenanceFactory extends Factory
     /**
      * Force the type of a maintenance (corrective, preventive, inspection, improvement).
      *
-     * @param MaintenanceType|string $type
      *
      * @return MaintenanceFactory
      */
@@ -167,7 +148,6 @@ class MaintenanceFactory extends Factory
     /**
      * Force the maintenance realization method (internal, external, both).
      *
-     * @param MaintenanceRealization|string $realization
      *
      * @return MaintenanceFactory
      */
@@ -189,7 +169,6 @@ class MaintenanceFactory extends Factory
      *       ->withOperators($ops->pluck('id')->toArray())
      *       ->create();
      *
-     * @param array $userIds
      *
      * @return MaintenanceFactory
      */
@@ -201,7 +180,6 @@ class MaintenanceFactory extends Factory
     /**
      * Adds companies to the maintenance.
      *
-     * @param array $companyIds
      *
      * @return MaintenanceFactory
      */

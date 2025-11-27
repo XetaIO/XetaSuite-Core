@@ -16,7 +16,7 @@ class ItemMovementsSeeder extends Seeder
      */
     public function run(): void
     {
-        $items = Item::with('supplier')->inRandomOrder()->limit(5)->get();
+        $items = Item::with('supplier')->inRandomOrder()->limit(10)->get();
         $user = User::firstWhere('email', 'admin@xetasuite.test');
 
         foreach ($items as $item) {
@@ -25,7 +25,7 @@ class ItemMovementsSeeder extends Seeder
                 ->entry()
                 ->forItem($item)
                 ->withSupplier($item->supplier->id)
-                ->withQuantity(random_int(10, 50), (float)$item->purchase_price)
+                ->withQuantity(random_int(10, 50), (float) $item->purchase_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))
                 ->create();
@@ -34,7 +34,7 @@ class ItemMovementsSeeder extends Seeder
             ItemMovement::factory()
                 ->exit()
                 ->forItem($item)
-                ->withQuantity(random_int(2, 4), (float)$item->purchase_price)
+                ->withQuantity(random_int(2, 4), (float) $item->purchase_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))
                 ->create();

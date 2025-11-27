@@ -17,20 +17,6 @@ class ItemFactory extends Factory
     /**
      * Configure the model factory.
      */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (Item $item) {
-            $item->materials()->increment('item_count');
-            $item->supplier()->increment('item_count');
-            $item->creator()->increment('item_count');
-        });
-    }
-
-    /**
-     * Configure the model factory.
-     *
-     * @return array
-     */
     public function definition(): array
     {
         return [
@@ -59,15 +45,13 @@ class ItemFactory extends Factory
             'number_warning_enabled' => false,
             'number_warning_minimum' => 0,
             'number_critical_enabled' => false,
-            'number_critical_minimum' => 0
+            'number_critical_minimum' => 0,
         ];
     }
 
     /**
      * Forces the use of an existing site (or site ID) & Forces the use of an existing supplier (or supplier ID).
      *
-     * @param Site|int $site
-     * @param Supplier|int $supplier
      *
      * @return ItemFactory
      */
@@ -82,50 +66,43 @@ class ItemFactory extends Factory
     /**
      * Defines a creator (User).
      *
-     * @param User|int  $user
      *
      * @return ItemFactory
      */
     public function createdBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 
     /**
      * Defines an editor (User).
      *
-     * @param User|int  $user
      *
      * @return ItemFactory
      */
     public function editedBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'edited_user_id' => $user instanceof User ? $user->id : $user
+            'edited_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 
     /**
      * Adds materials to the item.
      *
-     * @param array $materialIds
      *
      * @return ItemFactory
      */
     public function withMaterials(array $materialIds): static
     {
-        return $this->hasAttached($materialIds, [], 'materials')
-            ->state(fn () => [
-                'material_count' => count($materialIds)
-            ]);
+        return $this->hasAttached($materialIds, [], 'materials');
     }
 
     /**
      * Forces the "warning" alert status (and the minimum) for tests.
      *
-     * @param int $minimum
      *
      * @return ItemFactory
      */
@@ -140,7 +117,6 @@ class ItemFactory extends Factory
     /**
      * Forces the "critical" alert status (and the minimum) for tests.
      *
-     * @param int $minimum
      *
      * @return ItemFactory
      */

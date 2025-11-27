@@ -18,7 +18,7 @@
         "spatie/laravel-activitylog": "^4.10.2",
         "spatie/laravel-backup": "^9.3.6",
         "spatie/laravel-permission": "^6.23.0",
-        "xetaio/xetaravel-counts": "^1.0",
+        "xetaio/xetaravel-counts": "^2.0",
         "xetaio/xetaravel-iptraceable": "^12.0"
     },
     "require-dev": {

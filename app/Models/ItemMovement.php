@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Xetaio\Counts\Concerns\HasCounts;
+use XetaSuite\Observers\ItemMovementObserver;
 
+#[ObservedBy([ItemMovementObserver::class])]
 class ItemMovement extends Model
 {
+    use HasCounts;
     use HasFactory;
 
     /**
@@ -50,9 +55,20 @@ class ItemMovement extends Model
     ];
 
     /**
-     * Get the item associated with the item movement.
+     * Get the counts configuration for this movement.
      *
-     * @return BelongsTo
+     * @return array<string, string>
+     */
+    public function getCountsConfig(): array
+    {
+        return [
+            'item' => $this->type === 'entry' ? 'item_entry_count' : 'item_exit_count',
+            'creator' => $this->type === 'entry' ? 'item_entry_count' : 'item_exit_count',
+        ];
+    }
+
+    /**
+     * Get the item associated with the item movement.
      */
     public function item(): BelongsTo
     {
@@ -61,8 +77,6 @@ class ItemMovement extends Model
 
     /**
      * Get the supplier associated with the item movement. (Entries)
-     *
-     * @return BelongsTo
      */
     public function supplier(): BelongsTo
     {
@@ -71,8 +85,6 @@ class ItemMovement extends Model
 
     /**
      * The movable model associated with the item movement.
-     *
-     * @return MorphTo
      */
     public function movable(): MorphTo
     {
@@ -81,8 +93,6 @@ class ItemMovement extends Model
 
     /**
      * The creator of the item movement.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {
@@ -91,8 +101,6 @@ class ItemMovement extends Model
 
     /**
      * Get the maintenance associated with the item movement. (Exits)
-     *
-     * @return BelongsTo
      */
     public function maintenance(): BelongsTo
     {

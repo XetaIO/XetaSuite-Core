@@ -4,35 +4,16 @@ declare(strict_types=1);
 
 namespace XetaSuite\Observers;
 
-use Exception;
 use XetaSuite\Models\Material;
 
 class MaterialObserver
 {
     /**
-     * Called before a delete.
+     * Handle the "deleting" event.
      *
-     * @param Material $material
-     *
-     * @throws Exception
+     * Save the material name in related records before the FK is set to null.
      */
     public function deleting(Material $material): void
-    {
-        if ($material->cleanings()->exists()
-            || $material->incidents()->exists()
-            || $material->maintenances()->exists()) {
-            throw new Exception('It is impossible to delete the material as long as it has linked records.');
-        }
-    }
-
-    /**
-     * Called after a delete.
-     *
-     * @param Material $material
-     *
-     * @return void
-     */
-    public function deleted(Material $material): void
     {
         $name = $material->name;
 
