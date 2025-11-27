@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace XetaSuite\Observers;
 
-use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Maintenance;
 
 class MaintenanceObserver
@@ -21,9 +20,7 @@ class MaintenanceObserver
         $maintenance->incidents()
             ->update(['maintenance_id' => null]);
 
-        ItemMovement::query()
-            ->where('movable_type', Maintenance::class)
-            ->where('movable_id', $maintenance->id)
+        $maintenance->itemMovements()
             ->update([
                 'movable_type' => null,
                 'movable_id' => null,
