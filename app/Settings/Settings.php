@@ -18,7 +18,8 @@ class Settings
 
     public function __construct(
         protected Cache $cache,
-    ) {}
+    ) {
+    }
 
     /**
      * Generate the key used by the cache driver to store the value.
