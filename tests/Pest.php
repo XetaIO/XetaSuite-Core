@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
+use Spatie\Permission\Models\Role;
+use XetaSuite\Models\Site;
+use XetaSuite\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -44,7 +50,42 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Helper to create authenticated user on headquarters with role
+ */
+function createUserOnHeadquarters(Site $headquarters, Role $role): User
 {
-    // ..
+    $user = User::factory()->withSite($headquarters)->create();
+
+    // Assign role to user for this specific site (team)
+    setPermissionsTeamId($headquarters->id);
+    $user->assignRole($role);
+
+    // Simulate middleware setting session
+    session([
+        'current_site_id' => $headquarters->id,
+        'is_on_headquarters' => true,
+    ]);
+
+    return $user;
+}
+
+/**
+ * Helper to create authenticated user on regular site with role
+ */
+function createUserOnRegularSite(Site $site, Role $role): User
+{
+    $user = User::factory()->withSite($site)->create();
+
+    // Assign role to user for this specific site (team)
+    setPermissionsTeamId($site->id);
+    $user->assignRole($role);
+
+    // Simulate middleware setting session
+    session([
+        'current_site_id' => $site->id,
+        'is_on_headquarters' => false,
+    ]);
+
+    return $user;
 }

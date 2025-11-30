@@ -15,13 +15,14 @@ return [
     'role.delete' => 'Delete roles',
 
     // Users
-    'user.view' => 'View users list & details',
+    'user.viewAny' => 'View users list',
+    'user.view' => 'View user details',
     'user.create' => 'Create new users',
     'user.update' => 'Update existing users',
     'user.delete' => 'Delete users',
     'user.restore' => 'Restore deleted users',
-    'user.assignDirectPermissions' => 'Assign direct permissions to users',
-    'user.assignSites' => 'Assign sites to users',
+    'user.assignDirectPermission' => 'Assign direct permissions to users',
+    'user.assignSite' => 'Assign sites to users',
 
     // Materials
     'material.view' => 'View materials',
@@ -39,7 +40,7 @@ return [
     'setting.delete' => 'Delete settings',
 
     // Zones
-    'zone.view' => 'View zones',
+    'zone.viewAny' => 'View all zones',
     'zone.create' => 'Create zones',
     'zone.update' => 'Update zones',
     'zone.delete' => 'Delete zones',
@@ -100,7 +101,8 @@ return [
     'itemExit.viewOthersSites' => 'View items exits from other sites',
 
     // Suppliers
-    'supplier.view' => 'View suppliers',
+    'supplier.viewAny' => 'View all suppliers',
+    'supplier.view' => 'View supplier',
     'supplier.create' => 'Create suppliers',
     'supplier.update' => 'Update suppliers',
     'supplier.delete' => 'Delete suppliers',

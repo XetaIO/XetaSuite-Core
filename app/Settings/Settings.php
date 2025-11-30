@@ -11,22 +11,17 @@ use XetaSuite\Models\Setting;
 
 class Settings
 {
-    protected null|array $context = [
+    protected ?array $context = [
         'model_type' => null,
-        'model_id' => null
+        'model_id' => null,
     ];
 
     public function __construct(
         protected Cache $cache,
-    ) {
-    }
+    ) {}
 
     /**
      * Generate the key used by the cache driver to store the value.
-     *
-     * @param string $key
-     *
-     * @return string
      */
     protected function getCacheKey(string $key): string
     {
@@ -51,11 +46,7 @@ class Settings
     }
 
     /**
-     * Get the value for the given key, siteId and context fromm the cache or from the database if no cache key.
-     *
-     * @param string $key
-     *
-     * @return mixed
+     * Get the value for the given key, siteId and context from the cache or from the database if no cache key.
      */
     public function get(string $key): mixed
     {
@@ -76,9 +67,7 @@ class Settings
     /**
      * Remove the specified key.
      *
-     * @param string $key The key to flush.
-     *
-     * @return bool
+     * @param  string  $key  The key to flush.
      */
     public function remove(string $key): bool
     {
@@ -92,13 +81,12 @@ class Settings
      *
      *
      *
-     * @param Model|array|null $context
-     * Pattern :
-     *  [
-     *      'type' => 'Xetaravel\Models\User',
-     *      'id' => 1
-     *  ]
-     *
+     * @param  Model|array|null  $context
+     *                                     Pattern :
+     *                                     [
+     *                                     'type' => 'XetaSuite\Models\User',
+     *                                     'id' => 1
+     *                                     ]
      * @return $this
      */
     public function setContext(Model|array|null $context = null): self
@@ -111,7 +99,7 @@ class Settings
         }
         $this->context = [
             'model_type' => $context['type'] ?? null,
-            'model_id' => $context['id'] ?? null
+            'model_id' => $context['id'] ?? null,
         ];
 
         return $this;
@@ -126,10 +114,9 @@ class Settings
     {
         $this->context = [
             'model_type' => null,
-            'model_id' => null
+            'model_id' => null,
         ];
 
         return $this;
     }
-
 }

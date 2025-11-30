@@ -52,6 +52,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'first_name',
         'last_name',
         'email',
+        'locale',
         'office_phone',
         'cell_phone',
         'end_employment_contract',
@@ -77,13 +78,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password_setup_at' => 'datetime',
         'password' => 'hashed',
         'last_login_date' => 'datetime',
-        'end_employment_contract' => 'datetime'
+        'end_employment_contract' => 'datetime',
     ];
 
     /**
      * Get the cleanings created by the user.
-     *
-     * @return HasMany
      */
     public function cleanings(): HasMany
     {
@@ -92,8 +91,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the incidents created by the user.
-     *
-     * @return HasMany
      */
     public function incidents(): HasMany
     {
@@ -102,8 +99,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the maintenances created by the user.
-     *
-     * @return HasMany
      */
     public function maintenances(): HasMany
     {
@@ -112,8 +107,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the maintenance's operators for the user.
-     *
-     * @return BelongsToMany
      */
     public function maintenancesOperators(): BelongsToMany
     {
@@ -123,8 +116,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the settings for the user.
-     *
-     * @return MorphMany
      */
     public function settings(): MorphMany
     {
@@ -133,8 +124,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the sites for the user.
-     *
-     * @return BelongsToMany
      */
     public function sites(): BelongsToMany
     {
@@ -144,8 +133,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the user who deleted the user.
-     *
-     * @return BelongsTo
      */
     public function deleter(): BelongsTo
     {
@@ -154,8 +141,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the notifications for the user.
-     *
-     * @return MorphMany
      */
     public function notifications(): MorphMany
     {
@@ -166,8 +151,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     /**
      * Get the first site ID for the user.
-     *
-     * @return int|null
      */
     public function getFirstSiteId(): ?int
     {
@@ -183,8 +166,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * Function to assign the given roles to the given sites
      *
-     * @param BackedEnum|Collection|int|array|string|Role $roles
-     * @param array|int $sites
      *
      * @return $this
      */
@@ -210,8 +191,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * Function to assign the given permissions to the given sites
      *
-     * @param BackedEnum|Collection|int|array|string|Permission $permissions
-     * @param array|int $sites
      *
      * @return $this
      */

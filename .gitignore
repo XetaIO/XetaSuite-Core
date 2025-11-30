@@ -30,4 +30,5 @@ CLAUDE.md
 _ide_helper.php
 _ide_helper_models.php
 .phpstorm.meta.php
+.packet-lock.json
 XetaSuite-core.code-workspace

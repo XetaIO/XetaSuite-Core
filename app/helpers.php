@@ -24,7 +24,7 @@ if (! function_exists('settings')) {
         // We must reset the context to the default value.
         $settings->setContext([
             'model_type' => null,
-            'model_id' => null
+            'model_id' => null,
         ]);
 
         // If context is not null, set it.
@@ -33,5 +33,16 @@ if (! function_exists('settings')) {
         }
 
         return $settings->get(key: $key);
+    }
+}
+
+if (! function_exists('isOnHeadquarters')) {
+    /**
+     * Check if the current user is on the headquarters site.
+     * Uses the value stored in session by SetCurrentSite middleware.
+     */
+    function isOnHeadquarters(): bool
+    {
+        return session('is_on_headquarters', false);
     }
 }

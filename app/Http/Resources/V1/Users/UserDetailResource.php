@@ -6,7 +6,7 @@ namespace XetaSuite\Http\Resources\V1\Users;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class UserDetailResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -16,6 +16,11 @@ class UserResource extends JsonResource
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'full_name' => $this->full_name,
+            'current_site_id' => $this->current_site_id,
+            'email' => $this->email,
+            'locale' => $this->locale,
+            'roles' => $this->roles->pluck('name')->toArray(),
+            'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
         ];
     }
 }

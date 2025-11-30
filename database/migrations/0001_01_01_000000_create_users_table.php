@@ -21,6 +21,7 @@ return new class () extends Migration {
             $table->string('last_name');
             $table->string('email', 255)->unique()->index();
             $table->string('password')->nullable();
+            $table->string('locale', 5)->default('en');
             $table->string('office_phone')->nullable();
             $table->string('cell_phone')->nullable();
             $table->rememberToken();

@@ -23,18 +23,26 @@ class Site extends Model
      */
     protected $fillable = [
         'name',
+        'is_headquarters',
         'email',
         'office_phone',
         'cell_phone',
         'address',
         'zip_code',
-        'city'
+        'city',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_headquarters' => 'boolean',
     ];
 
     /**
      * Get all the zones for the site.
-     *
-     * @return HasMany
      */
     public function zones(): HasMany
     {
@@ -43,8 +51,6 @@ class Site extends Model
 
     /**
      * Get the managers for the site.
-     *
-     * @return BelongsToMany
      */
     public function managers(): BelongsToMany
     {
@@ -56,8 +62,6 @@ class Site extends Model
 
     /**
      * Get the users for the site.
-     *
-     * @return BelongsToMany
      */
     public function users(): BelongsToMany
     {

@@ -13,6 +13,20 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+
+        // Middlewares for web routes
+        $middleware->web(append: [
+            \XetaSuite\Http\Middleware\SetLocale::class,
+            \XetaSuite\Http\Middleware\SetCurrentSite::class,
+            \XetaSuite\Http\Middleware\SetCurrentPermissionsAndRoles::class,
+        ]);
+
+        // Middlewares for API routes (stateful SPA via Sanctum)
+        $middleware->api(append: [
+            \XetaSuite\Http\Middleware\SetLocale::class,
+            \XetaSuite\Http\Middleware\SetCurrentSite::class,
+            \XetaSuite\Http\Middleware\SetCurrentPermissionsAndRoles::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

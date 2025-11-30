@@ -249,7 +249,7 @@ trait ItemPresenter
     protected function supplierDisplayName(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->supplier?->name ?? $this->supplier_name ?? 'No supplier'
+            get: fn () => $this->load('supplier')->supplier?->name ?? $this->supplier_name ?? 'No supplier'
         );
     }
 }

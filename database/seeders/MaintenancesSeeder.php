@@ -21,10 +21,10 @@ class MaintenancesSeeder extends Seeder
 
         foreach ($itemMovements as $itemMovement) {
             $maintenance = Maintenance::factory()
-                    ->forSite($itemMovement->item->site_id)
-                    ->withMaterial($itemMovement->item->materials->first())
-                    ->createdBy($user)
-                    ->create();
+                ->forSite($itemMovement->item->site_id)
+                ->forMaterial($itemMovement->item->materials->first())
+                ->createdBy($user)
+                ->create();
 
             $itemMovement->movable_type = Maintenance::class;
             $itemMovement->movable_id = $maintenance->id;
