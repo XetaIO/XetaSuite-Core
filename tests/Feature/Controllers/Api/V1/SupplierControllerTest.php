@@ -266,7 +266,7 @@ describe('store', function () {
             'name' => 'New Supplier',
             'description' => 'A great supplier',
             'created_by_id' => $user->id,
-            'created_by_name' => $user->full_name,
+            'created_by_name' => null,
         ]);
     });
 

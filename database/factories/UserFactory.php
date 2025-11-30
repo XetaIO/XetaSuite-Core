@@ -40,6 +40,7 @@ class UserFactory extends Factory
             'current_site_id' => null,
             'end_employment_contract' => null,
             'password_setup_at' => now(),
+            'locale' => 'en',
         ];
     }
 
