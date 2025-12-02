@@ -31,9 +31,25 @@ class SiteDetailResource extends JsonResource
             'city' => $this->city,
             'country' => $this->country,
 
+            // Relationships
+            'managers' => $this->whenLoaded('managers', fn () => $this->managers->map(fn ($user) => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->full_name,
+                'avatar' => $user->avatar,
+            ])),
+            'users' => $this->whenLoaded('users', fn () => $this->users->map(fn ($user) => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->full_name,
+                'avatar' => $user->avatar,
+            ])),
+
             // Counts
-            'zones_count' => $this->whenCounted('zones'),
-            'users_count' => $this->whenCounted('users'),
+            'zone_count' => $this->whenCounted('zones'),
+            'user_count' => $this->whenCounted('users'),
 
             // Timestamps
             'created_at' => $this->created_at?->toISOString(),

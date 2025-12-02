@@ -33,6 +33,8 @@ class StoreSiteRequest extends FormRequest
             'postal_code' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
+            'manager_ids' => ['nullable', 'array'],
+            'manager_ids.*' => ['integer', 'exists:users,id'],
         ];
     }
 
@@ -52,6 +54,7 @@ class StoreSiteRequest extends FormRequest
             'postal_code' => __('sites.postal_code'),
             'city' => __('sites.city'),
             'country' => __('sites.country'),
+            'manager_ids' => __('sites.managers'),
         ];
     }
 }

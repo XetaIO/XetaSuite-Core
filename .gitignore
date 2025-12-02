@@ -13,7 +13,6 @@
 /.vscode
 /.zed
 /auth.json
-/.github/copilot-instructions.md
 /node_modules
 /public/build
 /public/hot

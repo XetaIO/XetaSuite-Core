@@ -11,13 +11,12 @@ class UpdateSite
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {
-    }
+    ) {}
 
     /**
      * Update an existing site.
      *
-     * @param  array{name?: string, is_headquarters?: bool, email?: string|null, office_phone?: string|null, cell_phone?: string|null, address_line_1?: string|null, address_line_2?: string|null, postal_code?: string|null, city?: string|null, country?: string|null}  $data
+     * @param  array{name?: string, is_headquarters?: bool, email?: string|null, office_phone?: string|null, cell_phone?: string|null, address_line_1?: string|null, address_line_2?: string|null, postal_code?: string|null, city?: string|null, country?: string|null, manager_ids?: array<int>|null}  $data
      * @return array{success: bool, site?: Site, message?: string}
      */
     public function handle(Site $site, array $data): array
@@ -40,11 +39,38 @@ class UpdateSite
             ];
         }
 
+        // Extract manager_ids before updating site
+        $managerIds = $data['manager_ids'] ?? null;
+        unset($data['manager_ids']);
+
         $site->update($data);
+
+        // Sync managers if provided
+        if ($managerIds !== null) {
+            $this->syncManagers($site, $managerIds);
+        }
 
         return [
             'success' => true,
             'site' => $site->fresh(),
         ];
+    }
+
+    /**
+     * Sync managers for the site.
+     *
+     * @param  array<int>  $managerIds
+     */
+    private function syncManagers(Site $site, array $managerIds): void
+    {
+        // Get current manager IDs
+        $currentManagerIds = $site->managers()->allRelatedIds();
+
+        // Find managers to remove (were managers, now shouldn't be)
+        $toRemove = $currentManagerIds->diff($managerIds);
+
+        // Update existing pivot records
+        $site->managers()->updateExistingPivot($toRemove, ['manager' => false]);
+        $site->managers()->updateExistingPivot($managerIds, ['manager' => true]);
     }
 }

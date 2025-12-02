@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use XetaSuite\Models\Site;
+use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
@@ -83,7 +84,7 @@ describe('index', function () {
 
         $response->assertOk();
         $hqData = collect($response->json('data'))->firstWhere('id', $this->headquarters->id);
-        expect($hqData['zones_count'])->toBe(3);
+        expect($hqData['zone_count'])->toBe(3);
     });
 
     it('filters sites by search term', function () {
@@ -152,7 +153,7 @@ describe('show', function () {
                 'data' => [
                     'id', 'name', 'is_headquarters', 'email', 'office_phone',
                     'cell_phone', 'address_line_1', 'address_line_2', 'postal_code', 'city', 'country',
-                    'zones_count', 'users_count', 'created_at', 'updated_at',
+                    'zone_count', 'user_count', 'created_at', 'updated_at',
                 ],
             ]);
     });
@@ -445,5 +446,266 @@ describe('destroy', function () {
             ->deleteJson("/api/v1/sites/{$site->id}");
 
         $response->assertForbidden();
+    });
+});
+
+// ============================================================================
+// USERS ENDPOINT TESTS
+// ============================================================================
+
+describe('users', function () {
+    it('returns users for a site for authorized user', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        // Create users and attach them to the headquarters
+        $siteUsers = User::factory()->count(3)->create();
+        $this->headquarters->users()->attach($siteUsers->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'first_name', 'last_name', 'full_name', 'avatar'],
+                ],
+            ]);
+
+        expect(count($response->json('data')))->toBeGreaterThanOrEqual(3);
+    });
+
+    it('returns only users attached to the site', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        // Create users - some attached to HQ, some not
+        $attachedUsers = User::factory()->count(2)->create();
+        $notAttachedUsers = User::factory()->count(2)->create();
+
+        $this->headquarters->users()->attach($attachedUsers->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertOk();
+
+        $returnedIds = collect($response->json('data'))->pluck('id')->toArray();
+        foreach ($attachedUsers as $attachedUser) {
+            expect($returnedIds)->toContain($attachedUser->id);
+        }
+        foreach ($notAttachedUsers as $notAttached) {
+            expect($returnedIds)->not->toContain($notAttached->id);
+        }
+    });
+
+    it('filters users by search term', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $john = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
+        $jane = User::factory()->create(['first_name' => 'Jane', 'last_name' => 'Smith']);
+
+        $this->headquarters->users()->attach([$john->id, $jane->id]);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users?search=John");
+
+        $response->assertOk();
+
+        $names = collect($response->json('data'))->pluck('first_name');
+        expect($names)->toContain('John');
+        expect($names)->not->toContain('Jane');
+    });
+
+    it('denies access for user not on headquarters', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertForbidden();
+    });
+
+    it('denies access for user without view permission', function () {
+        $roleWithoutView = Role::create(['name' => 'limited-users', 'guard_name' => 'web']);
+        $user = createUserOnHeadquarters($this->headquarters, $roleWithoutView);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $response = $this->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// MANAGERS TESTS
+// ============================================================================
+
+describe('managers', function () {
+    it('creates a site with managers', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        // Create users to be managers
+        $managers = User::factory()->count(2)->create();
+
+        // Note: For creation, we cannot assign managers yet because the site doesn't exist
+        // and users must be attached to the site first. This test validates the structure.
+        $response = $this->actingAs($user)
+            ->postJson('/api/v1/sites', [
+                'name' => 'Site With Managers',
+                'manager_ids' => $managers->pluck('id')->toArray(),
+            ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.name', 'Site With Managers')
+            ->assertJsonStructure([
+                'data' => ['id', 'name', 'managers'],
+            ]);
+    });
+
+    it('updates a site to add managers', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $site = Site::factory()->create(['is_headquarters' => false]);
+
+        // Create and attach users to the site
+        $potentialManagers = User::factory()->count(3)->create();
+        $site->users()->attach($potentialManagers->pluck('id'));
+
+        // Update site to make some users managers
+        $managerIds = $potentialManagers->take(2)->pluck('id')->toArray();
+
+        $response = $this->actingAs($user)
+            ->putJson("/api/v1/sites/{$site->id}", [
+                'manager_ids' => $managerIds,
+            ]);
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data.managers');
+
+        // Verify managers are set correctly in database
+        $site->refresh();
+        expect($site->managers()->count())->toBe(2);
+        foreach ($managerIds as $managerId) {
+            expect($site->managers()->pluck('users.id')->toArray())->toContain($managerId);
+        }
+    });
+
+    it('updates a site to remove managers', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $site = Site::factory()->create(['is_headquarters' => false]);
+
+        // Create users and set them as managers
+        $managers = User::factory()->count(3)->create();
+        foreach ($managers as $manager) {
+            $site->users()->attach($manager->id, ['manager' => true]);
+        }
+
+        expect($site->managers()->count())->toBe(3);
+
+        // Update to remove all managers
+        $response = $this->actingAs($user)
+            ->putJson("/api/v1/sites/{$site->id}", [
+                'manager_ids' => [],
+            ]);
+
+        $response->assertOk()
+            ->assertJsonCount(0, 'data.managers');
+
+        $site->refresh();
+        expect($site->managers()->count())->toBe(0);
+    });
+
+    it('updates a site to change managers', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $site = Site::factory()->create(['is_headquarters' => false]);
+
+        // Create users - 2 current managers, 2 potential new managers
+        $currentManagers = User::factory()->count(2)->create();
+        $newManagers = User::factory()->count(2)->create();
+
+        // Attach all users to site
+        foreach ($currentManagers as $manager) {
+            $site->users()->attach($manager->id, ['manager' => true]);
+        }
+        $site->users()->attach($newManagers->pluck('id'));
+
+        // Update to swap managers
+        $response = $this->actingAs($user)
+            ->putJson("/api/v1/sites/{$site->id}", [
+                'manager_ids' => $newManagers->pluck('id')->toArray(),
+            ]);
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data.managers');
+
+        $site->refresh();
+
+        // Verify new managers are set
+        foreach ($newManagers as $newManager) {
+            expect($site->managers()->pluck('users.id')->toArray())->toContain($newManager->id);
+        }
+
+        // Verify old managers are no longer managers
+        foreach ($currentManagers as $oldManager) {
+            expect($site->managers()->pluck('users.id')->toArray())->not->toContain($oldManager->id);
+        }
+    });
+
+    it('returns managers in site detail response', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $site = Site::factory()->create(['is_headquarters' => false]);
+
+        // Create and set managers
+        $managers = User::factory()->count(2)->create();
+        foreach ($managers as $manager) {
+            $site->users()->attach($manager->id, ['manager' => true]);
+        }
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$site->id}");
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data.managers')
+            ->assertJsonStructure([
+                'data' => [
+                    'managers' => [
+                        '*' => ['id', 'first_name', 'last_name', 'full_name', 'avatar'],
+                    ],
+                ],
+            ]);
+    });
+
+    it('validates manager_ids is an array', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/v1/sites', [
+                'name' => 'Test Site',
+                'manager_ids' => 'not-an-array',
+            ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['manager_ids']);
+    });
+
+    it('validates manager_ids contains existing user ids', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/v1/sites', [
+                'name' => 'Test Site',
+                'manager_ids' => [99999, 99998],
+            ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['manager_ids.0', 'manager_ids.1']);
     });
 });

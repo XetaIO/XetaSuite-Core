@@ -8,8 +8,8 @@ use XetaSuite\Http\Controllers\Api\V1\SiteController;
 use XetaSuite\Http\Controllers\Api\V1\SupplierController;
 use XetaSuite\Http\Controllers\Api\V1\UserLocaleController;
 use XetaSuite\Http\Controllers\Api\V1\UserSiteController;
-use XetaSuite\Http\Resources\V1\Items\ItemResource;
 use XetaSuite\Http\Resources\V1\Users\UserDetailResource;
+use XetaSuite\Models\User;
 
 /*
  |--------------------------------------------------------------------------
@@ -29,12 +29,9 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     // Update user current site
     Route::patch('/user/site', UserSiteController::class);
 
-    /*Route::get('/items/{item}', function (\XetaSuite\Models\Item $item) {
-        return new ItemResource($item);
-    });*/
-
     // Sites (headquarters only - enforced by SitePolicy)
     Route::apiResource('sites', SiteController::class);
+    Route::get('sites/{site}/users', [SiteController::class, 'users']);
 
     // Suppliers (headquarters only - enforced by SupplierPolicy)
     Route::apiResource('suppliers', SupplierController::class);

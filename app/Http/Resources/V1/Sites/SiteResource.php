@@ -21,8 +21,8 @@ class SiteResource extends JsonResource
             'city' => $this->city,
 
             // Counts
-            'zones_count' => $this->whenCounted('zones'),
-            'users_count' => $this->whenCounted('users'),
+            'zone_count' => $this->whenCounted('zones'),
+            'user_count' => $this->whenCounted('users'),
 
             // Timestamps
             'created_at' => $this->created_at?->toISOString(),

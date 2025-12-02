@@ -13,6 +13,7 @@ use XetaSuite\Http\Requests\V1\Sites\StoreSiteRequest;
 use XetaSuite\Http\Requests\V1\Sites\UpdateSiteRequest;
 use XetaSuite\Http\Resources\V1\Sites\SiteDetailResource;
 use XetaSuite\Http\Resources\V1\Sites\SiteResource;
+use XetaSuite\Http\Resources\V1\Users\UserResource;
 use XetaSuite\Models\Site;
 use XetaSuite\Services\SiteService;
 
@@ -20,8 +21,7 @@ class SiteController extends Controller
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of sites.
@@ -52,7 +52,7 @@ class SiteController extends Controller
             ], 422);
         }
 
-        return new SiteDetailResource($result['site']->loadCount(['zones', 'users']));
+        return new SiteDetailResource($result['site']->load(['managers', 'users'])->loadCount(['zones', 'users']));
     }
 
     /**
@@ -62,7 +62,7 @@ class SiteController extends Controller
     {
         $this->authorize('view', $site);
 
-        $site->loadCount(['zones', 'users']);
+        $site->load(['managers', 'users'])->loadCount(['zones', 'users']);
 
         return new SiteDetailResource($site);
     }
@@ -80,7 +80,7 @@ class SiteController extends Controller
             ], 422);
         }
 
-        return new SiteDetailResource($result['site']->loadCount(['zones', 'users']));
+        return new SiteDetailResource($result['site']->load(['managers', 'users'])->loadCount(['zones', 'users']));
     }
 
     /**
@@ -99,5 +99,25 @@ class SiteController extends Controller
         }
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Get users for a site (for manager selection).
+     */
+    public function users(Site $site): AnonymousResourceCollection
+    {
+        $this->authorize('view', $site);
+
+        $query = $site->users()->orderBy('last_name')->orderBy('first_name');
+
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
+            });
+        }
+
+        return UserResource::collection($query->get());
     }
 }
