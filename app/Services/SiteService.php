@@ -60,10 +60,10 @@ class SiteService
     private function applySearch(Builder $query, string $search): Builder
     {
         return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
-                ->orWhere('city', 'LIKE', "%{$search}%")
-                ->orWhere('address_line_1', 'LIKE', "%{$search}%");
+            $q->where('name', 'ILIKE', "%{$search}%")
+                ->orWhere('email', 'ILIKE', "%{$search}%")
+                ->orWhere('city', 'ILIKE', "%{$search}%")
+                ->orWhere('address_line_1', 'ILIKE', "%{$search}%");
         });
     }
 

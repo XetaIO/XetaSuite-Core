@@ -112,9 +112,9 @@ class SiteController extends Controller
 
         if ($search = request('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('username', 'like', "%{$search}%");
+                $q->where('first_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('username', 'ILIKE', "%{$search}%");
             });
         }
 
