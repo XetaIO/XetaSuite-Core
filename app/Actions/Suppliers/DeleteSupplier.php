@@ -11,7 +11,8 @@ class DeleteSupplier
 {
     public function __construct(
         private readonly SupplierService $supplierService
-    ) {}
+    ) {
+    }
 
     /**
      * Delete a supplier.

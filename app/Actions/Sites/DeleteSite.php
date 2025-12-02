@@ -11,7 +11,8 @@ class DeleteSite
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {}
+    ) {
+    }
 
     /**
      * Delete a site.

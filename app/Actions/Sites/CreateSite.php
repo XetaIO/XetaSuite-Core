@@ -11,7 +11,8 @@ class CreateSite
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new site.

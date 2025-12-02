@@ -20,7 +20,8 @@ class SupplierController extends Controller
 {
     public function __construct(
         private readonly SupplierService $supplierService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of suppliers.

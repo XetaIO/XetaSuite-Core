@@ -20,7 +20,8 @@ class SiteController extends Controller
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of sites.
