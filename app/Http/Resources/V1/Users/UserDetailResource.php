@@ -16,11 +16,18 @@ class UserDetailResource extends JsonResource
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'full_name' => $this->full_name,
-            'current_site_id' => $this->current_site_id,
+            'current_site_id' => $this->current_site_id ?? $this->getFirstSiteId(),
             'email' => $this->email,
             'locale' => $this->locale,
             'roles' => $this->roles->pluck('name')->toArray(),
             'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
+            'sites' => $this->sites->map(function ($site) {
+                return [
+                    'id' => $site->id,
+                    'name' => $site->name,
+                    'is_headquarters' => $site->is_headquarters,
+                ];
+            })->toArray(),
         ];
     }
 }

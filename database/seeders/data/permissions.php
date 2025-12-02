@@ -3,12 +3,14 @@
 return [
 
     // Permissions
+    'permission.viewAny' => 'View permissions list',
     'permission.view' => 'View permissions',
     'permission.create' => 'Create new permissions',
     'permission.update' => 'Update permissions',
     'permission.delete' => 'Delete permissions',
 
     // Roles
+    'role.viewAny' => 'View roles list',
     'role.view' => 'View roles',
     'role.create' => 'Create new roles',
     'role.update' => 'Update roles',
@@ -25,6 +27,7 @@ return [
     'user.assignSite' => 'Assign sites to users',
 
     // Materials
+    'material.viewAny' => 'View materials list',
     'material.view' => 'View materials',
     'material.create' => 'Create materials',
     'material.update' => 'Edit materials information',
@@ -34,6 +37,7 @@ return [
     'material.scanQrcode' => 'Scan qrcode for materials',
 
     // Settings
+    'setting.viewAny' => 'View settings list',
     'setting.view' => 'List and view settings',
     'setting.create' => 'Add new settings',
     'setting.update' => 'Edit settings',
@@ -46,6 +50,7 @@ return [
     'zone.delete' => 'Delete zones',
 
     // Cleanings
+    'cleaning.viewAny' => 'View cleanings list',
     'cleaning.view' => 'View cleanings',
     'cleaning.create' => 'Create cleanings',
     'cleaning.update' => 'Update cleanings',
@@ -54,6 +59,7 @@ return [
     'cleaning.generatePlan' => 'Generate cleaning plan',
 
     // Sites
+    'site.viewAny' => 'View sites list',
     'site.view' => 'View sites',
     'site.create' => 'Create sites',
     'site.update' => 'Update sites',
@@ -61,6 +67,7 @@ return [
     'site.export' => 'Export sites',
 
     // Maintenance
+    'maintenance.viewAny' => 'View maintenances list',
     'maintenance.view' => 'View maintenances',
     'maintenance.create' => 'Create maintenances',
     'maintenance.update' => 'Update maintenances',
@@ -68,6 +75,7 @@ return [
     'maintenance.export' => 'Export maintenances',
 
     // Incidents
+    'incident.viewAny' => 'View incidents list',
     'incident.view' => 'View incidents',
     'incident.create' => 'Open new incidents',
     'incident.update' => 'Modify incidents',
@@ -75,6 +83,7 @@ return [
     'incident.export' => 'Export incidents',
 
     // Items (Stock)
+    'item.viewAny' => 'View items list',
     'item.view' => 'List and view items',
     'item.create' => 'Add new items',
     'item.update' => 'Edit items',
@@ -84,21 +93,14 @@ return [
     'item.scanQrcode' => 'Scan qrcode for items',
     'item.viewOthersSites' => 'View items from other sites',
 
-    // Items Entries
-    'itemEntry.view' => 'View items entries',
-    'itemEntry.create' => 'Create items entries',
-    'itemEntry.update' => 'Update items entries',
-    'itemEntry.delete' => 'Delete items entries',
-    'itemEntry.export' => 'Export items entries',
-    'itemEntry.viewOthersSites' => 'View items entries from other sites',
-
-    // Items Exits
-    'itemExit.view' => 'View items exits',
-    'itemExit.create' => 'Create items exits',
-    'itemExit.update' => 'Update items exits',
-    'itemExit.delete' => 'Delete items exits',
-    'itemExit.export' => 'Export items exits',
-    'itemExit.viewOthersSites' => 'View items exits from other sites',
+    // Items Movements
+    'item-movement.viewAny' => 'View items movements list',
+    'item-movement.view' => 'View items movements',
+    'item-movement.create' => 'Create items entries',
+    'item-movement.update' => 'Update items entries',
+    'item-movement.delete' => 'Delete items entries',
+    'item-movement.export' => 'Export items entries',
+    'item-movement.viewOthersSites' => 'View items entries from other sites',
 
     // Suppliers
     'supplier.viewAny' => 'View all suppliers',
@@ -108,19 +110,8 @@ return [
     'supplier.delete' => 'Delete suppliers',
     'supplier.export' => 'Export suppliers',
 
-    // Calendars
-    'calendar.view' => 'View calendars',
-    'calendar.create' => 'Create calendars',
-    'calendar.update' => 'Update calendars',
-    'calendar.delete' => 'Delete calendars',
-
-    // Calendars Events
-    'calendarEvent.view' => 'View calendar events',
-    'calendarEvent.create' => 'Create calendar events',
-    'calendarEvent.update' => 'Update calendar events',
-    'calendarEvent.delete' => 'Delete calendar events',
-
     // Companies
+    'company.viewAny' => 'View companies list',
     'company.view' => 'View companies',
     'company.create' => 'Create companies',
     'company.update' => 'Update companies',

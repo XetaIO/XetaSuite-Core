@@ -6,14 +6,22 @@ namespace XetaSuite\Http\Controllers\Api\V1;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use XetaSuite\Actions\Suppliers\CreateSupplier;
+use XetaSuite\Actions\Suppliers\DeleteSupplier;
+use XetaSuite\Actions\Suppliers\UpdateSupplier;
 use XetaSuite\Http\Requests\V1\Suppliers\StoreSupplierRequest;
 use XetaSuite\Http\Requests\V1\Suppliers\UpdateSupplierRequest;
 use XetaSuite\Http\Resources\V1\Items\ItemResource;
 use XetaSuite\Http\Resources\V1\Suppliers\SupplierDetailResource;
 use XetaSuite\Models\Supplier;
+use XetaSuite\Services\SupplierService;
 
 class SupplierController extends Controller
 {
+    public function __construct(
+        private readonly SupplierService $supplierService
+    ) {}
+
     /**
      * Display a listing of suppliers.
      */
@@ -21,24 +29,11 @@ class SupplierController extends Controller
     {
         $this->authorize('viewAny', Supplier::class);
 
-        $suppliers = Supplier::query()
-            ->with('creator')
-            ->when(request('search'), function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'ILIKE', "%{$search}%")
-                        ->orWhere('description', 'ILIKE', "%{$search}%");
-                });
-            })
-            ->when(request('sort_by'), function ($query, $sortBy) {
-                $direction = request('sort_direction', 'asc');
-                $allowedSorts = ['name', 'item_count', 'created_at'];
-                if (in_array($sortBy, $allowedSorts)) {
-                    $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-                }
-            }, function ($query) {
-                $query->orderBy('name');
-            })
-            ->paginate(20);
+        $suppliers = $this->supplierService->getPaginatedSuppliers([
+            'search' => request('search'),
+            'sort_by' => request('sort_by'),
+            'sort_direction' => request('sort_direction'),
+        ]);
 
         return SupplierDetailResource::collection($suppliers);
     }
@@ -46,13 +41,9 @@ class SupplierController extends Controller
     /**
      * Store a newly created supplier.
      */
-    public function store(StoreSupplierRequest $request): SupplierDetailResource
+    public function store(StoreSupplierRequest $request, CreateSupplier $action): SupplierDetailResource
     {
-        $supplier = Supplier::create([
-            'created_by_id' => $request->user()->id,
-            'name' => $request->validated('name'),
-            'description' => $request->validated('description'),
-        ]);
+        $supplier = $action->handle($request->user(), $request->validated());
 
         return new SupplierDetailResource($supplier);
     }
@@ -76,25 +67,11 @@ class SupplierController extends Controller
     {
         $this->authorize('view', $supplier);
 
-        $items = $supplier->items()
-            ->with('site')
-            ->when(request('search'), function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'ILIKE', "%{$search}%")
-                        ->orWhere('description', 'ILIKE', "%{$search}%")
-                        ->orWhere('reference', 'ILIKE', "%{$search}%");
-                });
-            })
-            ->when(request('sort_by'), function ($query, $sortBy) {
-                $direction = request('sort_direction', 'asc');
-                $allowedSorts = ['name', 'description', 'reference', 'current_stock', 'purchase_price', 'created_at'];
-                if (in_array($sortBy, $allowedSorts)) {
-                    $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-                }
-            }, function ($query) {
-                $query->orderBy('name');
-            })
-            ->paginate(20);
+        $items = $this->supplierService->getSupplierItems($supplier, [
+            'search' => request('search'),
+            'sort_by' => request('sort_by'),
+            'sort_direction' => request('sort_direction'),
+        ]);
 
         return ItemResource::collection($items);
     }
@@ -102,9 +79,9 @@ class SupplierController extends Controller
     /**
      * Update the specified supplier.
      */
-    public function update(UpdateSupplierRequest $request, Supplier $supplier): SupplierDetailResource
+    public function update(UpdateSupplierRequest $request, Supplier $supplier, UpdateSupplier $action): SupplierDetailResource
     {
-        $supplier->update($request->validated());
+        $supplier = $action->handle($supplier, $request->validated());
 
         return new SupplierDetailResource($supplier);
     }
@@ -112,21 +89,20 @@ class SupplierController extends Controller
     /**
      * Remove the specified supplier.
      */
-    public function destroy(Supplier $supplier): JsonResponse
+    public function destroy(Supplier $supplier, DeleteSupplier $action): JsonResponse
     {
         $this->authorize('delete', $supplier);
 
-        // Check if supplier has items before deleting
-        if ($supplier->items()->exists()) {
+        $result = $action->handle($supplier);
+
+        if (! $result['success']) {
             return response()->json([
-                'message' => __('suppliers.cannot_delete_has_items'),
+                'message' => $result['message'],
             ], 422);
         }
 
-        $supplier->delete();
-
         return response()->json([
-            'message' => __('suppliers.deleted'),
+            'message' => $result['message'],
         ]);
     }
 }
