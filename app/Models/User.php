@@ -154,14 +154,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function getFirstSiteId(): ?int
     {
-        // return $this->sites()->value('id');
-        $id = $this->sites()->first()?->id;
-
-        if (is_null($id)) {
-            return null;
-        }
-
-        return $id;
+        return $this->sites()->value('id');
     }
 
     /**

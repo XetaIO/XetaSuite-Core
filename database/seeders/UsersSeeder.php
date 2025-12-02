@@ -20,5 +20,10 @@ class UsersSeeder extends Seeder
 
         // Other users
         $users = User::factory()->count(3)->create();
+
+        $users->each(function (User $user) {
+            $siteIds = Site::inRandomOrder()->take(rand(1, Site::count()))->pluck('id')->toArray();
+            $user->sites()->sync($siteIds);
+        });
     }
 }

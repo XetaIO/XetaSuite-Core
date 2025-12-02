@@ -12,7 +12,6 @@ use XetaSuite\Actions\Sites\UpdateSite;
 use XetaSuite\Http\Requests\V1\Sites\StoreSiteRequest;
 use XetaSuite\Http\Requests\V1\Sites\UpdateSiteRequest;
 use XetaSuite\Http\Resources\V1\Sites\SiteDetailResource;
-use XetaSuite\Http\Resources\V1\Sites\SiteResource;
 use XetaSuite\Http\Resources\V1\Users\UserResource;
 use XetaSuite\Models\Site;
 use XetaSuite\Services\SiteService;
@@ -37,7 +36,7 @@ class SiteController extends Controller
             'sort_direction' => request('sort_direction'),
         ]);
 
-        return SiteResource::collection($sites);
+        return SiteDetailResource::collection($sites);
     }
 
     /**

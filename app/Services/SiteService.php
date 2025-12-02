@@ -18,6 +18,7 @@ class SiteService
     public function getPaginatedSites(array $filters = []): LengthAwarePaginator
     {
         return Site::query()
+            ->with('managers', 'users')
             ->withCount(['zones', 'users'])
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when(
