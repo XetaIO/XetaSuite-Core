@@ -11,7 +11,8 @@ class UpdateSite
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {}
+    ) {
+    }
 
     /**
      * Update an existing site.
