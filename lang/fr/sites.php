@@ -6,9 +6,8 @@ return [
     'email' => 'Email',
     'office_phone' => 'Téléphone fixe',
     'cell_phone' => 'Téléphone portable',
-    'address_line_1' => 'Adresse ligne 1',
-    'address_line_2' => 'Adresse ligne 2',
-    'postal_code' => 'Code postal',
+    'address' => 'Adresse',
+    'zip_code' => 'Code postal',
     'city' => 'Ville',
     'country' => 'Pays',
 

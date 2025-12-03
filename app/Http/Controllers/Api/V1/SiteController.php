@@ -12,7 +12,7 @@ use XetaSuite\Actions\Sites\UpdateSite;
 use XetaSuite\Http\Requests\V1\Sites\StoreSiteRequest;
 use XetaSuite\Http\Requests\V1\Sites\UpdateSiteRequest;
 use XetaSuite\Http\Resources\V1\Sites\SiteDetailResource;
-use XetaSuite\Http\Resources\V1\Users\UserResource;
+use XetaSuite\Http\Resources\V1\Sites\SiteUserResource;
 use XetaSuite\Models\Site;
 use XetaSuite\Services\SiteService;
 
@@ -20,8 +20,7 @@ class SiteController extends Controller
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of sites.
@@ -108,7 +107,12 @@ class SiteController extends Controller
     {
         $this->authorize('view', $site);
 
-        $query = $site->users()->orderBy('last_name')->orderBy('first_name');
+        // Set site ID for role scoping in resource
+        SiteUserResource::$siteId = $site->id;
+
+        $query = $site->users()
+            ->orderBy('last_name')
+            ->orderBy('first_name');
 
         if ($search = request('search')) {
             $query->where(function ($q) use ($search) {
@@ -118,6 +122,31 @@ class SiteController extends Controller
             });
         }
 
-        return UserResource::collection($query->get());
+        return SiteUserResource::collection($query->limit(15)->get());
+    }
+
+    /**
+     * Get paginated members of a site with their roles.
+     */
+    public function members(Site $site): AnonymousResourceCollection
+    {
+        $this->authorize('view', $site);
+
+        // Set site ID for role scoping in resource
+        SiteUserResource::$siteId = $site->id;
+
+        $query = $site->users()
+            ->orderBy('last_name')
+            ->orderBy('first_name');
+
+        if ($search = request('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('email', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        return SiteUserResource::collection($query->paginate(10));
     }
 }

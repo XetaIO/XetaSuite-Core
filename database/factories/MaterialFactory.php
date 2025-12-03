@@ -69,8 +69,11 @@ class MaterialFactory extends Factory
      */
     public function forZone(Zone|int $zone): static
     {
+        $zoneModel = $zone instanceof Zone ? $zone : Zone::find($zone);
+
         return $this->state(fn () => [
-            'zone_id' => $zone instanceof Zone ? $zone->id : $zone,
+            'zone_id' => $zoneModel->id,
+            'site_id' => $zoneModel->site_id,
         ]);
     }
 

@@ -11,13 +11,12 @@ class UpdateSite
 {
     public function __construct(
         private readonly SiteService $siteService
-    ) {
-    }
+    ) {}
 
     /**
      * Update an existing site.
      *
-     * @param  array{name?: string, is_headquarters?: bool, email?: string|null, office_phone?: string|null, cell_phone?: string|null, address_line_1?: string|null, address_line_2?: string|null, postal_code?: string|null, city?: string|null, country?: string|null, manager_ids?: array<int>|null}  $data
+     * @param  array{name?: string, is_headquarters?: bool, email?: string|null, office_phone?: string|null, cell_phone?: string|null, address?: string|null, zip_code?: string|null, city?: string|null, country?: string|null, manager_ids?: array<int>|null}  $data
      * @return array{success: bool, site?: Site, message?: string}
      */
     public function handle(Site $site, array $data): array

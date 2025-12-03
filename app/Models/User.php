@@ -154,7 +154,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function getFirstSiteId(): ?int
     {
-        return $this->sites()->value('id');
+        return $this->sites()->orderBy('id')->value('id');
     }
 
     /**

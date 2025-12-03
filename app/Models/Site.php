@@ -27,9 +27,8 @@ class Site extends Model
         'email',
         'office_phone',
         'cell_phone',
-        'address_line_1',
-        'address_line_2',
-        'postal_code',
+        'address',
+        'zip_code',
         'city',
         'country',
     ];

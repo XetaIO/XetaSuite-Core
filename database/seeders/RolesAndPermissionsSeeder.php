@@ -25,19 +25,30 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Define roles and their permissions
         $rolesDefinition = [
-            'admin' => array_keys($permissions),
-
+            'admin' => [
+                'permissions' => array_keys($permissions),
+                'level' => 100,
+            ],
             'manager' => [
-                'user.view', 'material.view', 'incident.view',
-                'incident.update', 'maintenance.view',
+                'permissions' => [
+                    'user.view', 'material.view', 'incident.view',
+                    'incident.update', 'maintenance.view',
+                ],
+                'level' => 50,
             ],
 
             'technician' => [
-                'incident.view', 'incident.update', 'maintenance.view',
+                'permissions' => [
+                    'incident.view', 'incident.update', 'maintenance.view',
+                ],
+                'level' => 40,
             ],
 
             'operator' => [
-                'incident.view', 'material.view', 'item.view',
+                'permissions' => [
+                    'incident.view', 'material.view', 'item.view',
+                ],
+                'level' => 10,
             ],
         ];
 
@@ -46,18 +57,19 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create roles for each site
         foreach ($sites as $site) {
-            foreach ($rolesDefinition as $roleName => $rolePermissions) {
+            foreach ($rolesDefinition as $roleName => $roleSettings) {
                 $role = Role::updateOrCreate(
                     [
                         'name' => $roleName,
                         'site_id' => $roleName === 'admin' ? null : $site->id,
                         'guard_name' => 'web',
+                        'level' => $roleSettings['level'],
                     ],
-                    ['description' => ucfirst($roleName) . ' role for ' . $site->name]
+                    ['description' => ucfirst($roleName).' role for '.$site->name]
                 );
 
                 // Sync permissions for this role and site
-                $role->syncPermissions($rolePermissions);
+                $role->syncPermissions($roleSettings['permissions']);
             }
         }
     }

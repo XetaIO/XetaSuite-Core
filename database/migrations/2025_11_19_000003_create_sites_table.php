@@ -7,7 +7,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -22,9 +23,8 @@ return new class () extends Migration {
             $table->string('email', 100)->nullable();
             $table->string('office_phone', 20)->nullable();
             $table->string('cell_phone', 20)->nullable();
-            $table->string('address_line_1')->nullable();
-            $table->string('address_line_2')->nullable();
-            $table->string('postal_code', 20)->nullable();
+            $table->string('address')->nullable();
+            $table->string('zip_code', 20)->nullable();
             $table->string('city', 100)->nullable();
             $table->string('country', 100)->nullable();
 

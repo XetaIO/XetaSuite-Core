@@ -22,7 +22,11 @@ class UsersSeeder extends Seeder
         $users = User::factory()->count(3)->create();
 
         $users->each(function (User $user) {
-            $siteIds = Site::inRandomOrder()->take(rand(1, Site::count()))->pluck('id')->toArray();
+            $siteIds = Site::inRandomOrder()
+                ->where('is_headquarters', false)
+                ->take(rand(1, Site::where('is_headquarters', false)->count()))
+                ->pluck('id')
+                ->toArray();
             $user->sites()->sync($siteIds);
         });
     }

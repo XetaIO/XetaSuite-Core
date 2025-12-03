@@ -65,9 +65,8 @@ describe('CreateSite', function () {
             'email' => 'complete@example.com',
             'office_phone' => '0123456789',
             'cell_phone' => '0612345678',
-            'address_line_1' => '123 Main St',
-            'address_line_2' => 'Building A',
-            'postal_code' => '75001',
+            'address' => '123 Main St',
+            'zip_code' => '75001',
             'city' => 'Paris',
             'country' => 'France',
         ]);
@@ -76,9 +75,8 @@ describe('CreateSite', function () {
             ->and($result['site']->email)->toBe('complete@example.com')
             ->and($result['site']->office_phone)->toBe('0123456789')
             ->and($result['site']->cell_phone)->toBe('0612345678')
-            ->and($result['site']->address_line_1)->toBe('123 Main St')
-            ->and($result['site']->address_line_2)->toBe('Building A')
-            ->and($result['site']->postal_code)->toBe('75001')
+            ->and($result['site']->address)->toBe('123 Main St')
+            ->and($result['site']->zip_code)->toBe('75001')
             ->and($result['site']->city)->toBe('Paris')
             ->and($result['site']->country)->toBe('France');
     });

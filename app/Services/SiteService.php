@@ -63,7 +63,7 @@ class SiteService
             $q->where('name', 'ILIKE', "%{$search}%")
                 ->orWhere('email', 'ILIKE', "%{$search}%")
                 ->orWhere('city', 'ILIKE', "%{$search}%")
-                ->orWhere('address_line_1', 'ILIKE', "%{$search}%");
+                ->orWhere('address', 'ILIKE', "%{$search}%");
         });
     }
 

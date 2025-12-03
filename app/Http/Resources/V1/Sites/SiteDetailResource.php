@@ -25,9 +25,8 @@ class SiteDetailResource extends JsonResource
             'cell_phone' => $this->cell_phone,
 
             // Address
-            'address_line_1' => $this->address_line_1,
-            'address_line_2' => $this->address_line_2,
-            'postal_code' => $this->postal_code,
+            'address' => $this->address,
+            'zip_code' => $this->zip_code,
             'city' => $this->city,
             'country' => $this->country,
 

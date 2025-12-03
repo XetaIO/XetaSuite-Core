@@ -13,8 +13,6 @@ class SiteFactory extends Factory
 
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -29,9 +27,8 @@ class SiteFactory extends Factory
             'office_phone' => $this->faker->optional()->phoneNumber(),
             'cell_phone' => $this->faker->optional()->phoneNumber(),
 
-            'address_line_1' => $this->faker->optional()->streetAddress(),
-            'address_line_2' => $this->faker->optional()->secondaryAddress(),
-            'postal_code' => $this->faker->optional()->postcode(),
+            'address' => $this->faker->optional()->streetAddress(),
+            'zip_code' => $this->faker->optional()->postcode(),
             'city' => $this->faker->optional()->city(),
             'country' => $this->faker->optional()->country(),
         ];

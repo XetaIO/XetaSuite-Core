@@ -45,6 +45,7 @@ return [
 
     // Zones
     'zone.viewAny' => 'View all zones',
+    'zone.view' => 'View zone details',
     'zone.create' => 'Create zones',
     'zone.update' => 'Update zones',
     'zone.delete' => 'Delete zones',

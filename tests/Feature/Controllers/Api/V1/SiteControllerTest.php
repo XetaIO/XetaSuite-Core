@@ -152,7 +152,7 @@ describe('show', function () {
             ->assertJsonStructure([
                 'data' => [
                     'id', 'name', 'is_headquarters', 'email', 'office_phone',
-                    'cell_phone', 'address_line_1', 'address_line_2', 'postal_code', 'city', 'country',
+                    'cell_phone', 'address', 'zip_code', 'city', 'country',
                     'zone_count', 'user_count', 'created_at', 'updated_at',
                 ],
             ]);
@@ -467,7 +467,7 @@ describe('users', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'first_name', 'last_name', 'full_name', 'avatar'],
+                    '*' => ['id', 'full_name', 'email', 'avatar', 'roles', 'created_at'],
                 ],
             ]);
 
@@ -510,9 +510,44 @@ describe('users', function () {
 
         $response->assertOk();
 
-        $names = collect($response->json('data'))->pluck('first_name');
-        expect($names)->toContain('John');
-        expect($names)->not->toContain('Jane');
+        $names = collect($response->json('data'))->pluck('full_name');
+        expect($names)->toContain('John Doe');
+        expect($names)->not->toContain('Jane Smith');
+    });
+
+    it('limits results to 15 users', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        // Create 20 users and attach them to the headquarters
+        $siteUsers = User::factory()->count(20)->create();
+        $this->headquarters->users()->attach($siteUsers->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertOk();
+
+        expect(count($response->json('data')))->toBeLessThanOrEqual(15);
+    });
+
+    it('includes user roles for the site', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        $testRole = Role::create(['name' => 'test-role', 'guard_name' => 'web']);
+        $siteUser = User::factory()->create();
+        $this->headquarters->users()->attach($siteUser->id);
+
+        // Assign role to user for this site
+        setPermissionsTeamId($this->headquarters->id);
+        $siteUser->assignRole($testRole);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/sites/{$this->headquarters->id}/users");
+
+        $response->assertOk();
+
+        $userData = collect($response->json('data'))->firstWhere('id', $siteUser->id);
+        expect($userData['roles'])->toContain('test-role');
     });
 
     it('denies access for user not on headquarters', function () {
