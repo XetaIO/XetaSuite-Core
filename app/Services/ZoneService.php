@@ -105,7 +105,7 @@ class ZoneService
      */
     private function applySorting(Builder $query, string $sortBy, string $direction): Builder
     {
-        $allowedSorts = ['name', 'allow_material', 'children_count', 'materials_count', 'created_at'];
+        $allowedSorts = ['name', 'allow_material', 'children_count', 'material_count', 'created_at'];
 
         if (in_array($sortBy, $allowedSorts, true)) {
             $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');

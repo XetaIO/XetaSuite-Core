@@ -39,7 +39,7 @@ class ZoneDetailResource extends JsonResource
                 'name' => $child->name,
                 'allow_material' => $child->allow_material,
                 'children_count' => $child->children_count ?? $child->children()->count(),
-                'materials_count' => $child->materials_count ?? $child->materials()->count(),
+                'material_count' => $child->material_count ?? $child->materials()->count(),
             ])),
 
             // Materials (only when zone allows materials)
@@ -54,7 +54,7 @@ class ZoneDetailResource extends JsonResource
 
             // Counts
             'children_count' => $this->whenCounted('children'),
-            'materials_count' => $this->whenCounted('materials'),
+            'material_count' => $this->whenCounted('materials'),
 
             // Timestamps
             'created_at' => $this->created_at?->toISOString(),

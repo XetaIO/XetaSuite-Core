@@ -89,7 +89,7 @@ describe('index', function () {
         expect($data[1]['name'])->toBe('Zebra Zone');
     });
 
-    it('includes children_count and materials_count in response', function () {
+    it('includes children_count and material_count in response', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -166,7 +166,7 @@ describe('show', function () {
 
         $response->assertOk()
             ->assertJsonStructure([
-                'data' => ['id', 'name', 'allow_material', 'parent_id', 'site_id', 'site', 'children_count', 'materials_count', 'created_at', 'updated_at'],
+                'data' => ['id', 'name', 'allow_material', 'parent_id', 'site_id', 'site', 'children_count', 'material_count', 'created_at', 'updated_at'],
             ])
             ->assertJsonPath('data.id', $zone->id)
             ->assertJsonPath('data.name', $zone->name);

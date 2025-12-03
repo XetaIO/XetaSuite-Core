@@ -82,9 +82,9 @@ trait ItemPresenter
             get: fn () => match ($this->stock_status) {
                 'critical' => 'red',
                 'warning' => 'orange',
-                'empty' => 'gray',
+                'empty' => 'dark',
                 'ok' => 'green',
-                default => 'gray',
+                default => 'dark',
             }
         );
     }
