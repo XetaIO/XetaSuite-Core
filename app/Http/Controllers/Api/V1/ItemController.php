@@ -30,7 +30,8 @@ class ItemController extends Controller
 {
     public function __construct(
         private readonly ItemService $itemService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of items.
@@ -171,7 +172,7 @@ class ItemController extends Controller
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
         );
 
-        $writer = new SvgWriter;
+        $writer = new SvgWriter();
         $result = $writer->write($qrCode);
 
         return response()->json([

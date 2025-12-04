@@ -24,7 +24,8 @@ class RecordItemPriceChange implements ShouldQueue
         public string $createdByName,
         public string $currency,
         public ?string $notes = null
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.

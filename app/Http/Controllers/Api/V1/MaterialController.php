@@ -20,7 +20,8 @@ class MaterialController extends Controller
 {
     public function __construct(
         private readonly MaterialService $materialService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of materials.

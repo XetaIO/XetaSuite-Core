@@ -18,7 +18,8 @@ class CheckItemCriticalStock implements ShouldQueue
      */
     public function __construct(
         public int $itemId
-    ) {}
+    ) {
+    }
 
     /**
      * Execute the job.
