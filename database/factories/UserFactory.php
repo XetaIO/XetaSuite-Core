@@ -23,8 +23,6 @@ class UserFactory extends Factory
 
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -73,7 +71,6 @@ class UserFactory extends Factory
     /**
      * Forces the use of an existing site (or site ID).
      *
-     * @param Site|int $site
      *
      * @return UserFactory
      */
@@ -83,7 +80,9 @@ class UserFactory extends Factory
 
         return $this->state(fn () => [
             'current_site_id' => $siteId,
-        ]);
+        ])->afterCreating(function (User $user) use ($siteId) {
+            $user->sites()->syncWithoutDetaching([$siteId]);
+        });
     }
 
     /**
@@ -103,7 +102,6 @@ class UserFactory extends Factory
     /**
      * State : User with cleanings
      *
-     * @param int $count
      *
      * @return UserFactory
      */
@@ -119,7 +117,6 @@ class UserFactory extends Factory
     /**
      * State : User with incidents created by him
      *
-     * @param int $count
      *
      * @return UserFactory
      */
@@ -135,7 +132,6 @@ class UserFactory extends Factory
     /**
      * State : User with maintenances created by him
      *
-     * @param int $count
      *
      * @return UserFactory
      */
@@ -151,7 +147,6 @@ class UserFactory extends Factory
     /**
      * State : User acting as operator (many-to-many)
      *
-     * @param int $count
      *
      * @return UserFactory
      */
@@ -166,7 +161,6 @@ class UserFactory extends Factory
     /**
      * State : User assigned to multiple sites (BelongsToMany)
      *
-     * @param int $count
      *
      * @return UserFactory
      */

@@ -35,7 +35,7 @@ class ZoneResource extends JsonResource
 
             // Counts
             'children_count' => $this->whenCounted('children'),
-            'material_count' => $this->whenCounted('materials'),
+            'material_count' => $this->material_count,
 
             // Timestamps
             'created_at' => $this->created_at?->toISOString(),
