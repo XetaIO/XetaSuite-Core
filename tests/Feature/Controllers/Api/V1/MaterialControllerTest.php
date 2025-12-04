@@ -30,6 +30,7 @@ beforeEach(function () {
     // Create permissions
     $permissions = [
         'material.viewAny',
+        'material.view',
         'material.create',
         'material.update',
         'material.delete',
@@ -641,7 +642,7 @@ describe('availableZones', function () {
         ]);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/materials-available-zones');
+            ->getJson('/api/v1/materials/available-zones');
 
         $response->assertOk()
             ->assertJsonStructure(['data' => [['id', 'name']]]);
@@ -653,7 +654,7 @@ describe('availableZones', function () {
     });
 
     it('requires authentication', function () {
-        $response = $this->getJson('/api/v1/materials-available-zones');
+        $response = $this->getJson('/api/v1/materials/available-zones');
 
         $response->assertUnauthorized();
     });
@@ -674,7 +675,7 @@ describe('availableRecipients', function () {
         $otherUser->sites()->attach($this->otherSite);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/materials-available-recipients');
+            ->getJson('/api/v1/materials/available-recipients');
 
         $response->assertOk()
             ->assertJsonStructure(['data' => [['id', 'full_name', 'email']]]);
@@ -686,7 +687,115 @@ describe('availableRecipients', function () {
     });
 
     it('requires authentication', function () {
-        $response = $this->getJson('/api/v1/materials-available-recipients');
+        $response = $this->getJson('/api/v1/materials/available-recipients');
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// STATS TESTS
+// ============================================================================
+
+describe('stats', function () {
+    it('returns monthly statistics for a material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/stats");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'months',
+                    'incidents',
+                    'maintenances',
+                    'cleanings',
+                    'item_movements',
+                ],
+            ]);
+
+        // Should have 12 months of data
+        expect($response->json('data.months'))->toHaveCount(12);
+        expect($response->json('data.incidents'))->toHaveCount(12);
+        expect($response->json('data.maintenances'))->toHaveCount(12);
+        expect($response->json('data.cleanings'))->toHaveCount(12);
+        expect($response->json('data.item_movements'))->toHaveCount(12);
+    });
+
+    it('returns correct counts for material with data', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()
+            ->forZone($this->zoneWithMaterials)
+            ->createdBy($user)
+            ->create();
+
+        // Create 2 incidents this month
+        Incident::factory()
+            ->count(2)
+            ->forMaterial($material)
+            ->forSite($this->regularSite)
+            ->create(['created_at' => now()]);
+
+        // Create 1 maintenance this month
+        Maintenance::factory()
+            ->forMaterial($material)
+            ->forSite($this->regularSite)
+            ->create(['created_at' => now()]);
+
+        // Create 3 cleanings this month
+        Cleaning::factory()
+            ->count(3)
+            ->forMaterial($material)
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create(['created_at' => now()]);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/stats");
+
+        $response->assertOk();
+
+        // Check that the last month (current) has the correct counts
+        $incidents = $response->json('data.incidents');
+        $maintenances = $response->json('data.maintenances');
+        $cleanings = $response->json('data.cleanings');
+
+        expect($incidents[11])->toBe(2); // Last month (current)
+        expect($maintenances[11])->toBe(1);
+        expect($cleanings[11])->toBe(3);
+    });
+
+    it('denies access for material on different site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/stats");
+
+        $response->assertForbidden();
+    });
+
+    it('denies access for user without view permission', function () {
+        $noPermRole = Role::create(['name' => 'no-perm', 'guard_name' => 'web']);
+        $user = createUserOnRegularSite($this->regularSite, $noPermRole);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/stats");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/stats");
 
         $response->assertUnauthorized();
     });

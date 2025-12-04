@@ -20,8 +20,7 @@ class MaterialController extends Controller
 {
     public function __construct(
         private readonly MaterialService $materialService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of materials.
@@ -124,5 +123,18 @@ class MaterialController extends Controller
                 'email' => $user->email,
             ]),
         ]);
+    }
+
+    /**
+     * Get monthly statistics for a material over the last 12 months.
+     * Returns counts for incidents, maintenances, cleanings, and item movements (exit).
+     */
+    public function stats(Material $material): JsonResponse
+    {
+        $this->authorize('view', $material);
+
+        $stats = $this->materialService->getMonthlyStats($material);
+
+        return response()->json(['data' => $stats]);
     }
 }

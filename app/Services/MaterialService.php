@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace XetaSuite\Services;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use XetaSuite\Models\Cleaning;
+use XetaSuite\Models\Incident;
+use XetaSuite\Models\ItemMovement;
+use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Zone;
 
@@ -94,5 +100,91 @@ class MaterialService
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 
         return $query->orderBy($sortBy, $direction);
+    }
+
+    /**
+     * Get monthly statistics for a material over the last 12 months.
+     *
+     * @return array{months: array<string>, incidents: array<int>, maintenances: array<int>, cleanings: array<int>, item_movements: array<int>}
+     */
+    public function getMonthlyStats(Material $material): array
+    {
+        $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+
+        // Generate months labels
+        $months = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $months[] = $currentDate->format('Y-m');
+            $currentDate->addMonth();
+        }
+
+        // Query incidents by month
+        $incidentsData = Incident::query()
+            ->where('material_id', $material->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(created_at, 'YYYY-MM') as month"),
+                DB::raw('count(*) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Query maintenances by month
+        $maintenancesData = Maintenance::query()
+            ->where('material_id', $material->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(created_at, 'YYYY-MM') as month"),
+                DB::raw('count(*) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Query cleanings by month
+        $cleaningsData = Cleaning::query()
+            ->where('material_id', $material->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(created_at, 'YYYY-MM') as month"),
+                DB::raw('count(*) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Query item movements (exits) via maintenances for this material
+        $itemMovementsData = ItemMovement::query()
+            ->where('type', 'exit')
+            ->where('movable_type', Maintenance::class)
+            ->whereIn('movable_id', Maintenance::where('material_id', $material->id)->pluck('id'))
+            ->whereBetween('movement_date', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(movement_date, 'YYYY-MM') as month"),
+                DB::raw('sum(quantity) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Build response arrays with 0 for months without data
+        $incidents = [];
+        $maintenances = [];
+        $cleanings = [];
+        $itemMovements = [];
+
+        foreach ($months as $month) {
+            $incidents[] = (int) ($incidentsData[$month] ?? 0);
+            $maintenances[] = (int) ($maintenancesData[$month] ?? 0);
+            $cleanings[] = (int) ($cleaningsData[$month] ?? 0);
+            $itemMovements[] = (int) ($itemMovementsData[$month] ?? 0);
+        }
+
+        return [
+            'months' => $months,
+            'incidents' => $incidents,
+            'maintenances' => $maintenances,
+            'cleanings' => $cleanings,
+            'item_movements' => $itemMovements,
+        ];
     }
 }

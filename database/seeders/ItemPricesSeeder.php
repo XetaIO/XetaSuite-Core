@@ -16,7 +16,7 @@ class ItemPricesSeeder extends Seeder
      */
     public function run(): void
     {
-        $items = Item::inRandomOrder()->take(20)->get();
+        $items = Item::all();
         $user = User::firstWhere('email', 'admin@xetasuite.test');
 
         foreach ($items as $item) {
@@ -27,7 +27,7 @@ class ItemPricesSeeder extends Seeder
                 ItemPrice::factory()
                     ->forItem($item)
                     ->fromSupplier($item->supplier_id)
-                    ->withPrice((float)$item->purchase_price, true)
+                    ->withPrice((float) $item->purchase_price, true)
                     ->createdBy($user)
                     ->create();
             }

@@ -604,7 +604,7 @@ describe('availableParents', function () {
         Zone::factory()->forSite($this->otherSite)->create(['allow_material' => false, 'name' => 'Other Site Zone']);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/zones-available-parents');
+            ->getJson('/api/v1/zones/available-parents');
 
         $response->assertOk();
         $names = collect($response->json('data'))->pluck('name');
@@ -621,7 +621,7 @@ describe('availableParents', function () {
         $zone3 = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false, 'name' => 'Zone 3']);
 
         $response = $this->actingAs($user)
-            ->getJson("/api/v1/zones-available-parents?exclude_zone_id={$zone1->id}");
+            ->getJson("/api/v1/zones/available-parents?exclude_zone_id={$zone1->id}");
 
         $response->assertOk();
         $names = collect($response->json('data'))->pluck('name');

@@ -1,0 +1,319 @@
+<?php
+
+declare(strict_types=1);
+
+namespace XetaSuite\Services;
+
+use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use XetaSuite\Models\Item;
+use XetaSuite\Models\ItemMovement;
+use XetaSuite\Models\ItemPrice;
+use XetaSuite\Models\Material;
+use XetaSuite\Models\Supplier;
+use XetaSuite\Models\User;
+
+class ItemService
+{
+    /**
+     * Get a paginated list of items with optional search, filters and sorting.
+     *
+     * @param  array{search?: string, supplier_id?: int, stock_status?: string, sort_by?: string, sort_direction?: string, per_page?: int}  $filters
+     */
+    public function getPaginatedItems(array $filters = []): LengthAwarePaginator
+    {
+        $currentSiteId = auth()->user()->current_site_id;
+
+        return Item::query()
+            ->with(['supplier', 'creator'])
+            ->where('site_id', $currentSiteId)
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['supplier_id'] ?? null, fn (Builder $query, int $supplierId) => $query->where('supplier_id', $supplierId))
+            ->when($filters['stock_status'] ?? null, fn (Builder $query, string $status) => $this->applyStockStatusFilter($query, $status))
+            ->when(
+                $filters['sort_by'] ?? null,
+                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query) => $query->orderBy('name')
+            )
+            ->paginate($filters['per_page'] ?? 20);
+    }
+
+    /**
+     * Get items for a specific supplier.
+     */
+    public function getItemsForSupplier(Supplier $supplier, array $filters = []): LengthAwarePaginator
+    {
+        return Item::query()
+            ->with(['site'])
+            ->where('supplier_id', $supplier->id)
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->orderBy('name')
+            ->paginate($filters['per_page'] ?? 20);
+    }
+
+    /**
+     * Get items for a specific material.
+     */
+    public function getItemsForMaterial(Material $material): EloquentCollection
+    {
+        return $material->items()
+            ->with(['supplier'])
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Get available suppliers for item creation (global suppliers from HQ).
+     */
+    public function getAvailableSuppliers(): EloquentCollection
+    {
+        return Supplier::query()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    /**
+     * Get available materials for item assignment (materials on current site).
+     * Limited to 20 results - use search parameter for more specific filtering.
+     */
+    public function getAvailableMaterials(?string $search = null): EloquentCollection
+    {
+        $currentSiteId = auth()->user()->current_site_id;
+
+        return Material::query()
+            ->where('site_id', $currentSiteId)
+            ->when($search, fn (Builder $query) => $query->where('name', 'ilike', "%{$search}%"))
+            ->orderBy('name')
+            ->limit(20)
+            ->get(['id', 'name']);
+    }
+
+    /**
+     * Get available recipients for critical alerts (users with access to current site).
+     * Limited to 20 results - use search parameter for more specific filtering.
+     */
+    public function getAvailableRecipients(?string $search = null): Collection
+    {
+        $currentSiteId = auth()->user()->current_site_id;
+
+        return User::query()
+            ->whereHas('sites', fn (Builder $query) => $query->where('sites.id', $currentSiteId))
+            ->when($search, fn (Builder $query) => $query->where(function (Builder $q) use ($search) {
+                $q->where('first_name', 'ilike', "%{$search}%")
+                    ->orWhere('last_name', 'ilike', "%{$search}%")
+                    ->orWhere('email', 'ilike', "%{$search}%");
+            }))
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->limit(20)
+            ->get(['id', 'first_name', 'last_name', 'email'])
+            ->map(fn (User $user) => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+            ]);
+    }
+
+    /**
+     * Check if a reference is unique for the site.
+     */
+    public function isReferenceUnique(string $reference, int $siteId, ?int $excludeItemId = null): bool
+    {
+        $query = Item::query()
+            ->where('reference', $reference)
+            ->where('site_id', $siteId);
+
+        if ($excludeItemId) {
+            $query->where('id', '!=', $excludeItemId);
+        }
+
+        return ! $query->exists();
+    }
+
+    /**
+     * Check if an item can be deleted.
+     * Items with movements cannot be deleted.
+     */
+    public function canDelete(Item $item): bool
+    {
+        return $item->movements()->count() === 0;
+    }
+
+    /**
+     * Get the current stock level for an item.
+     */
+    public function getStockLevel(Item $item): int
+    {
+        return $item->item_entry_total - $item->item_exit_total;
+    }
+
+    /**
+     * Get the stock status for an item.
+     */
+    public function getStockStatus(Item $item): string
+    {
+        $stock = $this->getStockLevel($item);
+
+        if ($stock <= 0) {
+            return 'empty';
+        }
+
+        if ($item->number_critical_enabled && $stock <= $item->number_critical_minimum) {
+            return 'critical';
+        }
+
+        if ($item->number_warning_enabled && $stock <= $item->number_warning_minimum) {
+            return 'warning';
+        }
+
+        return 'ok';
+    }
+
+    /**
+     * Get monthly statistics for an item over the last 12 months.
+     *
+     * @return array{months: array<string>, entries: array<int>, exits: array<int>, prices: array<float>}
+     */
+    public function getMonthlyStats(Item $item): array
+    {
+        $startDate = Carbon::now()->subMonths(11)->startOfMonth();
+        $endDate = Carbon::now()->endOfMonth();
+
+        // Generate months labels
+        $months = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $months[] = $currentDate->format('Y-m');
+            $currentDate->addMonth();
+        }
+
+        // Query entries by month
+        $entriesData = ItemMovement::query()
+            ->where('item_id', $item->id)
+            ->where('type', 'entry')
+            ->whereBetween('movement_date', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(movement_date, 'YYYY-MM') as month"),
+                DB::raw('sum(quantity) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Query exits by month
+        $exitsData = ItemMovement::query()
+            ->where('item_id', $item->id)
+            ->where('type', 'exit')
+            ->whereBetween('movement_date', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(movement_date, 'YYYY-MM') as month"),
+                DB::raw('sum(quantity) as count')
+            )
+            ->groupBy('month')
+            ->pluck('count', 'month');
+
+        // Query prices by month (get the latest price for each month)
+        $pricesData = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->whereBetween('effective_date', [$startDate, $endDate])
+            ->select(
+                DB::raw("to_char(effective_date, 'YYYY-MM') as month"),
+                DB::raw('max(price) as price')
+            )
+            ->groupBy('month')
+            ->pluck('price', 'month');
+
+        // Build response arrays with 0 for months without data
+        $entries = [];
+        $exits = [];
+        $prices = [];
+        $lastKnownPrice = (float) $item->purchase_price;
+
+        // Get the last price before the start date
+        $priorPrice = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('effective_date', '<', $startDate)
+            ->orderBy('effective_date', 'desc')
+            ->value('price');
+
+        if ($priorPrice !== null) {
+            $lastKnownPrice = (float) $priorPrice;
+        }
+
+        foreach ($months as $month) {
+            $entries[] = (int) ($entriesData[$month] ?? 0);
+            $exits[] = (int) ($exitsData[$month] ?? 0);
+
+            // For prices, use the last known price if no new price for this month
+            if (isset($pricesData[$month])) {
+                $lastKnownPrice = (float) $pricesData[$month];
+            }
+            $prices[] = $lastKnownPrice;
+        }
+
+        // Build the response as an array of objects for frontend compatibility
+        $result = [];
+        foreach ($months as $index => $month) {
+            $result[] = [
+                'month' => $month,
+                'entries' => $entries[$index],
+                'exits' => $exits[$index],
+                'price' => $prices[$index],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Apply search filter to items query.
+     */
+    private function applySearch(Builder $query, string $search): Builder
+    {
+        return $query->where(function (Builder $query) use ($search) {
+            $query->where('name', 'ILIKE', "%{$search}%")
+                ->orWhere('reference', 'ILIKE', "%{$search}%")
+                ->orWhere('description', 'ILIKE', "%{$search}%")
+                ->orWhere('supplier_reference', 'ILIKE', "%{$search}%");
+        });
+    }
+
+    /**
+     * Apply stock status filter.
+     */
+    private function applyStockStatusFilter(Builder $query, string $status): Builder
+    {
+        return match ($status) {
+            'empty' => $query->whereRaw('item_entry_total - item_exit_total <= 0'),
+            'critical' => $query->where('number_critical_enabled', true)
+                ->whereRaw('item_entry_total - item_exit_total > 0')
+                ->whereRaw('item_entry_total - item_exit_total <= number_critical_minimum'),
+            'warning' => $query->where('number_warning_enabled', true)
+                ->whereRaw('item_entry_total - item_exit_total > number_critical_minimum')
+                ->whereRaw('item_entry_total - item_exit_total <= number_warning_minimum'),
+            'ok' => $query->whereRaw('item_entry_total - item_exit_total > 0')
+                ->where(function (Builder $q) {
+                    $q->where('number_warning_enabled', false)
+                        ->orWhereRaw('item_entry_total - item_exit_total > number_warning_minimum');
+                }),
+            default => $query,
+        };
+    }
+
+    /**
+     * Apply sorting to items query.
+     */
+    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
+    {
+        $allowedColumns = ['name', 'reference', 'purchase_price', 'created_at'];
+        $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'name';
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($sortBy, $direction);
+    }
+}

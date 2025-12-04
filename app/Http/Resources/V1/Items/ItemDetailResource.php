@@ -6,6 +6,7 @@ namespace XetaSuite\Http\Resources\V1\Items;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use XetaSuite\Services\ItemService;
 
 class ItemDetailResource extends JsonResource
 {
@@ -14,93 +15,80 @@ class ItemDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $itemService = app(ItemService::class);
+
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'full_name' => $this->full_name,
             'reference' => $this->reference,
             'description' => $this->description,
 
-            // Stock complet
-            'stock' => [
-                'current' => $this->current_stock,
-                'status' => $this->stock_status,
-                'status_color' => $this->stock_status_color,
-                'status_label' => $this->stock_status_label,
-                'in_stock' => $this->in_stock,
-                'value' => $this->stock_value,
-                'formatted_value' => $this->formatted_stock_value
-            ],
+            // Site info
+            'site_id' => $this->site_id,
 
-            // Alertes
-            'alerts' => [
-                'is_low_stock' => $this->is_low_stock,
-                'is_critical_stock' => $this->is_critical_stock,
-                'needs_restock' => $this->needs_restock,
-                'quantity_to_warning_level' => $this->quantity_to_warning_level,
-                'warning_enabled' => $this->number_warning_enabled,
-                'warning_minimum' => $this->number_warning_minimum,
-                'critical_enabled' => $this->number_critical_enabled,
-                'critical_minimum' => $this->number_critical_minimum,
-            ],
-
-            // Prices
-            'pricing' => [
-                'current_price' => $this->current_price_value,
-                'formatted_price' => $this->formatted_price,
-                'currency' => $this->currency,
-            ],
-
-            // Movement statistics
-            'movements' => [
-                'entry_total' => $this->item_entry_total,
-                'exit_total' => $this->item_exit_total,
-                'entry_count' => $this->item_entry_count,
-                'exit_count' => $this->item_exit_count,
-                'average_entry' => $this->average_entry_quantity,
-                'average_exit' => $this->average_exit_quantity
-            ],
-
-            // Relations
-            'site' => $this->whenLoaded('site', fn () => [
-                'id' => $this->site->id,
-                'name' => $this->site->name,
+            // Supplier info
+            'supplier_id' => $this->supplier_id,
+            'supplier_name' => $this->supplier?->name ?? $this->supplier_name,
+            'supplier_reference' => $this->supplier_reference,
+            'supplier' => $this->whenLoaded('supplier', fn () => [
+                'id' => $this->supplier->id,
+                'name' => $this->supplier->name,
             ]),
 
-            'supplier' => [
-                'id' => $this->supplier_id,
-                'name' => $this->supplier_display_name,
-                'reference' => $this->supplier_reference,
-            ],
-
-            'created_by' => $this->when($this->created_by_id, [
-                'id' => $this->created_by_id,
-                'name' => $this->created_by_name,
+            // Creator info
+            'created_by_id' => $this->created_by_id,
+            'created_by_name' => $this->created_by_name,
+            'creator' => $this->whenLoaded('creator', fn () => [
+                'id' => $this->creator->id,
+                'full_name' => $this->creator->full_name,
+                'email' => $this->creator->email,
             ]),
 
-            // Price history (if loaded)
-            'price_history' => $this->whenLoaded(
-                'prices',
-                fn () => ItemPriceResource::collection($this->prices)
-            ),
+            // Editor info
+            'edited_by_id' => $this->edited_by_id,
+            'editor' => $this->whenLoaded('editor', fn () => $this->editor ? [
+                'id' => $this->editor->id,
+                'full_name' => $this->editor->full_name,
+            ] : null),
 
-            // History of movements
-            'movement_history' => $this->whenLoaded(
-                'movements',
-                fn () => ItemMovementResource::collection($this->movements)
-            ),
+            // Pricing
+            'purchase_price' => (float) $this->purchase_price,
+            'currency' => $this->currency,
 
-            // Linked materials
-            'materials' => $this->whenLoaded(
-                'materials',
-                fn () => $this->materials->map(fn ($material) => [
+            // Stock counts
+            'item_entry_total' => $this->item_entry_total,
+            'item_exit_total' => $this->item_exit_total,
+            'item_entry_count' => $this->item_entry_count,
+            'item_exit_count' => $this->item_exit_count,
+            'stock_level' => $this->item_entry_total - $this->item_exit_total,
+            'stock_status' => $itemService->getStockStatus($this->resource),
+
+            // Relation counts
+            'material_count' => $this->material_count,
+            'qrcode_flash_count' => $this->qrcode_flash_count,
+
+            // Stock alerts
+            'number_warning_enabled' => $this->number_warning_enabled,
+            'number_warning_minimum' => $this->number_warning_minimum,
+            'number_critical_enabled' => $this->number_critical_enabled,
+            'number_critical_minimum' => $this->number_critical_minimum,
+
+            // Materials (many-to-many)
+            'materials' => $this->whenLoaded('materials', fn () => $this->materials->map(fn ($material) => [
                 'id' => $material->id,
                 'name' => $material->name,
-            ])
-            ),
+            ])),
 
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            // Recipients for critical alerts
+            'recipients' => $this->whenLoaded('recipients', fn () => $this->recipients->map(fn ($recipient) => [
+                'id' => $recipient->id,
+                'full_name' => $recipient->full_name,
+                'email' => $recipient->email,
+            ])),
+
+            // Timestamps
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }
