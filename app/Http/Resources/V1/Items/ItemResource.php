@@ -25,12 +25,12 @@ class ItemResource extends JsonResource
 
             // Supplier info
             'supplier_id' => $this->supplier_id,
-            'supplier_name' => $this->supplier?->name ?? $this->supplier_name,
+            'supplier_name' => $this->supplier_name,
             'supplier_reference' => $this->supplier_reference,
 
             // Creator info
             'created_by_id' => $this->created_by_id,
-            'created_by_name' => $this->creator?->full_name ?? $this->created_by_name,
+            'created_by_name' => $this->created_by_name,
 
             // Pricing
             'purchase_price' => (float) $this->purchase_price,
