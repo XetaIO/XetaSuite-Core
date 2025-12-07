@@ -22,7 +22,7 @@ class ZoneService
             ->with(['site', 'parent'])
             ->withCount(['children', 'materials'])
             ->where('site_id', auth()->user()->current_site_id)
-            /*->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->where('site_id', $siteId))*/
+            /* ->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->where('site_id', $siteId)) */
             /*->when(
                 array_key_exists('parent_id', $filters),
                 fn (Builder $query) => $query->where('parent_id', $filters['parent_id'])
@@ -81,15 +81,6 @@ class ZoneService
         }
 
         return $ids;
-    }
-
-    /**
-     * Check if a zone can be deleted.
-     */
-    public function canDelete(Zone $zone): bool
-    {
-        // Cannot delete if zone has children or materials
-        return $zone->children()->doesntExist() && $zone->materials()->doesntExist();
     }
 
     /**

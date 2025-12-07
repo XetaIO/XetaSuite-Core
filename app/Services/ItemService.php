@@ -68,12 +68,31 @@ class ItemService
 
     /**
      * Get available suppliers for item creation (global suppliers from HQ).
+     *
+     * @param  string|null  $search  Search term to filter suppliers by name
+     * @param  int|null  $includeId  Always include this supplier ID (even if not in search results)
      */
-    public function getAvailableSuppliers(): EloquentCollection
+    public function getAvailableSuppliers(?string $search = null, ?int $includeId = null): EloquentCollection
     {
-        return Supplier::query()
+        $suppliers = Supplier::query()
+            ->when($search, fn (Builder $query) => $query->where('name', 'ILIKE', "%{$search}%"))
+            ->when($includeId, fn (Builder $query) => $query->where('id', '!=', $includeId))
             ->orderBy('name')
+            ->limit($includeId ? 19 : 20)
             ->get(['id', 'name']);
+
+        // If includeId is provided, fetch that supplier and prepend it to the list
+        if ($includeId) {
+            $includedSupplier = Supplier::query()
+                ->where('id', $includeId)
+                ->first(['id', 'name']);
+
+            if ($includedSupplier) {
+                $suppliers->prepend($includedSupplier);
+            }
+        }
+
+        return $suppliers;
     }
 
     /**
@@ -86,7 +105,7 @@ class ItemService
 
         return Material::query()
             ->where('site_id', $currentSiteId)
-            ->when($search, fn (Builder $query) => $query->where('name', 'ilike', "%{$search}%"))
+            ->when($search, fn (Builder $query) => $query->where('name', 'ILIKE', "%{$search}%"))
             ->orderBy('name')
             ->limit(20)
             ->get(['id', 'name']);
@@ -103,9 +122,9 @@ class ItemService
         return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('sites.id', $currentSiteId))
             ->when($search, fn (Builder $query) => $query->where(function (Builder $q) use ($search) {
-                $q->where('first_name', 'ilike', "%{$search}%")
-                    ->orWhere('last_name', 'ilike', "%{$search}%")
-                    ->orWhere('email', 'ilike', "%{$search}%");
+                $q->where('first_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('email', 'ILIKE', "%{$search}%");
             }))
             ->orderBy('first_name')
             ->orderBy('last_name')
@@ -134,45 +153,6 @@ class ItemService
         }
 
         return ! $query->exists();
-    }
-
-    /**
-     * Check if an item can be deleted.
-     * Items with movements cannot be deleted.
-     */
-    public function canDelete(Item $item): bool
-    {
-        return $item->movements()->count() === 0;
-    }
-
-    /**
-     * Get the current stock level for an item.
-     */
-    public function getStockLevel(Item $item): int
-    {
-        return $item->item_entry_total - $item->item_exit_total;
-    }
-
-    /**
-     * Get the stock status for an item.
-     */
-    public function getStockStatus(Item $item): string
-    {
-        $stock = $this->getStockLevel($item);
-
-        if ($stock <= 0) {
-            return 'empty';
-        }
-
-        if ($item->number_critical_enabled && $stock <= $item->number_critical_minimum) {
-            return 'critical';
-        }
-
-        if ($item->number_warning_enabled && $stock <= $item->number_warning_minimum) {
-            return 'warning';
-        }
-
-        return 'ok';
     }
 
     /**
@@ -232,7 +212,7 @@ class ItemService
         $entries = [];
         $exits = [];
         $prices = [];
-        $lastKnownPrice = (float) $item->purchase_price;
+        $lastKnownPrice = (float) $item->current_price;
 
         // Get the last price before the start date
         $priorPrice = ItemPrice::query()
@@ -310,7 +290,7 @@ class ItemService
      */
     private function applySorting(Builder $query, string $sortBy, string $direction): Builder
     {
-        $allowedColumns = ['name', 'reference', 'purchase_price', 'created_at'];
+        $allowedColumns = ['name', 'reference', 'current_price', 'created_at'];
         $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'name';
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 

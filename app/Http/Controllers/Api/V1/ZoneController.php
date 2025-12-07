@@ -44,6 +44,9 @@ class ZoneController extends Controller
 
     /**
      * Store a newly created zone.
+     *
+     * @param  StoreZoneRequest  $request  The incoming request.
+     * @param  CreateZone  $action  The action to create the zone.
      */
     public function store(StoreZoneRequest $request, CreateZone $action): ZoneDetailResource
     {
@@ -57,6 +60,8 @@ class ZoneController extends Controller
 
     /**
      * Display the specified zone.
+     *
+     * @param  Zone  $zone  The zone to display.
      */
     public function show(Zone $zone): ZoneDetailResource
     {
@@ -80,6 +85,10 @@ class ZoneController extends Controller
 
     /**
      * Update the specified zone.
+     *
+     * @param  UpdateZoneRequest  $request  The incoming request.
+     * @param  Zone  $zone  The zone to update.
+     * @param  UpdateZone  $action  The action to update the zone.
      */
     public function update(UpdateZoneRequest $request, Zone $zone, UpdateZone $action): ZoneDetailResource
     {
@@ -92,7 +101,10 @@ class ZoneController extends Controller
     }
 
     /**
-     * Remove the specified zone.
+     * Delete the specified zone.
+     *
+     * @param  Zone  $zone  The zone to delete.
+     * @param  DeleteZone  $action  The action to delete the zone.
      */
     public function destroy(Zone $zone, DeleteZone $action): JsonResponse
     {
@@ -128,6 +140,8 @@ class ZoneController extends Controller
 
     /**
      * Get child zones for a zone.
+     *
+     * @param  Zone  $zone  The zone to get children for.
      */
     public function children(Zone $zone): AnonymousResourceCollection
     {
@@ -139,7 +153,10 @@ class ZoneController extends Controller
     }
 
     /**
-     * Get materials for a zone (only if zone allows materials).
+     * Get materials for a zone.
+     *
+     * @param  Zone  $zone  The zone to get materials for.
+     * @return JsonResponse
      */
     public function materials(Zone $zone): JsonResponse|AnonymousResourceCollection
     {

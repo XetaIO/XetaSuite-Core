@@ -25,7 +25,7 @@ class ItemMovementsSeeder extends Seeder
                 ->entry()
                 ->forItem($item)
                 ->fromSupplier($item->supplier->id)
-                ->withQuantity(random_int(10, 50), (float) $item->purchase_price)
+                ->withQuantity(random_int(10, 50), (float) $item->current_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))
                 ->create();
@@ -34,7 +34,7 @@ class ItemMovementsSeeder extends Seeder
             ItemMovement::factory()
                 ->exit()
                 ->forItem($item)
-                ->withQuantity(random_int(2, 4), (float) $item->purchase_price)
+                ->withQuantity(random_int(2, 4), (float) $item->current_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))
                 ->create();

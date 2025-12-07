@@ -47,14 +47,6 @@ class SupplierService
     }
 
     /**
-     * Check if a supplier can be deleted.
-     */
-    public function canDelete(Supplier $supplier): bool
-    {
-        return ! $supplier->items()->exists();
-    }
-
-    /**
      * Apply search filter to suppliers query.
      */
     private function applySearch(Builder $query, string $search): Builder
@@ -96,7 +88,7 @@ class SupplierService
      */
     private function applyItemSorting(Builder $query, string $sortBy, string $direction): Builder
     {
-        $allowedSorts = ['name', 'description', 'reference', 'current_stock', 'purchase_price', 'created_at'];
+        $allowedSorts = ['name', 'description', 'reference', 'current_stock', 'current_price', 'created_at'];
 
         if (in_array($sortBy, $allowedSorts, true)) {
             $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');

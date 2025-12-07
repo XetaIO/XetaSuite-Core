@@ -28,7 +28,7 @@ class ItemDetailResource extends JsonResource
 
             // Supplier info
             'supplier_id' => $this->supplier_id,
-            'supplier_name' => $this->supplier?->name ?? $this->supplier_name,
+            'supplier_name' => $this->supplier_name,
             'supplier_reference' => $this->supplier_reference,
             'supplier' => $this->whenLoaded('supplier', fn () => [
                 'id' => $this->supplier->id,
@@ -52,7 +52,7 @@ class ItemDetailResource extends JsonResource
             ] : null),
 
             // Pricing
-            'purchase_price' => (float) $this->purchase_price,
+            'current_price' => (float) $this->current_price,
             'currency' => $this->currency,
 
             // Stock counts
@@ -60,8 +60,9 @@ class ItemDetailResource extends JsonResource
             'item_exit_total' => $this->item_exit_total,
             'item_entry_count' => $this->item_entry_count,
             'item_exit_count' => $this->item_exit_count,
-            'stock_level' => $this->item_entry_total - $this->item_exit_total,
-            'stock_status' => $itemService->getStockStatus($this->resource),
+            'current_stock' => $this->current_stock,
+            'stock_status' => $this->stock_status,
+            'stock_status_color' => $this->stock_status_color,
 
             // Relation counts
             'material_count' => $this->material_count,

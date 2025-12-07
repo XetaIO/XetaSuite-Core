@@ -27,7 +27,7 @@ class ItemPricesSeeder extends Seeder
                 ItemPrice::factory()
                     ->forItem($item)
                     ->fromSupplier($item->supplier_id)
-                    ->withPrice((float) $item->purchase_price, true)
+                    ->withPrice((float) $item->current_price, true)
                     ->createdBy($user)
                     ->create();
             }

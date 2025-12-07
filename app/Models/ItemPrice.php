@@ -36,13 +36,11 @@ class ItemPrice extends Model
      */
     protected $casts = [
         'price' => 'decimal:2',
-        'effective_date' => 'date',
+        'effective_date' => 'datetime',
     ];
 
     /**
      * Get the item that owns the price.
-     *
-     * @return BelongsTo
      */
     public function item(): BelongsTo
     {
@@ -51,8 +49,6 @@ class ItemPrice extends Model
 
     /**
      * Get the supplier that owns the price.
-     *
-     * @return BelongsTo
      */
     public function supplier(): BelongsTo
     {
@@ -61,8 +57,6 @@ class ItemPrice extends Model
 
     /**
      * Get the user that created the price.
-     *
-     * @return BelongsTo
      */
     public function creator(): BelongsTo
     {

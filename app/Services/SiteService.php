@@ -30,20 +30,6 @@ class SiteService
     }
 
     /**
-     * Check if a site can be deleted.
-     */
-    public function canDelete(Site $site): bool
-    {
-        // Cannot delete headquarters
-        if ($site->is_headquarters) {
-            return false;
-        }
-
-        // Cannot delete if site has zones
-        return ! $site->zones()->exists();
-    }
-
-    /**
      * Check if a headquarters site already exists.
      */
     public function headquartersExists(?int $excludeId = null): bool

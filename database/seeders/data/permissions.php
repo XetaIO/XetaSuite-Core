@@ -33,8 +33,8 @@ return [
     'material.update' => 'Edit materials information',
     'material.delete' => 'Delete materials',
     'material.export' => 'Export materials',
-    'material.generateQrcode' => 'Generate qrcode for materials',
-    'material.scanQrcode' => 'Scan qrcode for materials',
+    'material.generateQrCode' => 'Generate qrcode for materials',
+    'material.scanQrCode' => 'Scan qrcode for materials',
 
     // Settings
     'setting.viewAny' => 'View settings list',
@@ -90,8 +90,8 @@ return [
     'item.update' => 'Edit items',
     'item.delete' => 'Delete items',
     'item.export' => 'Export items',
-    'item.generateQrcode' => 'Generate qrcode for items',
-    'item.scanQrcode' => 'Scan qrcode for items',
+    'item.generateQrCode' => 'Generate qrcode for items',
+    'item.scanQrCode' => 'Scan qrcode for items',
     'item.viewOthersSites' => 'View items from other sites',
 
     // Items Movements

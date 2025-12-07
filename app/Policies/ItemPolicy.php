@@ -60,12 +60,20 @@ class ItemPolicy
     }
 
     /**
-     * Determine whether the user can create movements for the item.
-     * Uses item.update permission since movements modify stock.
+     * Determine whether the user can generate a QR code for the item.
+     * User must be on the same site as the item.
      */
-    public function createMovement(User $user, Item $item): bool
+    public function generateQrCode(User $user, Item $item): bool
     {
-        return $user->can('item.update')
+        return $user->can('item.generateQrCode')
             && $item->site_id === $user->current_site_id;
+    }
+
+    /**
+     * Determine whether the user can scan QrCode for the model.
+     */
+    public function scanQrCode(User $user): bool
+    {
+        return $user->can('item.scanQrCode');
     }
 }

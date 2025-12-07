@@ -58,4 +58,22 @@ class MaterialPolicy
         return $user->can('material.delete')
             && $material->zone?->site_id === $user->current_site_id;
     }
+
+    /**
+     * Determine whether the user can generate a QR code for the material.
+     * User must be on the same site as the material's zone.
+     */
+    public function generateQrCode(User $user, Material $material): bool
+    {
+        return $user->can('material.generateQrCode')
+            && $material->zone?->site_id === $user->current_site_id;
+    }
+
+    /**
+     * Determine whether the user can scan QrCode for the model.
+     */
+    public function scanQrCode(User $user): bool
+    {
+        return $user->can('material.scanQrCode');
+    }
 }

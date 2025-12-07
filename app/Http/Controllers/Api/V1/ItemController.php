@@ -13,23 +13,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use XetaSuite\Actions\Items\CreateItem;
-use XetaSuite\Actions\Items\CreateItemMovement;
 use XetaSuite\Actions\Items\DeleteItem;
 use XetaSuite\Actions\Items\UpdateItem;
-use XetaSuite\Http\Requests\V1\Items\StoreItemMovementRequest;
 use XetaSuite\Http\Requests\V1\Items\StoreItemRequest;
 use XetaSuite\Http\Requests\V1\Items\UpdateItemRequest;
-use XetaSuite\Http\Resources\V1\Items\ItemDashboardResource;
+use XetaSuite\Http\Resources\V1\ItemMovements\ItemMovementResource;
 use XetaSuite\Http\Resources\V1\Items\ItemDetailResource;
-use XetaSuite\Http\Resources\V1\Items\ItemMovementResource;
 use XetaSuite\Http\Resources\V1\Items\ItemResource;
+use XetaSuite\Http\Resources\V1\Materials\MaterialResource;
 use XetaSuite\Models\Item;
+use XetaSuite\Services\ItemMovementService;
+use XetaSuite\Services\ItemPriceService;
 use XetaSuite\Services\ItemService;
 
 class ItemController extends Controller
 {
     public function __construct(
-        private readonly ItemService $itemService
+        private readonly ItemService $itemService,
+        private readonly ItemMovementService $movementService,
+        private readonly ItemPriceService $priceService
     ) {
     }
 
@@ -54,6 +56,9 @@ class ItemController extends Controller
 
     /**
      * Store a newly created item.
+     *
+     * @param  StoreItemRequest  $request  The incoming request.
+     * @param  CreateItem  $action  The action to create the item.
      */
     public function store(StoreItemRequest $request, CreateItem $action): ItemDetailResource
     {
@@ -66,6 +71,8 @@ class ItemController extends Controller
 
     /**
      * Display the specified item.
+     *
+     * @param  Item  $item  The item to display.
      */
     public function show(Item $item): ItemDetailResource
     {
@@ -78,6 +85,10 @@ class ItemController extends Controller
 
     /**
      * Update the specified item.
+     *
+     * @param  UpdateItemRequest  $request  The incoming request.
+     * @param  Item  $item  The item to update.
+     * @param  UpdateItem  $action  The action to update the item.
      */
     public function update(UpdateItemRequest $request, Item $item, UpdateItem $action): ItemDetailResource
     {
@@ -89,7 +100,10 @@ class ItemController extends Controller
     }
 
     /**
-     * Remove the specified item from storage.
+     * Delete the specified item.
+     *
+     * @param  Item  $item  The item to delete.
+     * @param  DeleteItem  $action  The action to delete the item.
      */
     public function destroy(Item $item, DeleteItem $action): JsonResponse
     {
@@ -108,6 +122,8 @@ class ItemController extends Controller
 
     /**
      * Get monthly statistics for an item.
+     *
+     * @param  Item  $item  The item to get statistics for.
      */
     public function stats(Item $item): JsonResponse
     {
@@ -121,47 +137,70 @@ class ItemController extends Controller
     }
 
     /**
-     * Get movements for an item.
+     * Get paginated materials for an item.
+     *
+     * @param  Item  $item  The item to get materials for.
+     */
+    public function materials(Item $item): AnonymousResourceCollection
+    {
+        $this->authorize('view', $item);
+
+        $materials = $item->materials()
+            ->with('zone')
+            ->orderBy('name')
+            ->paginate((int) request('per_page', 5));
+
+        return MaterialResource::collection($materials);
+    }
+
+    /**
+     * Get paginated movements for an item.
+     *
+     * @param  Item  $item  The item to get movements for.
      */
     public function movements(Item $item): AnonymousResourceCollection
     {
         $this->authorize('view', $item);
 
-        $movements = $item->movements()
-            ->with(['supplier', 'creator'])
-            ->orderBy('movement_date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $movements = $this->movementService->getPaginatedMovements($item, [
+            'type' => request('type'),
+            'sort_by' => request('sort_by'),
+            'sort_direction' => request('sort_direction'),
+        ]);
 
         return ItemMovementResource::collection($movements);
     }
 
     /**
-     * Store a new movement for an item.
+     * Get price history with statistics for an item.
+     *
+     * @param  Item  $item  The item to get price history for.
      */
-    public function storeMovement(
-        StoreItemMovementRequest $request,
-        Item $item,
-        CreateItemMovement $action
-    ): ItemMovementResource {
-        $movement = $action->handle($item, $request->user(), $request->validated());
+    public function priceHistory(Item $item): JsonResponse
+    {
+        $this->authorize('view', $item);
 
-        return new ItemMovementResource(
-            $movement->load(['supplier', 'creator'])
-        );
+        $limit = (int) request('limit', 20);
+        $limit = max(5, min(100, $limit));
+
+        $data = $this->priceService->getPriceHistoryWithStats($item, $limit);
+
+        return response()->json([
+            'data' => $data,
+        ]);
     }
 
     /**
-     * Generate QR code for an item.
+     * Generate and return a QR code for the item.
      */
     public function qrCode(Item $item): JsonResponse
     {
-        $this->authorize('view', $item);
+        $this->authorize('generateQrCode', $item);
 
         $size = (int) request('size', 200);
         $size = max(100, min(500, $size)); // Limit between 100 and 500
 
-        $url = config('app.frontend_url').'/items/'.$item->id;
+        $url = config('app.frontend_url').'?source=qr&item='.$item->id;
 
         $qrCode = new QrCode(
             data: $url,
@@ -185,13 +224,18 @@ class ItemController extends Controller
     }
 
     /**
-     * Get available suppliers for item creation.
+     * Get available suppliers for item assignment.
+     *
+     * @param  Request  $request  The incoming request.
      */
-    public function availableSuppliers(): JsonResponse
+    public function availableSuppliers(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Item::class);
 
-        $suppliers = $this->itemService->getAvailableSuppliers();
+        $suppliers = $this->itemService->getAvailableSuppliers(
+            $request->query('search'),
+            $request->query('include_id') ? (int) $request->query('include_id') : null
+        );
 
         return response()->json([
             'suppliers' => $suppliers,
@@ -200,6 +244,8 @@ class ItemController extends Controller
 
     /**
      * Get available materials for item assignment.
+     *
+     * @param  Request  $request  The incoming request.
      */
     public function availableMaterials(Request $request): JsonResponse
     {
@@ -213,7 +259,9 @@ class ItemController extends Controller
     }
 
     /**
-     * Get available recipients for critical alerts.
+     * Get available recipients for item assignment.
+     *
+     * @param  Request  $request  The incoming request.
      */
     public function availableRecipients(Request $request): JsonResponse
     {
@@ -224,27 +272,5 @@ class ItemController extends Controller
         return response()->json([
             'recipients' => $recipients,
         ]);
-    }
-
-    /**
-     * Dashboard items with low stock alerts.
-     */
-    public function dashboard(): AnonymousResourceCollection
-    {
-        $items = Item::with('site')
-            ->where(function ($query) {
-                $query->where('number_warning_enabled', true)
-                    ->whereRaw('(item_entry_total - item_exit_total) <= number_warning_minimum');
-            })
-            ->orWhere(function ($query) {
-                $query->where('number_critical_enabled', true)
-                    ->whereRaw('(item_entry_total - item_exit_total) <= number_critical_minimum');
-            })
-            ->orderBy('item_entry_total', 'asc')
-            ->orderBy('item_exit_total', 'desc')
-            ->limit(50)
-            ->get();
-
-        return ItemDashboardResource::collection($items);
     }
 }

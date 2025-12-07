@@ -122,11 +122,9 @@ describe('show', function () {
     it('returns supplier details for authorized user', function () {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
-        $supplier = Supplier::factory()->create([
+        $supplier = Supplier::factory()->createdBy($user)->create([
             'name' => 'Test Supplier',
             'description' => 'Test description',
-            'created_by_id' => $user->id,
-            'created_by_name' => $user->full_name,
         ]);
 
         $response = $this->actingAs($user)

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace XetaSuite\Http\Controllers\Api\V1;
 
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use XetaSuite\Actions\Materials\CreateMaterial;
@@ -43,6 +48,9 @@ class MaterialController extends Controller
 
     /**
      * Store a newly created material.
+     *
+     * @param  StoreMaterialRequest  $request  The incoming request.
+     * @param  CreateMaterial  $action  The action to create the material.
      */
     public function store(StoreMaterialRequest $request, CreateMaterial $action): MaterialDetailResource
     {
@@ -55,6 +63,8 @@ class MaterialController extends Controller
 
     /**
      * Display the specified material.
+     *
+     * @param  Material  $material  The material to display.
      */
     public function show(Material $material): MaterialDetailResource
     {
@@ -67,6 +77,10 @@ class MaterialController extends Controller
 
     /**
      * Update the specified material.
+     *
+     * @param  UpdateMaterialRequest  $request  The incoming request.
+     * @param  Material  $material  The material to update.
+     * @param  UpdateMaterial  $action  The action to update the material.
      */
     public function update(UpdateMaterialRequest $request, Material $material, UpdateMaterial $action): MaterialDetailResource
     {
@@ -78,7 +92,10 @@ class MaterialController extends Controller
     }
 
     /**
-     * Remove the specified material.
+     * Delete the specified material.
+     *
+     * @param  Material  $material  The material to delete.
+     * @param  DeleteMaterial  $action  The action to delete the material.
      */
     public function destroy(Material $material, DeleteMaterial $action): JsonResponse
     {
@@ -109,7 +126,6 @@ class MaterialController extends Controller
 
     /**
      * Get available recipients for cleaning alerts.
-     * Users with access to the current site.
      */
     public function availableRecipients(): JsonResponse
     {
@@ -129,6 +145,8 @@ class MaterialController extends Controller
     /**
      * Get monthly statistics for a material over the last 12 months.
      * Returns counts for incidents, maintenances, cleanings, and item movements (exit).
+     *
+     * @param  Material  $material  The material to get statistics for.
      */
     public function stats(Material $material): JsonResponse
     {
@@ -137,5 +155,40 @@ class MaterialController extends Controller
         $stats = $this->materialService->getMonthlyStats($material);
 
         return response()->json(['data' => $stats]);
+    }
+
+    /**
+     * Generate and return a QR code for the material.
+     *
+     * @param  Material  $material  The material to generate the QR code for.
+     */
+    public function qrCode(Material $material): JsonResponse
+    {
+        $this->authorize('generateQrCode', $material);
+
+        $size = (int) request('size', 200);
+        $size = max(100, min(500, $size)); // Limit between 100 and 500
+
+        $url = config('app.frontend_url').'?source=qr&material='.$material->id;
+
+        $qrCode = new QrCode(
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: $size,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        );
+
+        $writer = new SvgWriter();
+        $result = $writer->write($qrCode);
+
+        return response()->json([
+            'data' => [
+                'svg' => base64_encode($result->getString()),
+                'url' => $url,
+                'size' => $size,
+            ],
+        ]);
     }
 }

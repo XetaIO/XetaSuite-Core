@@ -9,9 +9,10 @@ use XetaSuite\Models\Zone;
 class UpdateZone
 {
     /**
-     * Update an existing zone.
+     * Update a zone.
      *
-     * @param  array{name?: string, parent_id?: int|null, allow_material?: bool}  $data
+     * @param  Zone  $zone  The zone to update.
+     * @param  array  $data  The data to update the zone with.
      */
     public function handle(Zone $zone, array $data): Zone
     {

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace XetaSuite\Actions\Materials;
 
+use Illuminate\Support\Facades\DB;
 use XetaSuite\Models\Material;
 
 class DeleteMaterial
 {
     /**
-     * Delete a material.
+     * Delete a material record.
      *
-     * The MaterialObserver handles:
-     * - Preserving material_name in related cleanings, incidents, maintenances
-     * - Detaching related items
+     * @param  Material  $material  The material to delete.
      */
     public function handle(Material $material): bool
     {
-        return $material->delete();
+        return DB::transaction(function () use ($material) {
+            return $material->delete();
+        });
     }
 }

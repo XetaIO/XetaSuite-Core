@@ -37,7 +37,7 @@ class Item extends Model
         'name',
         'description',
         'reference',
-        'purchase_price',
+        'current_price',
         'currency',
         'number_warning_enabled',
         'number_warning_minimum',
@@ -51,7 +51,7 @@ class Item extends Model
      * @var array
      */
     protected $casts = [
-        'purchase_price' => 'decimal:2',
+        'current_price' => 'decimal:2',
         'number_warning_enabled' => 'boolean',
         'number_warning_minimum' => 'integer',
         'number_critical_enabled' => 'boolean',
@@ -133,21 +133,5 @@ class Item extends Model
     public function editor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'edited_by_id');
-    }
-
-    /**
-     * Get the current price for the item, optionally filtered by supplier.
-     */
-    public function getCurrentPrice(?int $supplierId = null): ?ItemPrice
-    {
-        if ($supplierId === null) {
-            return $this->current_price;
-        }
-
-        // Else, query with filter
-        return $this->prices()
-            ->where('effective_date', '<=', now())
-            ->where('supplier_id', $supplierId)
-            ->first();
     }
 }

@@ -11,7 +11,8 @@ class UpdateSupplier
     /**
      * Update an existing supplier.
      *
-     * @param  array{name?: string, description?: string|null}  $data
+     * @param  Supplier  $supplier  The supplier to update.
+     * @param  array  $data  The data to update the supplier with.
      */
     public function handle(Supplier $supplier, array $data): Supplier
     {

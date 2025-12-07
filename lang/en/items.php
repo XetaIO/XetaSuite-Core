@@ -13,7 +13,7 @@ return [
     'description' => 'Description',
     'supplier' => 'Supplier',
     'supplier_reference' => 'Supplier Reference',
-    'purchase_price' => 'Purchase Price',
+    'current_price' => 'Purchase Price',
     'stock' => 'Stock',
     'current_stock' => 'Current Stock',
     'stock_status' => 'Stock Status',
@@ -45,6 +45,7 @@ return [
     'exit_total' => 'Total Exits',
     'entry_count' => 'Entry Count',
     'exit_count' => 'Exit Count',
+    'insufficient_stock' => 'Insufficient stock for :item. Current stock: :current.',
 
     // Invoice
     'invoice_number' => 'Invoice Number',
@@ -81,6 +82,9 @@ return [
     'stock_alert_warning' => 'Warning stock alert for :item',
     'stock_below_critical' => 'Stock is below critical threshold (:current/:minimum)',
     'stock_below_warning' => 'Stock is below warning threshold (:current/:minimum)',
+    'initial_price' => 'Initial price set for the item.',
+    'price_updated' => 'Item price updated.',
+    'supplier_changed' => 'Item supplier changed.',
 
     // Validation
     'reference_unique' => 'This reference already exists for this site.',

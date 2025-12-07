@@ -50,7 +50,7 @@ class ItemMovement extends Model
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
-        'invoice_date' => 'date',
+        'invoice_date' => 'datetime',
         'movement_date' => 'datetime',
     ];
 

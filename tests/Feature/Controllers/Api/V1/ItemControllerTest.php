@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
+use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\Supplier;
@@ -35,6 +36,11 @@ beforeEach(function () {
         'item.create',
         'item.update',
         'item.delete',
+        'item-movement.viewAny',
+        'item-movement.view',
+        'item-movement.create',
+        'item-movement.update',
+        'item-movement.delete',
     ];
 
     foreach ($permissions as $permission) {
@@ -93,8 +99,7 @@ describe('index', function () {
                         'description',
                         'supplier_id',
                         'supplier_name',
-                        'purchase_price',
-                        'stock_level',
+                        'current_price',
                         'stock_status',
                         'created_by_id',
                         'created_by_name',
@@ -197,9 +202,8 @@ describe('show', function () {
                     'supplier_name',
                     'supplier_reference',
                     'supplier',
-                    'purchase_price',
+                    'current_price',
                     'currency',
-                    'stock_level',
                     'stock_status',
                     'item_entry_total',
                     'item_exit_total',
@@ -276,7 +280,7 @@ describe('store', function () {
                 'description' => 'A full item description',
                 'supplier_id' => $this->supplier->id,
                 'supplier_reference' => 'SUP-REF-001',
-                'purchase_price' => 99.99,
+                'current_price' => 99.99,
                 'currency' => 'EUR',
                 'number_warning_enabled' => true,
                 'number_warning_minimum' => 10,
@@ -301,7 +305,7 @@ describe('store', function () {
             ->postJson('/api/v1/items', [
                 'name' => 'Item With Materials',
                 'reference' => 'REF-MAT-001',
-                'purchase_price' => 25.00,
+                'current_price' => 25.00,
                 'material_ids' => [$material1->id, $material2->id],
             ]);
 
@@ -318,7 +322,7 @@ describe('store', function () {
             ->postJson('/api/v1/items', [
                 'name' => 'Item With Recipients',
                 'reference' => 'REF-REC-001',
-                'purchase_price' => 50.00,
+                'current_price' => 50.00,
                 'recipient_ids' => [$recipient->id],
             ]);
 
@@ -345,7 +349,7 @@ describe('store', function () {
             ->postJson('/api/v1/items', [
                 'name' => 'New Item',
                 'reference' => 'DUPLICATE-REF',
-                'purchase_price' => 10.00,
+                'current_price' => 10.00,
             ]);
 
         $response->assertUnprocessable()
@@ -361,7 +365,7 @@ describe('store', function () {
             ->postJson('/api/v1/items', [
                 'name' => 'New Item',
                 'reference' => 'SHARED-REF',
-                'purchase_price' => 10.00,
+                'current_price' => 10.00,
             ]);
 
         $response->assertStatus(201);
@@ -375,7 +379,7 @@ describe('store', function () {
             ->postJson('/api/v1/items', [
                 'name' => 'New Item',
                 'reference' => 'REF-001',
-                'purchase_price' => 10.00,
+                'current_price' => 10.00,
             ]);
 
         $response->assertForbidden();
@@ -399,12 +403,12 @@ describe('update', function () {
             ->putJson('/api/v1/items/'.$item->id, [
                 'name' => 'Updated Name',
                 'reference' => $item->reference,
-                'purchase_price' => 199.99,
+                'current_price' => 199.99,
             ]);
 
         $response->assertOk()
             ->assertJsonPath('data.name', 'Updated Name')
-            ->assertJsonPath('data.purchase_price', 199.99);
+            ->assertJsonPath('data.current_price', 199.99);
 
         $this->assertDatabaseHas('items', [
             'id' => $item->id,
@@ -422,7 +426,7 @@ describe('update', function () {
             ->putJson('/api/v1/items/'.$otherItem->id, [
                 'name' => 'Updated Name',
                 'reference' => 'NEW-REF',
-                'purchase_price' => 10.00,
+                'current_price' => 10.00,
             ]);
 
         $response->assertForbidden();
@@ -438,7 +442,7 @@ describe('update', function () {
             ->putJson('/api/v1/items/'.$item2->id, [
                 'name' => $item2->name,
                 'reference' => 'REF-001', // Already exists
-                'purchase_price' => $item2->purchase_price,
+                'current_price' => $item2->current_price,
             ]);
 
         $response->assertUnprocessable()
@@ -454,7 +458,7 @@ describe('update', function () {
             ->putJson('/api/v1/items/'.$item->id, [
                 'name' => 'Updated Name',
                 'reference' => 'MY-REF', // Same as before
-                'purchase_price' => 50.00,
+                'current_price' => 50.00,
             ]);
 
         $response->assertOk();
@@ -470,7 +474,7 @@ describe('update', function () {
             ->putJson('/api/v1/items/'.$item->id, [
                 'name' => 'Updated Name',
                 'reference' => $item->reference,
-                'purchase_price' => 10.00,
+                'current_price' => 10.00,
             ]);
 
         $response->assertForbidden();
@@ -635,6 +639,102 @@ describe('movements', function () {
 });
 
 // ============================================================================
+// PRICE HISTORY TESTS
+// ============================================================================
+
+describe('priceHistory', function () {
+    it('returns price history with statistics for item', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $item = Item::factory()
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create([
+                'current_price' => 25.00,
+            ]);
+
+        // Create some price history
+        ItemPrice::factory()->count(5)->forItem($item)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/price-history');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'history' => [
+                        '*' => [
+                            'id',
+                            'price',
+                            'effective_date',
+                            'notes',
+                            'created_at',
+                        ],
+                    ],
+                    'stats' => [
+                        'current_price',
+                        'average_price',
+                        'min_price',
+                        'max_price',
+                        'price_change',
+                        'price_change_percent',
+                        'total_entries',
+                    ],
+                ],
+            ]);
+    });
+
+    it('returns empty history when no price records exist', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $item = Item::factory()
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create(['current_price' => 10.00]);
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/price-history');
+
+        $response->assertOk()
+            ->assertJsonPath('data.history', [])
+            ->assertJsonPath('data.stats.total_entries', 0);
+
+        // Check current_price is present and numeric
+        expect($response->json('data.stats.current_price'))->toBeNumeric();
+    });
+
+    it('cannot view price history for item from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherItem = Item::factory()->forSite($this->otherSite)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$otherItem->id.'/price-history');
+
+        $response->assertForbidden();
+    });
+
+    it('requires item.view permission', function () {
+        // Create a role with no permissions for this site
+        setPermissionsTeamId($this->regularSite->id);
+        $roleWithoutPermission = Role::create([
+            'name' => 'no-view-role',
+            'guard_name' => 'web',
+            'site_id' => $this->regularSite->id,
+        ]);
+
+        $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
+
+        $item = Item::factory()->forSite($this->regularSite)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/price-history');
+
+        $response->assertForbidden();
+    });
+});
+
+// ============================================================================
 // STORE MOVEMENT TESTS
 // ============================================================================
 
@@ -677,16 +777,12 @@ describe('storeMovement', function () {
             ->create();
 
         // Create an entry movement first to have stock to exit
-        ItemMovement::create([
-            'item_id' => $item->id,
-            'type' => 'entry',
-            'quantity' => 100,
-            'unit_price' => 0,
-            'total_price' => 0,
-            'created_by_id' => $user->id,
-            'created_by_name' => $user->full_name,
-            'movement_date' => now(),
-        ]);
+        ItemMovement::factory()
+            ->entry()
+            ->forItem($item)
+            ->withQuantity(100, 0)
+            ->createdBy($user)
+            ->create();
 
         $response = $this->actingAs($user)
             ->postJson('/api/v1/items/'.$item->id.'/movements', [
@@ -824,6 +920,128 @@ describe('qrCode', function () {
 
         $response = $this->actingAs($user)
             ->getJson('/api/v1/items/'.$otherItem->id.'/qr-code');
+
+        $response->assertForbidden();
+    });
+});
+
+// ============================================================================
+// MATERIALS ENDPOINT TESTS
+// ============================================================================
+
+describe('materials', function () {
+    it('returns paginated materials for item', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $zone = Zone::factory()->forSite($this->regularSite)->create();
+
+        $materials = Material::factory()
+            ->count(7)
+            ->forSite($this->regularSite)
+            ->forZone($zone)
+            ->create();
+
+        $item = Item::factory()
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create();
+
+        $item->materials()->attach($materials->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/materials');
+
+        $response->assertOk()
+            ->assertJsonCount(5, 'data') // Default per_page is 5
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'zone',
+                    ],
+                ],
+                'meta' => [
+                    'current_page',
+                    'last_page',
+                    'per_page',
+                    'total',
+                ],
+            ])
+            ->assertJsonPath('meta.total', 7);
+    });
+
+    it('can paginate through materials', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $zone = Zone::factory()->forSite($this->regularSite)->create();
+
+        $materials = Material::factory()
+            ->count(7)
+            ->forSite($this->regularSite)
+            ->forZone($zone)
+            ->create();
+
+        $item = Item::factory()
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create();
+
+        $item->materials()->attach($materials->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/materials?page=2');
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'data') // 7 total, 5 on page 1, 2 on page 2
+            ->assertJsonPath('meta.current_page', 2);
+    });
+
+    it('can specify per_page parameter', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $zone = Zone::factory()->forSite($this->regularSite)->create();
+
+        $materials = Material::factory()
+            ->count(10)
+            ->forSite($this->regularSite)
+            ->forZone($zone)
+            ->create();
+
+        $item = Item::factory()
+            ->forSite($this->regularSite)
+            ->createdBy($user)
+            ->create();
+
+        $item->materials()->attach($materials->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/materials?per_page=3');
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('meta.per_page', 3);
+    });
+
+    it('cannot view materials for item from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherItem = Item::factory()->forSite($this->otherSite)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$otherItem->id.'/materials');
+
+        $response->assertForbidden();
+    });
+
+    it('requires item.view permission', function () {
+        $roleWithoutPermission = Role::create(['name' => 'no-item-view', 'guard_name' => 'web']);
+        $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
+
+        $item = Item::factory()->forSite($this->regularSite)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/items/'.$item->id.'/materials');
 
         $response->assertForbidden();
     });

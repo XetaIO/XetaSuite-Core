@@ -32,7 +32,7 @@ return new class () extends Migration {
             $table->string('created_by_name', 100)->nullable();
 
             $table->decimal('price', 10, 2);
-            $table->date('effective_date'); // Date price application
+            $table->timestamp('effective_date'); // Date price application
             $table->string('currency', 3)->default('EUR');
             $table->text('notes')->nullable(); // Reason of price change
 

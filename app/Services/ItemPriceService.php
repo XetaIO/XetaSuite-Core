@@ -4,92 +4,67 @@ declare(strict_types=1);
 
 namespace XetaSuite\Services;
 
-use Illuminate\Support\Facades\DB;
 use XetaSuite\Models\Item;
-use XetaSuite\Models\ItemPrice;
-use XetaSuite\Models\Supplier;
 
 class ItemPriceService
 {
     /**
-     * Update or create a new price for an item.
+     * Get price history with statistics for an item.
+     * Returns history entries and computed stats for display.
      */
-    public function updatePrice(
-        Item $item,
-        float $newPrice,
-        ?Supplier $supplier = null,
-        ?string $effectiveDate = null,
-        ?string $notes = null
-    ): ItemPrice {
-        return DB::transaction(function () use ($item, $newPrice, $supplier, $effectiveDate, $notes) {
-            $itemPrice = ItemPrice::create([
-                'item_id' => $item->id,
-                'supplier_id' => $supplier?->id,
-                'supplier_name' => $supplier?->name,
-                'created_by_id' => auth()->id(),
-                'created_by_name' => auth()->user()?->full_name,
-                'price' => $newPrice,
-                'effective_date' => $effectiveDate ?? now()->toDateString(),
-                'notes' => $notes,
-            ]);
-
-            // Mettre à jour le prix actuel dans la table items
-            $item->update([
-                'purchase_price' => $newPrice,
-                'supplier_id' => $supplier?->id,
-                'supplier_name' => $supplier?->name,
-            ]);
-
-            return $itemPrice;
-        });
-    }
-
-    /**
-     * Get price history for an item.
-     */
-    public function getPriceHistory(Item $item, ?int $supplierId = null)
+    public function getPriceHistoryWithStats(Item $item, int $limit = 20): array
     {
-        $query = $item->prices();
+        $history = $item->prices()
+            ->orderBy('effective_date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
 
-        if ($supplierId) {
-            $query->where('supplier_id', $supplierId);
-        }
+        // Sort ascending for chart display
+        $sortedHistory = $history->sortBy('effective_date')->values();
 
-        return $query->get();
-    }
+        // Calculate statistics
+        $prices = $sortedHistory->pluck('price')->filter();
 
-    /**
-     * Calculate price variation between two dates.
-     */
-    public function getPriceVariation(Item $item, string $startDate, string $endDate): array
-    {
-        $startPrice = $item->prices()
-            ->where('effective_date', '<=', $startDate)
-            ->first();
-
-        $endPrice = $item->prices()
-            ->where('effective_date', '<=', $endDate)
-            ->first();
-
-        if (! $startPrice || ! $endPrice) {
+        if ($prices->isEmpty()) {
             return [
-                'start_price' => $startPrice?->price ?? 0,
-                'end_price' => $endPrice?->price ?? 0,
-                'variation' => 0,
-                'variation_percent' => 0,
+                'history' => [],
+                'stats' => [
+                    'current_price' => $item->current_price ?? 0,
+                    'average_price' => 0,
+                    'min_price' => 0,
+                    'max_price' => 0,
+                    'price_change' => 0,
+                    'price_change_percent' => 0,
+                    'total_entries' => 0,
+                ],
             ];
         }
 
-        $variation = $endPrice->price - $startPrice->price;
-        $variationPercent = $startPrice->price > 0
-            ? ($variation / $startPrice->price) * 100
+        $firstPrice = $prices->first();
+        $lastPrice = $prices->last();
+        $priceChange = $lastPrice - $firstPrice;
+        $priceChangePercent = $firstPrice > 0
+            ? round(($priceChange / $firstPrice) * 100, 2)
             : 0;
 
         return [
-            'start_price' => $startPrice->price,
-            'end_price' => $endPrice->price,
-            'variation' => $variation,
-            'variation_percent' => round($variationPercent, 2),
+            'history' => $sortedHistory->map(fn ($price) => [
+                'id' => $price->id,
+                'price' => (float) $price->price,
+                'effective_date' => $price->effective_date->toDateString(),
+                'notes' => $price->notes,
+                'created_at' => $price->created_at->toISOString(),
+            ])->values()->toArray(),
+            'stats' => [
+                'current_price' => (float) ($item->current_price ?? $lastPrice),
+                'average_price' => round($prices->avg(), 2),
+                'min_price' => (float) $prices->min(),
+                'max_price' => (float) $prices->max(),
+                'price_change' => round($priceChange, 2),
+                'price_change_percent' => $priceChangePercent,
+                'total_entries' => $prices->count(),
+            ],
         ];
     }
 }

@@ -25,6 +25,7 @@ class SupplierController extends Controller
 
     /**
      * Display a listing of suppliers.
+     * Only shows suppliers the user has access to.
      */
     public function index(): AnonymousResourceCollection
     {
@@ -41,6 +42,9 @@ class SupplierController extends Controller
 
     /**
      * Store a newly created supplier.
+     *
+     * @param  StoreSupplierRequest  $request  The incoming request.
+     * @param  CreateSupplier  $action  The action to create a supplier.
      */
     public function store(StoreSupplierRequest $request, CreateSupplier $action): SupplierDetailResource
     {
@@ -51,6 +55,8 @@ class SupplierController extends Controller
 
     /**
      * Display the specified supplier.
+     *
+     * @param  Supplier  $supplier  The supplier to display.
      */
     public function show(Supplier $supplier): SupplierDetailResource
     {
@@ -62,7 +68,9 @@ class SupplierController extends Controller
     }
 
     /**
-     * Display a paginated listing of items for the specified supplier.
+     * Get items for a supplier (with pagination).
+     *
+     * @param  Supplier  $supplier  The supplier to get items for.
      */
     public function items(Supplier $supplier): AnonymousResourceCollection
     {
@@ -79,6 +87,10 @@ class SupplierController extends Controller
 
     /**
      * Update the specified supplier.
+     *
+     * @param  UpdateSupplierRequest  $request  The incoming request.
+     * @param  Supplier  $supplier  The supplier to update.
+     * @param  UpdateSupplier  $action  The action to update the supplier.
      */
     public function update(UpdateSupplierRequest $request, Supplier $supplier, UpdateSupplier $action): SupplierDetailResource
     {
@@ -88,7 +100,10 @@ class SupplierController extends Controller
     }
 
     /**
-     * Remove the specified supplier.
+     * Delete the specified supplier.
+     *
+     * @param  Supplier  $supplier  The supplier to delete.
+     * @param  DeleteSupplier  $action  The action to delete the supplier.
      */
     public function destroy(Supplier $supplier, DeleteSupplier $action): JsonResponse
     {

@@ -25,6 +25,7 @@ class SiteController extends Controller
 
     /**
      * Display a listing of sites.
+     * Only shows sites the user has access to.
      */
     public function index(): AnonymousResourceCollection
     {
@@ -41,6 +42,9 @@ class SiteController extends Controller
 
     /**
      * Store a newly created site.
+     *
+     * @param  StoreSiteRequest  $request  The incoming request.
+     * @param  CreateSite  $action  The action to create the site.
      */
     public function store(StoreSiteRequest $request, CreateSite $action): JsonResponse|SiteDetailResource
     {
@@ -57,6 +61,8 @@ class SiteController extends Controller
 
     /**
      * Display the specified site.
+     *
+     * @param  Site  $site  The site to display.
      */
     public function show(Site $site): SiteDetailResource
     {
@@ -69,6 +75,10 @@ class SiteController extends Controller
 
     /**
      * Update the specified site.
+     *
+     * @param  UpdateSiteRequest  $request  The incoming request.
+     * @param  Site  $site  The site to update.
+     * @param  UpdateSite  $action  The action to update the site.
      */
     public function update(UpdateSiteRequest $request, Site $site, UpdateSite $action): JsonResponse|SiteDetailResource
     {
@@ -84,7 +94,10 @@ class SiteController extends Controller
     }
 
     /**
-     * Remove the specified site.
+     * Delete the specified site.
+     *
+     * @param  Site  $site  The site to delete.
+     * @param  DeleteSite  $action  The action to delete the site.
      */
     public function destroy(Site $site, DeleteSite $action): JsonResponse
     {
@@ -103,6 +116,8 @@ class SiteController extends Controller
 
     /**
      * Get users for a site (for manager selection).
+     *
+     * @param  Site  $site  The site to get users for.
      */
     public function users(Site $site): AnonymousResourceCollection
     {
@@ -127,7 +142,9 @@ class SiteController extends Controller
     }
 
     /**
-     * Get paginated members of a site with their roles.
+     * Get members for a site (with pagination).
+     *
+     * @param  Site  $site  The site to get members for.
      */
     public function members(Site $site): AnonymousResourceCollection
     {

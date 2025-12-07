@@ -12,7 +12,8 @@ class CreateSupplier
     /**
      * Create a new supplier.
      *
-     * @param  array{name: string, description?: string|null}  $data
+     * @param  User  $user  The user creating the supplier.
+     * @param  array  $data  The data for the new supplier.
      */
     public function handle(User $user, array $data): Supplier
     {

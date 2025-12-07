@@ -34,6 +34,7 @@ beforeEach(function () {
         'material.create',
         'material.update',
         'material.delete',
+        'material.generateQrcode',
     ];
 
     foreach ($permissions as $permission) {
@@ -796,6 +797,93 @@ describe('stats', function () {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/stats");
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// QR CODE TESTS
+// ============================================================================
+
+describe('qrCode', function () {
+    it('generates QR code for material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/qr-code");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'svg',
+                    'url',
+                    'size',
+                ],
+            ])
+            ->assertJsonPath('data.size', 200);
+    });
+
+    it('respects size parameter', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/qr-code?size=300");
+
+        $response->assertOk()
+            ->assertJsonPath('data.size', 300);
+    });
+
+    it('limits size between 100 and 500', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $responseTooSmall = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/qr-code?size=50");
+
+        $responseTooSmall->assertOk()
+            ->assertJsonPath('data.size', 100);
+
+        $responseTooBig = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/qr-code?size=1000");
+
+        $responseTooBig->assertOk()
+            ->assertJsonPath('data.size', 500);
+    });
+
+    it('cannot generate QR code for material from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$otherMaterial->id}/qr-code");
+
+        $response->assertForbidden();
+    });
+
+    it('denies access for user without generateQrcode permission', function () {
+        $noPermRole = Role::create(['name' => 'no-qr-perm', 'guard_name' => 'web']);
+        $noPermRole->givePermissionTo('material.view');
+        $user = createUserOnRegularSite($this->regularSite, $noPermRole);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/qr-code");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/qr-code");
 
         $response->assertUnauthorized();
     });

@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Http\Requests\V1\Items;
+namespace XetaSuite\Http\Requests\V1\ItemMovements;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreItemMovementRequest extends FormRequest
+class UpdateItemMovementRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->can('createMovement', $this->route('item'));
+        return $this->user()->can('update', $this->route('movement'));
     }
 
     /**
@@ -25,14 +24,13 @@ class StoreItemMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', Rule::in(['entry', 'exit'])],
-            'quantity' => 'required|integer|min:1|max:999999',
+            'quantity' => 'sometimes|required|integer|min:1|max:999999',
             'supplier_id' => 'nullable|integer|exists:suppliers,id',
             'supplier_invoice_number' => 'nullable|string|max:100',
             'invoice_date' => 'nullable|date',
             'unit_price' => 'nullable|numeric|min:0|max:9999999.99',
             'notes' => 'nullable|string|max:2000',
-            'movement_date' => 'nullable|date',
+            'movement_date' => 'sometimes|required|date',
         ];
     }
 
@@ -44,7 +42,6 @@ class StoreItemMovementRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'type' => __('items.movement_type'),
             'quantity' => __('items.quantity'),
             'supplier_id' => __('items.supplier'),
             'supplier_invoice_number' => __('items.invoice_number'),

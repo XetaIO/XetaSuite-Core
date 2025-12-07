@@ -49,8 +49,8 @@ return new class () extends Migration {
             $table->string('name')->index();
             $table->text('description')->nullable();
             $table->string('reference')->nullable()->index();
-            $table->decimal('purchase_price', 10, 2)->default(0.00)
-                ->comment('Current purchase price from supplier');
+            $table->decimal('current_price', 10, 2)->default(0.00)
+                ->comment('Dump from item_prices for faster access.');
             $table->string('currency', 3)->default('EUR');
 
             $table->unsignedInteger('item_entry_total')->default(0);

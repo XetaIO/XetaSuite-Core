@@ -19,37 +19,12 @@ trait ItemPresenter
     }
 
     /**
-     * Get the current price for the item.
-     */
-    /**
-     * Get the current price (without supplier filter).
-     */
-    protected function currentPrice(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->prices()
-                ->where('effective_date', '<=', now())
-                ->first()
-        );
-    }
-
-    /**
      * Get the current price value as float.
      */
     protected function currentPriceValue(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->current_price?->price ?? $this->purchase_price ?? 0.00
-        );
-    }
-
-    /**
-     * Get the stock value based on current price.
-     */
-    protected function stockValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => round($this->current_stock * $this->current_price_value, 2)
+            get: fn () => $this->current_price?->price ?? $this->current_price ?? 0.00
         );
     }
 
@@ -80,27 +55,11 @@ trait ItemPresenter
     {
         return Attribute::make(
             get: fn () => match ($this->stock_status) {
-                'critical' => 'red',
-                'warning' => 'orange',
-                'empty' => 'dark',
-                'ok' => 'green',
+                'critical' => 'error',
+                'warning' => 'warning',
+                'empty' => 'info',
+                'ok' => 'success',
                 default => 'dark',
-            }
-        );
-    }
-
-    /**
-     * Get the stock status label.
-     */
-    protected function stockStatusLabel(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => match ($this->stock_status) {
-                'critical' => 'Stock critical',
-                'warning' => 'Stock low',
-                'empty' => 'Out of stock',
-                'ok' => 'In stock',
-                default => 'Inconnu',
             }
         );
     }
@@ -112,7 +71,7 @@ trait ItemPresenter
     {
         return Attribute::make(
             get: fn () => $this->number_warning_enabled
-                && $this->current_stock <= $this->number_warning_minimum
+                && $this->current_stock <= $this->number_warning_minimum && $this->current_stock >= $this->number_critical_minimum
         );
     }
 
@@ -123,97 +82,7 @@ trait ItemPresenter
     {
         return Attribute::make(
             get: fn () => $this->number_critical_enabled
-                && $this->current_stock <= $this->number_critical_minimum
-        );
-    }
-
-    /**
-     * Check if item is in stock.
-     */
-    protected function inStock(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->current_stock > 0
-        );
-    }
-
-    /**
-     * Get formatted price with currency.
-     */
-    protected function formattedPrice(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => number_format($this->purchase_price, 2, ',', ' ').' €'
-        );
-    }
-
-    /**
-     * Get formatted stock value with currency.
-     */
-    protected function formattedStockValue(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => number_format($this->stock_value, 2, ',', ' ').' €'
-        );
-    }
-
-    /**
-     * Get the quantity to reach warning minimum.
-     */
-    protected function quantityToWarningLevel(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if (! $this->number_warning_enabled) {
-                    return 0;
-                }
-
-                $diff = $this->number_warning_minimum - $this->current_stock;
-
-                return max(0, $diff);
-            }
-        );
-    }
-
-    /**
-     * Get average movements per entry.
-     */
-    protected function averageEntryQuantity(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if ($this->item_entry_count == 0) {
-                    return 0;
-                }
-
-                return round($this->item_entry_total / $this->item_entry_count, 2);
-            }
-        );
-    }
-
-    /**
-     * Get average movements per exit.
-     */
-    protected function averageExitQuantity(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                if ($this->item_exit_count == 0) {
-                    return 0;
-                }
-
-                return round($this->item_exit_total / $this->item_exit_count, 2);
-            }
-        );
-    }
-
-    /**
-     * Check if item needs restock.
-     */
-    protected function needsRestock(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->is_low_stock || $this->is_critical_stock
+                && $this->current_stock <= $this->number_critical_minimum && $this->current_stock > 0
         );
     }
 
@@ -240,16 +109,6 @@ trait ItemPresenter
     {
         return Attribute::make(
             get: fn () => $this->supplier_id !== null || $this->supplier_name !== null
-        );
-    }
-
-    /**
-     * Get supplier display name (current or archived).
-     */
-    protected function supplierDisplayName(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->load('supplier')->supplier?->name ?? $this->supplier_name ?? 'No supplier'
         );
     }
 }

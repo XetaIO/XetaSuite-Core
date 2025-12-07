@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace XetaSuite\Actions\Sites;
 
+use Illuminate\Support\Facades\DB;
 use XetaSuite\Models\Site;
 use XetaSuite\Services\SiteService;
 
@@ -15,10 +16,11 @@ class UpdateSite
     }
 
     /**
-     * Update an existing site.
+     * Update a site.
      *
-     * @param  array{name?: string, is_headquarters?: bool, email?: string|null, office_phone?: string|null, cell_phone?: string|null, address?: string|null, zip_code?: string|null, city?: string|null, country?: string|null, manager_ids?: array<int>|null}  $data
-     * @return array{success: bool, site?: Site, message?: string}
+     * @param  Site  $site  The site to update.
+     * @param  array  $data  The data to update the site with.
+     * @return array{message: array|string|null, success: bool|array{site: Site|null, success: bool}}
      */
     public function handle(Site $site, array $data): array
     {
@@ -40,21 +42,23 @@ class UpdateSite
             ];
         }
 
-        // Extract manager_ids before updating site
-        $managerIds = $data['manager_ids'] ?? null;
-        unset($data['manager_ids']);
+        return DB::transaction(function () use ($site, $data) {
+            // Extract manager_ids before updating site
+            $managerIds = $data['manager_ids'] ?? null;
+            unset($data['manager_ids']);
 
-        $site->update($data);
+            $site->update($data);
 
-        // Sync managers if provided
-        if ($managerIds !== null) {
-            $this->syncManagers($site, $managerIds);
-        }
+            // Sync managers if provided
+            if ($managerIds !== null) {
+                $this->syncManagers($site, $managerIds);
+            }
 
-        return [
-            'success' => true,
-            'site' => $site->fresh(),
-        ];
+            return [
+                'success' => true,
+                'site' => $site->fresh(),
+            ];
+        });
     }
 
     /**

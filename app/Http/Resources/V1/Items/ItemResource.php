@@ -27,20 +27,25 @@ class ItemResource extends JsonResource
             'supplier_id' => $this->supplier_id,
             'supplier_name' => $this->supplier_name,
             'supplier_reference' => $this->supplier_reference,
+            'supplier' => $this->whenLoaded('supplier', fn () => [
+                'id' => $this->supplier->id,
+                'name' => $this->supplier->name,
+            ]),
 
             // Creator info
             'created_by_id' => $this->created_by_id,
             'created_by_name' => $this->created_by_name,
 
             // Pricing
-            'purchase_price' => (float) $this->purchase_price,
+            'current_price' => (float) $this->current_price,
             'currency' => $this->currency,
 
             // Stock counts
             'item_entry_total' => $this->item_entry_total,
             'item_exit_total' => $this->item_exit_total,
-            'stock_level' => $this->item_entry_total - $this->item_exit_total,
-            'stock_status' => $itemService->getStockStatus($this->resource),
+            'current_stock' => $this->current_stock,
+            'stock_status' => $this->stock_status,
+            'stock_status_color' => $this->stock_status_color,
 
             // Relation counts
             'material_count' => $this->material_count,

@@ -13,7 +13,7 @@ return [
     'description' => 'Description',
     'supplier' => 'Fournisseur',
     'supplier_reference' => 'Référence fournisseur',
-    'purchase_price' => 'Prix d\'achat',
+    'current_price' => 'Prix d\'achat',
     'stock' => 'Stock',
     'current_stock' => 'Stock actuel',
     'stock_status' => 'État du stock',
@@ -45,6 +45,7 @@ return [
     'exit_total' => 'Total des sorties',
     'entry_count' => 'Nombre d\'entrées',
     'exit_count' => 'Nombre de sorties',
+    'insufficient_stock' => 'Stock insuffisant pour :item. Stock actuel : :current.',
 
     // Invoice
     'invoice_number' => 'Numéro de facture',
@@ -81,6 +82,9 @@ return [
     'stock_alert_warning' => 'Alerte stock avertissement pour :item',
     'stock_below_critical' => 'Le stock est en dessous du seuil critique (:current/:minimum)',
     'stock_below_warning' => 'Le stock est en dessous du seuil d\'avertissement (:current/:minimum)',
+    'initial_price' => 'Prix initial défini pour l\'article.',
+    'price_updated' => 'Prix de l\'article mis à jour.',
+    'supplier_changed' => 'Fournisseur de l\'article modifié.',
 
     // Validation
     'reference_unique' => 'Cette référence existe déjà pour ce site.',
