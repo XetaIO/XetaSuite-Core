@@ -63,11 +63,6 @@ class SitePolicy
      */
     public function delete(User $user, Site $site): bool
     {
-        // Cannot delete headquarters site or site with zones
-        if ($site->is_headquarters || $site->zones()->exists()) {
-            return false;
-        }
-
         return $user->can('site.delete');
     }
 }

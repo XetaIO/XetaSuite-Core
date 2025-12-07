@@ -218,7 +218,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'quantity' => 8,
         ]);
 
@@ -233,7 +233,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'unit_price' => 15.00,
         ]);
 
@@ -250,7 +250,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->fromSupplier($oldSupplier)->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'supplier_id' => $newSupplier->id,
         ]);
 
@@ -264,7 +264,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'supplier_invoice_number' => 'NEW-INV-001',
             'invoice_date' => '2025-03-15',
         ]);
@@ -280,7 +280,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create(['notes' => 'Old notes']);
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'notes' => 'Updated notes',
         ]);
 
@@ -294,7 +294,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, [
+        $updatedMovement = $action->handle($movement, [
             'movement_date' => '2025-07-01',
         ]);
 
@@ -312,7 +312,7 @@ describe('UpdateItemMovement', function () {
         $action = app(UpdateItemMovement::class);
 
         // After update: 15 + (8-5) = 18
-        $action->handle($movement, $user, ['quantity' => 8]);
+        $action->handle($movement, ['quantity' => 8]);
 
         $item->refresh();
         expect($item->item_entry_total)->toBe(18);
@@ -329,7 +329,7 @@ describe('UpdateItemMovement', function () {
         $action = app(UpdateItemMovement::class);
 
         // After update: 15 + (3-5) = 13
-        $action->handle($movement, $user, ['quantity' => 3]);
+        $action->handle($movement, ['quantity' => 3]);
 
         $item->refresh();
         expect($item->item_entry_total)->toBe(13);
@@ -347,7 +347,7 @@ describe('UpdateItemMovement', function () {
         $action = app(UpdateItemMovement::class);
 
         // After update: 10 + (8-5) = 13
-        $action->handle($movement, $user, ['quantity' => 8]);
+        $action->handle($movement, ['quantity' => 8]);
 
         $item->refresh();
         expect($item->item_exit_total)->toBe(13);
@@ -360,7 +360,7 @@ describe('UpdateItemMovement', function () {
         $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
-        $updatedMovement = $action->handle($movement, $user, ['quantity' => 10]);
+        $updatedMovement = $action->handle($movement, ['quantity' => 10]);
 
         expect($updatedMovement)->not->toBe($movement)
             ->and($updatedMovement->quantity)->toBe(10);

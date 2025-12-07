@@ -17,7 +17,7 @@ class DeleteSupplier
      */
     public function handle(Supplier $supplier): array
     {
-        if (! $supplier->items()->exists()) {
+        if ($supplier->items()->exists()) {
             return [
                 'success' => false,
                 'message' => __('suppliers.cannot_delete_has_items'),

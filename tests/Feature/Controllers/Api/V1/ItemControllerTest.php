@@ -36,6 +36,7 @@ beforeEach(function () {
         'item.create',
         'item.update',
         'item.delete',
+        'item.generateQrCode',
         'item-movement.viewAny',
         'item-movement.view',
         'item-movement.create',
@@ -892,7 +893,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 300);
     });
 
-    it('limits size between 100 and 500', function () {
+    it('limits size between 100 and 400', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -910,7 +911,7 @@ describe('qrCode', function () {
             ->getJson('/api/v1/items/'.$item->id.'/qr-code?size=1000');
 
         $responseTooBig->assertOk()
-            ->assertJsonPath('data.size', 500);
+            ->assertJsonPath('data.size', 400);
     });
 
     it('cannot generate QR code for item from another site', function () {

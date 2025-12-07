@@ -405,7 +405,7 @@ describe('destroy', function () {
         $response = $this->actingAs($user)
             ->deleteJson("/api/v1/sites/{$this->headquarters->id}");
 
-        $response->assertForbidden();
+        $response->assertConflict();
 
         $this->assertDatabaseHas('sites', ['id' => $this->headquarters->id]);
     });
@@ -419,7 +419,7 @@ describe('destroy', function () {
         $response = $this->actingAs($user)
             ->deleteJson("/api/v1/sites/{$site->id}");
 
-        $response->assertUnprocessable()
+        $response->assertConflict()
             ->assertJsonPath('message', __('sites.cannot_delete_has_zones'));
 
         $this->assertDatabaseHas('sites', ['id' => $site->id]);

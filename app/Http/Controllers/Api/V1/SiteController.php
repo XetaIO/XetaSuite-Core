@@ -108,7 +108,7 @@ class SiteController extends Controller
         if (! $result['success']) {
             return response()->json([
                 'message' => $result['message'],
-            ], 422);
+            ], 409);
         }
 
         return response()->json(null, 204);

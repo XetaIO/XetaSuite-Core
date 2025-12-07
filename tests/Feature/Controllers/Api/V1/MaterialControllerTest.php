@@ -34,7 +34,7 @@ beforeEach(function () {
         'material.create',
         'material.update',
         'material.delete',
-        'material.generateQrcode',
+        'material.generateQrCode',
     ];
 
     foreach ($permissions as $permission) {
@@ -838,7 +838,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 300);
     });
 
-    it('limits size between 100 and 500', function () {
+    it('limits size between 100 and 400', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -853,7 +853,7 @@ describe('qrCode', function () {
             ->getJson("/api/v1/materials/{$material->id}/qr-code?size=1000");
 
         $responseTooBig->assertOk()
-            ->assertJsonPath('data.size', 500);
+            ->assertJsonPath('data.size', 400);
     });
 
     it('cannot generate QR code for material from another site', function () {

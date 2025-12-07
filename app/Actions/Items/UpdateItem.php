@@ -7,6 +7,7 @@ namespace XetaSuite\Actions\Items;
 use Illuminate\Support\Facades\DB;
 use XetaSuite\Actions\ItemPrices\CreateItemPrice;
 use XetaSuite\Models\Item;
+use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class UpdateItem
@@ -57,6 +58,8 @@ class UpdateItem
             // Record price change in history via queue if price or supplier changed
             if ($priceChanged || $supplierChanged) {
                 $data['notes'] = $priceChanged ? __('items.price_updated') : __('items.supplier_changed');
+                $data['supplier'] = $newSupplierId ? Supplier::find($newSupplierId) : null;
+                $data['current_price'] = $newPrice;
 
                 app(CreateItemPrice::class)->handle($item, $user, $data);
             }

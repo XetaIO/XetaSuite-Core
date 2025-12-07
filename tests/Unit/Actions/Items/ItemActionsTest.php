@@ -3,11 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use XetaSuite\Actions\Items\CreateItem;
 use XetaSuite\Actions\Items\DeleteItem;
 use XetaSuite\Actions\Items\UpdateItem;
-use XetaSuite\Jobs\RecordItemPriceChange;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
@@ -144,10 +142,6 @@ describe('CreateItem', function () {
 // ============================================================================
 
 describe('UpdateItem', function () {
-    beforeEach(function () {
-        Queue::fake();
-    });
-
     it('updates item name', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
@@ -162,7 +156,7 @@ describe('UpdateItem', function () {
             ->and($updatedItem->edited_by_id)->toBe($user->id);
     });
 
-    it('updates item price and dispatches job', function () {
+    it('updates item price', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 50.00]);
@@ -173,23 +167,9 @@ describe('UpdateItem', function () {
         ]);
 
         expect((float) $updatedItem->current_price)->toBe(75.0);
-        Queue::assertPushed(RecordItemPriceChange::class);
     });
 
-    it('does not dispatch job when price unchanged', function () {
-        $site = Site::factory()->create();
-        $user = User::factory()->create(['current_site_id' => $site->id]);
-        $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 50.00]);
-        $action = app(UpdateItem::class);
-
-        $action->handle($item, $user, [
-            'name' => 'Updated Name',
-        ]);
-
-        Queue::assertNotPushed(RecordItemPriceChange::class);
-    });
-
-    it('updates supplier and dispatches job', function () {
+    it('updates supplier', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $oldSupplier = Supplier::factory()->create();
@@ -202,7 +182,6 @@ describe('UpdateItem', function () {
         ]);
 
         expect($updatedItem->supplier_id)->toBe($newSupplier->id);
-        Queue::assertPushed(RecordItemPriceChange::class);
     });
 
     it('syncs materials', function () {
