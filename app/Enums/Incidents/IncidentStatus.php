@@ -14,10 +14,10 @@ enum IncidentStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::OPEN => 'Open',
-            self::IN_PROGRESS => 'In Progress',
-            self::RESOLVED => 'Resolved',
-            self::CLOSED => 'Closed'
+            self::OPEN => __('incidents.status_open'),
+            self::IN_PROGRESS => __('incidents.status_in_progress'),
+            self::RESOLVED => __('incidents.status_resolved'),
+            self::CLOSED => __('incidents.status_closed'),
         };
     }
 }

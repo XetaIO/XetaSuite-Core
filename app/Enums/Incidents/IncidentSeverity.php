@@ -14,10 +14,10 @@ enum IncidentSeverity: string
     public function label(): string
     {
         return match ($this) {
-            self::LOW => 'Low',
-            self::MEDIUM => 'Medium',
-            self::HIGH => 'High',
-            self::CRITICAL => 'Critical'
+            self::LOW => __('incidents.severity_low'),
+            self::MEDIUM => __('incidents.severity_medium'),
+            self::HIGH => __('incidents.severity_high'),
+            self::CRITICAL => __('incidents.severity_critical'),
         };
     }
 }

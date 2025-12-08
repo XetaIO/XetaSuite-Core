@@ -79,13 +79,11 @@ class MaintenanceFactory extends Factory
         if (is_null($material)) {
             return $this->state(fn () => [
                 'material_id' => null,
-                'material_name' => null,
             ]);
         }
 
         return $this->state(fn () => [
-            'material_id' => $material instanceof Material ? $material->id : $material,
-            'material_name' => null,
+            'material_id' => $material instanceof Material ? $material->id : $material
         ]);
     }
 

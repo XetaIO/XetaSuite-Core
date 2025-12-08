@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
 use XetaSuite\Http\Controllers\Api\V1\ItemMovementController;
 use XetaSuite\Http\Controllers\Api\V1\MaterialController;
@@ -82,9 +83,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
             'movements' => 'movement',
         ])->except(['index']);
 
-    // Incidents
-    // Route::middleware('auth:sanctum')->apiResource('incidents', \App\Http\Controllers\Api\V1\IncidentController::class);
-
-    // ...
+    // Incidents (site-scoped - enforced by IncidentPolicy)
+    Route::get('incidents/available-materials', [IncidentController::class, 'availableMaterials']);
+    Route::get('incidents/available-maintenances', [IncidentController::class, 'availableMaintenances']);
+    Route::get('incidents/severity-options', [IncidentController::class, 'severityOptions']);
+    Route::get('incidents/status-options', [IncidentController::class, 'statusOptions']);
+    Route::apiResource('incidents', IncidentController::class);
 
 });
