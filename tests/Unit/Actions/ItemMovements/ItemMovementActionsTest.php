@@ -375,42 +375,62 @@ describe('DeleteItemMovement', function () {
     it('deletes an entry movement and adjusts item totals', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
-        $item = Item::factory()->forSite($site)->createdBy($user)->create([
-            'item_entry_total' => 15,
-            'item_entry_count' => 3,
-        ]);
-        $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
-        $action = app(DeleteItemMovement::class);
 
+        // Start with existing totals (simulating 2 previous movements of 5 each = 10 total)
+        $item = Item::factory()->forSite($site)->createdBy($user)->create([
+            'item_entry_total' => 10,
+            'item_entry_count' => 2,
+        ]);
+
+        // Creating this movement will add to totals via observer: 10+5=15, 2+1=3
+        $movement = ItemMovement::factory()->forItem($item)->entry()->withQuantity(5, 10.00)->createdBy($user)->create();
+
+        // Verify totals after creation
+        $item->refresh();
+        expect($item->item_entry_total)->toBe(15)
+            ->and($item->item_entry_count)->toBe(3);
+
+        $action = app(DeleteItemMovement::class);
         $result = $action->handle($movement);
 
         expect($result['success'])->toBeTrue()
             ->and(ItemMovement::find($movement->id))->toBeNull();
 
+        // After deletion: 15-5=10, 3-1=2
         $item->refresh();
-        expect($item->item_entry_total)->toBe(10) // 15 - 5
-            ->and($item->item_entry_count)->toBe(2); // 3 - 1
+        expect($item->item_entry_total)->toBe(10)
+            ->and($item->item_entry_count)->toBe(2);
     });
 
     it('deletes an exit movement and adjusts item totals', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
+
+        // Start with existing totals (simulating 1 previous exit of 5)
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
             'item_entry_total' => 20,
-            'item_exit_total' => 10,
-            'item_exit_count' => 2,
+            'item_exit_total' => 5,
+            'item_exit_count' => 1,
         ]);
-        $movement = ItemMovement::factory()->forItem($item)->exit()->withQuantity(5, 10.00)->createdBy($user)->create();
-        $action = app(DeleteItemMovement::class);
 
+        // Creating this movement will add to totals via observer: 5+5=10, 1+1=2
+        $movement = ItemMovement::factory()->forItem($item)->exit()->withQuantity(5, 10.00)->createdBy($user)->create();
+
+        // Verify totals after creation
+        $item->refresh();
+        expect($item->item_exit_total)->toBe(10)
+            ->and($item->item_exit_count)->toBe(2);
+
+        $action = app(DeleteItemMovement::class);
         $result = $action->handle($movement);
 
         expect($result['success'])->toBeTrue()
             ->and(ItemMovement::find($movement->id))->toBeNull();
 
+        // After deletion: 10-5=5, 2-1=1
         $item->refresh();
-        expect($item->item_exit_total)->toBe(5) // 10 - 5
-            ->and($item->item_exit_count)->toBe(1); // 2 - 1
+        expect($item->item_exit_total)->toBe(5)
+            ->and($item->item_exit_count)->toBe(1);
     });
 
     it('returns success true after deletion', function () {

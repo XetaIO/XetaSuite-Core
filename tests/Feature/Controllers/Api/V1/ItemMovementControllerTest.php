@@ -568,12 +568,13 @@ describe('destroy', function () {
     it('can delete movement and update item totals', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
+        // Create item with initial totals at 0 - the movement creation will set them
         $item = Item::factory()
             ->forSite($this->regularSite)
             ->createdBy($user)
             ->create([
-                'item_entry_total' => 10,
-                'item_entry_count' => 1,
+                'item_entry_total' => 0,
+                'item_entry_count' => 0,
             ]);
 
         $movement = ItemMovement::factory()
@@ -582,6 +583,11 @@ describe('destroy', function () {
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
+
+        // After movement creation, totals should be updated by observer
+        $item->refresh();
+        expect($item->item_entry_total)->toBe(10);
+        expect($item->item_entry_count)->toBe(1);
 
         $response = $this->actingAs($user)
             ->deleteJson("/api/v1/items/{$item->id}/movements/{$movement->id}");
@@ -592,7 +598,7 @@ describe('destroy', function () {
             'id' => $movement->id,
         ]);
 
-        // Check item totals updated
+        // Check item totals updated back to 0
         $item->refresh();
         expect($item->item_entry_total)->toBe(0);
         expect($item->item_entry_count)->toBe(0);
@@ -601,13 +607,14 @@ describe('destroy', function () {
     it('can delete exit movement and update totals', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
+        // Create item with initial totals at 0 - the movement creation will set them
         $item = Item::factory()
             ->forSite($this->regularSite)
             ->createdBy($user)
             ->create([
                 'item_entry_total' => 20,
-                'item_exit_total' => 5,
-                'item_exit_count' => 1,
+                'item_exit_total' => 0,
+                'item_exit_count' => 0,
             ]);
 
         $movement = ItemMovement::factory()
@@ -617,12 +624,17 @@ describe('destroy', function () {
             ->createdBy($user)
             ->create();
 
+        // After movement creation, exit totals should be updated by observer
+        $item->refresh();
+        expect($item->item_exit_total)->toBe(5);
+        expect($item->item_exit_count)->toBe(1);
+
         $response = $this->actingAs($user)
             ->deleteJson("/api/v1/items/{$item->id}/movements/{$movement->id}");
 
         $response->assertNoContent();
 
-        // Check exit totals decreased
+        // Check exit totals decreased back to 0
         $item->refresh();
         expect($item->item_exit_total)->toBe(0);
         expect($item->item_exit_count)->toBe(0);
