@@ -75,6 +75,8 @@ class ZoneService
     {
         $ids = [];
 
+        $zone->load('children');
+
         foreach ($zone->children as $child) {
             $ids[] = $child->id;
             $ids = array_merge($ids, $this->getAllDescendantIds($child));
