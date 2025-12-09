@@ -55,13 +55,19 @@ class IncidentService
     /**
      * Get available maintenances for incident creation (maintenances on current site).
      */
-    public function getAvailableMaintenances(?int $materialId = null): Collection
+    public function getAvailableMaintenances(?int $materialId = null, ?string $search = null): Collection
     {
         $currentSiteId = auth()->user()->current_site_id;
 
         return Maintenance::query()
+            ->with('material:id,name')
             ->where('site_id', $currentSiteId)
             ->when($materialId, fn (Builder $query, int $id) => $query->where('material_id', $id))
+            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
+                $q->where('id', 'like', "%{$s}%")
+                    ->orWhere('description', 'ilike', "%{$s}%")
+                    ->orWhereHas('material', fn (Builder $mq) => $mq->where('name', 'ilike', "%{$s}%"));
+            }))
             ->orderByDesc('created_at')
             ->get(['id', 'description', 'material_id']);
     }

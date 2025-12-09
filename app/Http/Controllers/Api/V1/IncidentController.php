@@ -116,13 +116,15 @@ class IncidentController extends Controller
         $this->authorize('viewAny', Incident::class);
 
         $materialId = request('material_id') ? (int) request('material_id') : null;
-        $maintenances = $this->incidentService->getAvailableMaintenances($materialId);
+        $search = request('search') ?: null;
+        $maintenances = $this->incidentService->getAvailableMaintenances($materialId, $search);
 
         return response()->json([
             'data' => $maintenances->map(fn ($maintenance) => [
                 'id' => $maintenance->id,
                 'description' => $maintenance->description,
                 'material_id' => $maintenance->material_id,
+                'material_name' => $maintenance->material?->name,
             ]),
         ]);
     }
