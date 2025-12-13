@@ -31,7 +31,6 @@ class ItemPriceFactory extends Factory
 
             'price' => $this->faker->randomFloat(2, 0.5, 5000),
             'effective_date' => $this->faker->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
-            'currency' => $this->faker->currencyCode, // ex. EUR, USD, …
             'notes' => $this->faker->optional()->sentence(),
         ];
     }

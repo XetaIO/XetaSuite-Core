@@ -38,7 +38,6 @@ class Item extends Model
         'description',
         'reference',
         'current_price',
-        'currency',
         'number_warning_enabled',
         'number_warning_minimum',
         'number_critical_enabled',

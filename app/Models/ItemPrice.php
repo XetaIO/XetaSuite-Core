@@ -25,7 +25,6 @@ class ItemPrice extends Model
         'created_by_name',
         'price',
         'effective_date',
-        'currency',
         'notes',
     ];
 

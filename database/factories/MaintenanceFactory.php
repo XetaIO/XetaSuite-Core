@@ -185,4 +185,111 @@ class MaintenanceFactory extends Factory
     {
         return $this->hasAttached($companyIds, [], 'companies');
     }
+
+    // -------------------------------------------------------------------------
+    // Status shortcuts
+    // -------------------------------------------------------------------------
+
+    /**
+     * Set status to planned.
+     */
+    public function planned(): static
+    {
+        return $this->withStatus(MaintenanceStatus::PLANNED);
+    }
+
+    /**
+     * Set status to in_progress.
+     */
+    public function inProgress(): static
+    {
+        return $this->withStatus(MaintenanceStatus::IN_PROGRESS)->state(fn () => [
+            'started_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+        ]);
+    }
+
+    /**
+     * Set status to completed.
+     */
+    public function completed(): static
+    {
+        return $this->withStatus(MaintenanceStatus::COMPLETED)->state(fn () => [
+            'started_at' => $this->faker->dateTimeBetween('-2 months', '-1 month'),
+            'resolved_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+        ]);
+    }
+
+    /**
+     * Set status to canceled.
+     */
+    public function canceled(): static
+    {
+        return $this->withStatus(MaintenanceStatus::CANCELED)->state(fn () => [
+            'resolved_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Type shortcuts
+    // -------------------------------------------------------------------------
+
+    /**
+     * Set type to corrective.
+     */
+    public function corrective(): static
+    {
+        return $this->withType(MaintenanceType::CORRECTIVE);
+    }
+
+    /**
+     * Set type to preventive.
+     */
+    public function preventive(): static
+    {
+        return $this->withType(MaintenanceType::PREVENTIVE);
+    }
+
+    /**
+     * Set type to inspection.
+     */
+    public function inspection(): static
+    {
+        return $this->withType(MaintenanceType::INSPECTION);
+    }
+
+    /**
+     * Set type to improvement.
+     */
+    public function improvement(): static
+    {
+        return $this->withType(MaintenanceType::IMPROVEMENT);
+    }
+
+    // -------------------------------------------------------------------------
+    // Realization shortcuts
+    // -------------------------------------------------------------------------
+
+    /**
+     * Set realization to internal.
+     */
+    public function internal(): static
+    {
+        return $this->withRealization(MaintenanceRealization::INTERNAL);
+    }
+
+    /**
+     * Set realization to external.
+     */
+    public function external(): static
+    {
+        return $this->withRealization(MaintenanceRealization::EXTERNAL);
+    }
+
+    /**
+     * Set realization to both.
+     */
+    public function both(): static
+    {
+        return $this->withRealization(MaintenanceRealization::BOTH);
+    }
 }

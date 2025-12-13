@@ -26,7 +26,6 @@ class CreateItemPrice
             'created_by_name' => $user->full_name,
             'price' => $data['current_price'],
             'effective_date' => $data['effective_date'] ?? now(),
-            'currency' => $data['currency'] ?? 'EUR',
             'notes' => $data['notes'] ?? null,
         ]);
 

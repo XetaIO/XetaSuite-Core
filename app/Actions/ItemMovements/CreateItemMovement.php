@@ -56,7 +56,6 @@ class CreateItemMovement
                 'supplier_invoice_number' => $data['supplier_invoice_number'] ?? null,
                 'invoice_date' => isset($data['invoice_date']) ? new Carbon($data['invoice_date']) : null,
                 'created_by_id' => $user->id,
-                'created_by_name' => $user->full_name,
                 'notes' => $data['notes'] ?? null,
                 'movement_date' => $data['movement_date'] ?? now(),
             ]);
@@ -106,7 +105,6 @@ class CreateItemMovement
                 'movable_type' => $relatedModel ? get_class($relatedModel) : null,
                 'movable_id' => $relatedModel?->id ?? null,
                 'created_by_id' => $user->id,
-                'created_by_name' => $user->full_name,
                 'notes' => $data['notes'] ?? null,
                 'movement_date' => $movementDate ?? now(),
             ]);

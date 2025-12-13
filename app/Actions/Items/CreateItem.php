@@ -32,7 +32,6 @@ class CreateItem
                 'supplier_id' => $supplier?->id,
                 'supplier_reference' => $data['supplier_reference'] ?? null,
                 'current_price' => $data['current_price'] ?? 0,
-                'currency' => $data['currency'] ?? 'EUR',
                 'number_warning_enabled' => $data['number_warning_enabled'] ?? false,
                 'number_warning_minimum' => $data['number_warning_minimum'] ?? 0,
                 'number_critical_enabled' => $data['number_critical_enabled'] ?? false,

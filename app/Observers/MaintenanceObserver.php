@@ -9,9 +9,9 @@ use XetaSuite\Models\Maintenance;
 class MaintenanceObserver
 {
     /**
-     * Handle the "deleted" event.
+     * Handle the "deleting" event.
      */
-    public function deleted(Maintenance $maintenance): void
+    public function deleting(Maintenance $maintenance): void
     {
         $maintenance->companies()->detach();
 

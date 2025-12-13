@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
+use XetaSuite\Models\User;
 
 return new class () extends Migration {
     /**
@@ -24,7 +25,11 @@ return new class () extends Migration {
             $table->text('text')->nullable();
             $table->text('label')->nullable();
             $table->text('label_info')->nullable();
-            $table->unsignedBigInteger('last_updated_user_id')->nullable()->index();
+
+            $table->foreignIdFor(User::class, 'updated_by_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
 
             $table->timestamps();
 

@@ -50,21 +50,6 @@ describe('CreateItemPrice', function () {
         expect($price->supplier_id)->toBe($supplier->id);
     });
 
-    it('creates a price entry with currency', function () {
-        $site = Site::factory()->create();
-        $user = User::factory()->create(['current_site_id' => $site->id]);
-        $item = Item::factory()->forSite($site)->createdBy($user)->create();
-        $action = app(CreateItemPrice::class);
-
-        $price = $action->handle($item, $user, [
-            'current_price' => 100.00,
-            'currency' => 'USD',
-            'supplier' => null,
-        ]);
-
-        expect($price->currency)->toBe('USD');
-    });
-
     it('creates a price entry with notes', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
@@ -125,20 +110,6 @@ describe('CreateItemPrice', function () {
 
         $item->refresh();
         expect($item->supplier_id)->toBe($supplier->id);
-    });
-
-    it('defaults to EUR currency when not specified', function () {
-        $site = Site::factory()->create();
-        $user = User::factory()->create(['current_site_id' => $site->id]);
-        $item = Item::factory()->forSite($site)->createdBy($user)->create();
-        $action = app(CreateItemPrice::class);
-
-        $price = $action->handle($item, $user, [
-            'current_price' => 30.00,
-            'supplier' => null,
-        ]);
-
-        expect($price->currency)->toBe('EUR');
     });
 
     it('uses current date as effective date when not specified', function () {

@@ -14,10 +14,10 @@ enum MaintenanceStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PLANNED => 'Planned',
-            self::IN_PROGRESS => 'In progress',
-            self::COMPLETED => 'Completed',
-            self::CANCELLED => 'Canceled'
+            self::PLANNED => __('maintenances.status_planned'),
+            self::IN_PROGRESS => __('maintenances.status_in_progress'),
+            self::COMPLETED => __('maintenances.status_completed'),
+            self::CANCELLED => __('maintenances.status_canceled'),
         };
     }
 }

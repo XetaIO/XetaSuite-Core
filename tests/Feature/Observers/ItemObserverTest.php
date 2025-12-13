@@ -78,7 +78,6 @@ it('cascades deletion to prices via database constraint', function () {
     $this->item->prices()->create([
         'price' => 100.00,
         'effective_date' => now(),
-        'currency' => 'EUR',
         'created_by_id' => $this->user->id,
     ]);
 

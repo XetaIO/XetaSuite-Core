@@ -14,10 +14,10 @@ enum MaintenanceType: string
     public function label(): string
     {
         return match ($this) {
-            self::CORRECTIVE => 'Corrective',
-            self::PREVENTIVE => 'Preventive',
-            self::INSPECTION => 'Inspection',
-            self::IMPROVEMENT => 'Improvement'
+            self::CORRECTIVE => __('maintenances.type_corrective'),
+            self::PREVENTIVE => __('maintenances.type_preventive'),
+            self::INSPECTION => __('maintenances.type_inspection'),
+            self::IMPROVEMENT => __('maintenances.type_improvement'),
         };
     }
 }

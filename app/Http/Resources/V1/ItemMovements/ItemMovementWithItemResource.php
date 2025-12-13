@@ -34,6 +34,10 @@ class ItemMovementWithItemResource extends JsonResource
             'supplier_id' => $this->supplier_id,
             'supplier_name' => $this->supplier_name,
             'supplier_invoice_number' => $this->supplier_invoice_number,
+            'supplier' => $this->whenLoaded('supplier', fn () => [
+                'id' => $this->supplier->id,
+                'name' => $this->supplier->name,
+            ]),
             'invoice_date' => $this->invoice_date?->toDateString(),
 
             // Creator info

@@ -26,6 +26,6 @@ class Setting extends Model
         'text',
         'label',
         'label_info',
-        'last_updated_user_id'
+        'updated_by_id'
     ];
 }

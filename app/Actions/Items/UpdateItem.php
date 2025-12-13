@@ -38,7 +38,6 @@ class UpdateItem
                 'supplier_id' => $newSupplierId,
                 'supplier_reference' => array_key_exists('supplier_reference', $data) ? $data['supplier_reference'] : $item->supplier_reference,
                 'current_price' => $newPrice,
-                'currency' => $data['currency'] ?? $item->currency,
                 'number_warning_enabled' => $data['number_warning_enabled'] ?? $item->number_warning_enabled,
                 'number_warning_minimum' => $data['number_warning_minimum'] ?? $item->number_warning_minimum,
                 'number_critical_enabled' => $data['number_critical_enabled'] ?? $item->number_critical_enabled,

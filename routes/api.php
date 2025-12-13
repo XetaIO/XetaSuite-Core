@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Route;
 use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
 use XetaSuite\Http\Controllers\Api\V1\ItemMovementController;
+use XetaSuite\Http\Controllers\Api\V1\MaintenanceController;
 use XetaSuite\Http\Controllers\Api\V1\MaterialController;
 use XetaSuite\Http\Controllers\Api\V1\QrCodeScanController;
+use XetaSuite\Http\Controllers\Api\V1\SettingsController;
 use XetaSuite\Http\Controllers\Api\V1\SiteController;
 use XetaSuite\Http\Controllers\Api\V1\SupplierController;
 use XetaSuite\Http\Controllers\Api\V1\UserLocaleController;
@@ -89,5 +91,21 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('incidents/severity-options', [IncidentController::class, 'severityOptions']);
     Route::get('incidents/status-options', [IncidentController::class, 'statusOptions']);
     Route::apiResource('incidents', IncidentController::class);
+
+    // Maintenances (site-scoped - enforced by MaintenancePolicy)
+    Route::get('maintenances/available-materials', [MaintenanceController::class, 'availableMaterials']);
+    Route::get('maintenances/available-incidents', [MaintenanceController::class, 'availableIncidents']);
+    Route::get('maintenances/available-operators', [MaintenanceController::class, 'availableOperators']);
+    Route::get('maintenances/available-companies', [MaintenanceController::class, 'availableCompanies']);
+    Route::get('maintenances/available-items', [MaintenanceController::class, 'availableItems']);
+    Route::get('maintenances/type-options', [MaintenanceController::class, 'typeOptions']);
+    Route::get('maintenances/status-options', [MaintenanceController::class, 'statusOptions']);
+    Route::get('maintenances/realization-options', [MaintenanceController::class, 'realizationOptions']);
+    Route::apiResource('maintenances', MaintenanceController::class);
+    Route::get('maintenances/{maintenance}/incidents', [MaintenanceController::class, 'incidents']);
+    Route::get('maintenances/{maintenance}/item-movements', [MaintenanceController::class, 'itemMovements']);
+
+    // Settings (global app settings for frontend)
+    Route::get('settings', [SettingsController::class, 'index']);
 
 });

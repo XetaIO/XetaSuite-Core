@@ -32,7 +32,6 @@ class ItemFactory extends Factory
             'description' => $this->faker->optional()->paragraph(),
             'reference' => $this->faker->unique()->bothify('REF-####'),
             'current_price' => $this->faker->randomFloat(2, 0, 5000),
-            'currency' => $this->faker->currencyCode,
 
             'item_entry_total' => 0,
             'item_exit_total' => 0,

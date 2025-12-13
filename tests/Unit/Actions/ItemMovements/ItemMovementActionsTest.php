@@ -43,8 +43,7 @@ describe('CreateItemMovement', function () {
             ->and($movement->quantity)->toBe(10)
             ->and((float) $movement->unit_price)->toBe(5.0)
             ->and((float) $movement->total_price)->toBe(50.0)
-            ->and($movement->created_by_id)->toBe($user->id)
-            ->and($movement->created_by_name)->toBe($user->full_name);
+            ->and($movement->created_by_id)->toBe($user->id);
     });
 
     it('creates an entry movement with supplier', function () {

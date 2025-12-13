@@ -13,9 +13,9 @@ enum MaintenanceRealization: string
     public function label(): string
     {
         return match ($this) {
-            self::INTERNAL => 'Internal',
-            self::EXTERNAL => 'External',
-            self::BOTH => 'Both'
+            self::INTERNAL => __('maintenances.realization_internal'),
+            self::EXTERNAL => __('maintenances.realization_external'),
+            self::BOTH => __('maintenances.realization_both'),
         };
     }
 }

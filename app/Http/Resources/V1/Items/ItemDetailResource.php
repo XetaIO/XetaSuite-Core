@@ -53,7 +53,6 @@ class ItemDetailResource extends JsonResource
 
             // Pricing
             'current_price' => (float) $this->current_price,
-            'currency' => $this->currency,
 
             // Stock counts
             'item_entry_total' => $this->item_entry_total,

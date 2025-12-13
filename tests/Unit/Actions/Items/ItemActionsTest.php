@@ -63,11 +63,9 @@ describe('CreateItem', function () {
         $item = $action->handle($user, [
             'name' => 'Priced Item',
             'current_price' => 99.99,
-            'currency' => 'EUR',
         ]);
 
         expect((float) $item->current_price)->toBe(99.99)
-            ->and($item->currency)->toBe('EUR')
             ->and($item->prices)->toHaveCount(1)
             ->and((float) $item->prices->first()->price)->toBe(99.99);
     });
