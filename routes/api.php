@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use XetaSuite\Http\Controllers\Api\V1\CleaningController;
+use XetaSuite\Http\Controllers\Api\V1\DashboardController;
 use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
 use XetaSuite\Http\Controllers\Api\V1\ItemMovementController;
@@ -24,6 +26,10 @@ use XetaSuite\Http\Resources\V1\Users\UserDetailResource;
  |--------------------------------------------------------------------------
  */
 Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
+
+    // Dashboard stats & charts
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/charts', [DashboardController::class, 'chartsData']);
 
     // Get authenticated user
     Route::get('/auth/user', function (Request $request) {
@@ -78,7 +84,6 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
     // Item Movements - Global list for current site
     Route::get('item-movements', [ItemMovementController::class, 'index']);
-
     // Item Movements (nested under items)
     Route::apiResource('items.movements', ItemMovementController::class)
         ->parameters([
@@ -91,6 +96,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('incidents/severity-options', [IncidentController::class, 'severityOptions']);
     Route::get('incidents/status-options', [IncidentController::class, 'statusOptions']);
     Route::apiResource('incidents', IncidentController::class);
+
+    // Cleanings (site-scoped - enforced by CleaningPolicy)
+    Route::get('cleanings/available-materials', [CleaningController::class, 'availableMaterials']);
+    Route::get('cleanings/type-options', [CleaningController::class, 'typeOptions']);
+    Route::apiResource('cleanings', CleaningController::class);
 
     // Maintenances (site-scoped - enforced by MaintenancePolicy)
     Route::get('maintenances/available-materials', [MaintenanceController::class, 'availableMaterials']);
