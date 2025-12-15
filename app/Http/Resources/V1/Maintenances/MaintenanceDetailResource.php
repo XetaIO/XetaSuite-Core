@@ -34,7 +34,7 @@ class MaintenanceDetailResource extends JsonResource
 
             // Site info
             'site_id' => $this->site_id,
-            'site' => $this->when($this->relationLoaded('site') && $this->site, [
+            'site' => $this->when($this->relationLoaded('site') && $this->site, fn () => [
                 'id' => $this->site?->id,
                 'name' => $this->site?->name,
             ]),

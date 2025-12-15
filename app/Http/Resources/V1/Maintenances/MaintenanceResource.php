@@ -35,14 +35,14 @@ class MaintenanceResource extends JsonResource
             // Material info
             'material_id' => $this->material_id,
             'material_name' => $this->material?->name ?? $this->material_name,
-            'material' => $this->when($this->relationLoaded('material') && $this->material, [
+            'material' => $this->when($this->relationLoaded('material') && $this->material, fn () => [
                 'id' => $this->material?->id,
                 'name' => $this->material?->name,
             ]),
 
             // Site info
             'site_id' => $this->site_id,
-            'site' => $this->when($this->relationLoaded('site') && $this->site, [
+            'site' => $this->when($this->relationLoaded('site') && $this->site, fn () => [
                 'id' => $this->site?->id,
                 'name' => $this->site?->name,
             ]),
@@ -50,7 +50,7 @@ class MaintenanceResource extends JsonResource
             // Creator info
             'created_by_id' => $this->created_by_id,
             'created_by_name' => $this->creator?->full_name ?? $this->created_by_name,
-            'creator' => $this->when($this->relationLoaded('creator') && $this->creator, [
+            'creator' => $this->when($this->relationLoaded('creator') && $this->creator, fn () => [
                 'id' => $this->creator?->id,
                 'full_name' => $this->creator?->full_name,
             ]),
