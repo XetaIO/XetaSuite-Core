@@ -37,8 +37,11 @@ class CompanyFactory extends Factory
      */
     public function createdBy(User|int $user): static
     {
+        $userModel = $user instanceof User ? $user : User::findOrFail($user);
+
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $userModel->id,
+            'created_by_name' => $userModel->full_name,
         ]);
     }
 }

@@ -40,6 +40,13 @@ class MaintenanceResource extends JsonResource
                 'name' => $this->material?->name,
             ]),
 
+            // Site info
+            'site_id' => $this->site_id,
+            'site' => $this->when($this->relationLoaded('site') && $this->site, [
+                'id' => $this->site?->id,
+                'name' => $this->site?->name,
+            ]),
+
             // Creator info
             'created_by_id' => $this->created_by_id,
             'created_by_name' => $this->creator?->full_name ?? $this->created_by_name,

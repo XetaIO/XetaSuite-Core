@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use XetaSuite\Http\Controllers\Api\V1\CleaningController;
+use XetaSuite\Http\Controllers\Api\V1\CompanyController;
 use XetaSuite\Http\Controllers\Api\V1\DashboardController;
 use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
@@ -50,6 +51,11 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     // Suppliers (headquarters only - enforced by SupplierPolicy)
     Route::apiResource('suppliers', SupplierController::class);
     Route::get('suppliers/{supplier}/items', [SupplierController::class, 'items']);
+
+    // Companies (headquarters only - enforced by CompanyPolicy)
+    Route::apiResource('companies', CompanyController::class);
+    Route::get('companies/{company}/maintenances', [CompanyController::class, 'maintenances']);
+    Route::get('companies/{company}/stats', [CompanyController::class, 'stats']);
 
     // Zones (site-scoped - enforced by ZonePolicy)
     Route::get('zones/available-parents', [ZoneController::class, 'availableParents']);
