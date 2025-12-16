@@ -31,3 +31,5 @@ _ide_helper_models.php
 .phpstorm.meta.php
 .packet-lock.json
 XetaSuite-core.code-workspace
+database/seeders/data/mysql-old-data.sql
+database/seeders/LegacySeeder.php

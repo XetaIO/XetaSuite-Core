@@ -16,6 +16,7 @@ use XetaSuite\Http\Controllers\Api\V1\QrCodeScanController;
 use XetaSuite\Http\Controllers\Api\V1\SettingsController;
 use XetaSuite\Http\Controllers\Api\V1\SiteController;
 use XetaSuite\Http\Controllers\Api\V1\SupplierController;
+use XetaSuite\Http\Controllers\Api\V1\UserController;
 use XetaSuite\Http\Controllers\Api\V1\UserLocaleController;
 use XetaSuite\Http\Controllers\Api\V1\UserSiteController;
 use XetaSuite\Http\Controllers\Api\V1\ZoneController;
@@ -123,5 +124,16 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
     // Settings (global app settings for frontend)
     Route::get('settings', [SettingsController::class, 'index']);
+
+    // Users (enforced by UserPolicy)
+    Route::get('users/available-sites', [UserController::class, 'availableSites']);
+    Route::get('users/available-roles', [UserController::class, 'availableRoles']);
+    Route::get('users/available-permissions', [UserController::class, 'availablePermissions']);
+    Route::apiResource('users', UserController::class)->withTrashed(['show', 'update']);
+    Route::post('users/{user}/restore', [UserController::class, 'restore'])->withTrashed();
+    Route::get('users/{user}/roles-per-site', [UserController::class, 'rolesPerSite'])->withTrashed();
+    Route::get('users/{user}/cleanings', [UserController::class, 'cleanings'])->withTrashed();
+    Route::get('users/{user}/maintenances', [UserController::class, 'maintenances'])->withTrashed();
+    Route::get('users/{user}/incidents', [UserController::class, 'incidents'])->withTrashed();
 
 });

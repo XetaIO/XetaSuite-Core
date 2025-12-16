@@ -16,7 +16,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('user.viewAny') && settings('user_manage_enabled', true);
+        return $user->can('user.viewAny');
     }
 
     /**
@@ -32,7 +32,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('user.create') && settings('user_create_enabled', true);
+        return $user->can('user.create');
     }
 
     /**

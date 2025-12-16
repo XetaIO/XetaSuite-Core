@@ -86,15 +86,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function cleanings(): HasMany
     {
-        return $this->hasMany(Cleaning::class);
+        return $this->hasMany(Cleaning::class, 'created_by_id');
     }
 
     /**
-     * Get the incidents created by the user.
+     * Get the incidents reported by the user.
      */
     public function incidents(): HasMany
     {
-        return $this->hasMany(Incident::class);
+        return $this->hasMany(Incident::class, 'reported_by_id');
     }
 
     /**
@@ -102,7 +102,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function maintenances(): HasMany
     {
-        return $this->hasMany(Maintenance::class);
+        return $this->hasMany(Maintenance::class, 'created_by_id');
     }
 
     /**
