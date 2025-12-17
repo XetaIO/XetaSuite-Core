@@ -22,6 +22,13 @@ class IncidentResource extends JsonResource
             'severity' => $this->severity?->value,
             'severity_label' => $this->severity?->label(),
 
+            // Site info
+            'site_id' => $this->site_id,
+            'site' => $this->whenLoaded('site', fn () => [
+                'id' => $this->site->id,
+                'name' => $this->site->name,
+            ]),
+
             // Material info
             'material_id' => $this->material_id,
             'material_name' => $this->material_name,

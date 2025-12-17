@@ -20,11 +20,15 @@ class CleaningService
      */
     public function getPaginatedCleanings(array $filters = []): LengthAwarePaginator
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $query = Cleaning::query()
+            ->with(['site', 'material', 'creator']);
 
-        return Cleaning::query()
-            ->with(['material', 'creator'])
-            ->where('site_id', $currentSiteId)
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+
+        return $query
             ->when($filters['material_id'] ?? null, fn (Builder $query, int $materialId) => $query->where('material_id', $materialId))
             ->when($filters['type'] ?? null, fn (Builder $query, string $type) => $query->where('type', $type))
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))

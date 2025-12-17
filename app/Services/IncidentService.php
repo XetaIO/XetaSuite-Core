@@ -22,11 +22,15 @@ class IncidentService
      */
     public function getPaginatedIncidents(array $filters = []): LengthAwarePaginator
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $query = Incident::query()
+            ->with(['site', 'material', 'maintenance', 'reporter']);
 
-        return Incident::query()
-            ->with(['material', 'maintenance', 'reporter'])
-            ->where('site_id', $currentSiteId)
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+
+        return $query
             ->when($filters['material_id'] ?? null, fn (Builder $query, int $materialId) => $query->where('material_id', $materialId))
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
             ->when($filters['severity'] ?? null, fn (Builder $query, string $severity) => $query->where('severity', $severity))

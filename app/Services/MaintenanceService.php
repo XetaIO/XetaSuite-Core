@@ -28,12 +28,16 @@ class MaintenanceService
      */
     public function getPaginatedMaintenances(array $filters = []): LengthAwarePaginator
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $query = Maintenance::query()
+            ->with(['material', 'creator', 'operators', 'companies', 'site'])
+            ->withCount('incidents');
 
-        return Maintenance::query()
-            ->with(['material', 'creator', 'operators', 'companies'])
-            ->withCount('incidents')
-            ->where('site_id', $currentSiteId)
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+
+        return $query
             ->when($filters['material_id'] ?? null, fn (Builder $query, int $materialId) => $query->where('material_id', $materialId))
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
             ->when($filters['type'] ?? null, fn (Builder $query, string $type) => $query->where('type', $type))

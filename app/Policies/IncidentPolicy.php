@@ -27,8 +27,11 @@ class IncidentPolicy
      */
     public function view(User $user, Incident $incident): bool
     {
-        return $user->can('incident.viewAny')
-            && $incident->site_id === $user->current_site_id;
+        if (isOnHeadquarters()) {
+            // HQ : can see all incidents
+            return $user->can('incident.view');
+        }
+        return $user->can('incident.viewAny') && $incident->site_id === $user->current_site_id;
     }
 
     /**
@@ -45,8 +48,11 @@ class IncidentPolicy
      */
     public function update(User $user, Incident $incident): bool
     {
-        return $user->can('incident.update')
-            && $incident->site_id === $user->current_site_id;
+        // Disallow any modification from HQ
+        if (isOnHeadquarters()) {
+            return false;
+        }
+        return $user->can('incident.update') && $incident->site_id === $user->current_site_id;
     }
 
     /**
@@ -55,7 +61,10 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
-        return $user->can('incident.delete')
-            && $incident->site_id === $user->current_site_id;
+        // Disallow any deletion from HQ
+        if (isOnHeadquarters()) {
+            return false;
+        }
+        return $user->can('incident.delete') && $incident->site_id === $user->current_site_id;
     }
 }

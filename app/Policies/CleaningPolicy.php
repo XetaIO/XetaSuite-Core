@@ -27,8 +27,11 @@ class CleaningPolicy
      */
     public function view(User $user, Cleaning $cleaning): bool
     {
-        return $user->can('cleaning.viewAny')
-            && $cleaning->site_id === $user->current_site_id;
+        if (isOnHeadquarters()) {
+            // HQ : can see all cleanings
+            return $user->can('cleaning.view');
+        }
+        return $user->can('cleaning.view') && $cleaning->site_id === $user->current_site_id;
     }
 
     /**
@@ -45,8 +48,11 @@ class CleaningPolicy
      */
     public function update(User $user, Cleaning $cleaning): bool
     {
-        return $user->can('cleaning.update')
-            && $cleaning->site_id === $user->current_site_id;
+        // Disallow any modification from HQ
+        if (isOnHeadquarters()) {
+            return false;
+        }
+        return $user->can('cleaning.update') && $cleaning->site_id === $user->current_site_id;
     }
 
     /**
@@ -55,7 +61,10 @@ class CleaningPolicy
      */
     public function delete(User $user, Cleaning $cleaning): bool
     {
-        return $user->can('cleaning.delete')
-            && $cleaning->site_id === $user->current_site_id;
+        // Disallow any modification from HQ
+        if (isOnHeadquarters()) {
+            return false;
+        }
+        return $user->can('cleaning.delete') && $cleaning->site_id === $user->current_site_id;
     }
 }
