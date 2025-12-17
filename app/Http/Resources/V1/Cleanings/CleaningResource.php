@@ -27,6 +27,13 @@ class CleaningResource extends JsonResource
             'type' => $this->type->value,
             'type_label' => $this->type->label(),
 
+            // Site info
+            'site_id' => $this->site_id,
+            'site' => $this->when($this->relationLoaded('site') && $this->site, [
+                'id' => $this->site?->id,
+                'name' => $this->site?->name,
+            ]),
+
             // Material info
             'material_id' => $this->material_id,
             'material_name' => $this->material?->name ?? $this->material_name,

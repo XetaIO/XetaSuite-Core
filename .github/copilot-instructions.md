@@ -1,8 +1,19 @@
 # XetaSuite Core - Project Instructions
 
+> **Last updated**: December 2025
+
 ## Architecture Overview
 
-XetaSuite is a **multi-tenant ERP backend** (Laravel 12) serving a React SPA via Sanctum stateful API authentication. Multi-tenancy is site-based: users have roles/permissions per site via `spatie/laravel-permission` with teams.
+XetaSuite is a **multi-tenant ERP backend** (Laravel 12, PHP 8.2+) serving a React SPA via Sanctum stateful API authentication. Multi-tenancy is site-based: users have roles/permissions per site via `spatie/laravel-permission` with teams.
+
+### Tech Stack
+- **PHP** 8.2+ (supports 8.2, 8.3, 8.4)
+- **Laravel Framework** 12.x
+- **Laravel Sanctum** 4.x (stateful SPA authentication)
+- **Laravel Fortify** 1.x (authentication backend)
+- **Spatie Permission** 6.x (roles & permissions with teams)
+- **Pest** 3.x/4.x (testing framework)
+- **PostgreSQL** 16/17/18 (database)
 
 ### Domain Hierarchy
 ```
@@ -179,8 +190,24 @@ php artisan test tests/Feature/Observers/     # Directory
 
 ```bash
 composer run dev          # Server + queue + Vite concurrently
+composer run test         # Run all tests with config:clear
 vendor/bin/pint --dirty   # Format changed files before finalizing
+php artisan test --filter=ClassName  # Run specific tests
 ```
+
+## Key Packages Reference
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `laravel/framework` | ^12.0 | Core framework |
+| `laravel/sanctum` | ^4.0 | SPA authentication (cookies) |
+| `laravel/fortify` | 1.x | Auth backend (login, register, 2FA) |
+| `spatie/laravel-permission` | ^6.23 | Roles & permissions with teams |
+| `spatie/laravel-activitylog` | ^4.10 | Activity logging |
+| `spatie/laravel-backup` | ^9.3 | Database backups |
+| `xetaio/xetaravel-counts` | ^2.0 | Count caching |
+| `endroid/qr-code` | ^6.0 | QR code generation |
+| `pestphp/pest` | ^3.0\|^4.1 | Testing framework |
 
 ---
 
