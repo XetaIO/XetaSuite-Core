@@ -27,6 +27,10 @@ class ItemMovementPolicy
      */
     public function view(User $user, ItemMovement $movement): bool
     {
+        if (isOnHeadquarters()) {
+            // HQ : can see all item movements
+            return $user->can('item-movement.view');
+        }
         return $user->can('item-movement.view')
             && $movement->item?->site_id === $user->current_site_id;
     }
@@ -47,6 +51,10 @@ class ItemMovementPolicy
      */
     public function update(User $user, ItemMovement $movement): bool
     {
+        if (isOnHeadquarters()) {
+            // Disallow any modification from HQ
+            return $user->can('item-movement.update');
+        }
         return $user->can('item-movement.update')
             && $movement->item?->site_id === $user->current_site_id;
     }
@@ -57,6 +65,10 @@ class ItemMovementPolicy
      */
     public function delete(User $user, ItemMovement $movement): bool
     {
+        if (isOnHeadquarters()) {
+            // Disallow any modification from HQ
+            return $user->can('item-movement.delete');
+        }
         return $user->can('item-movement.delete')
             && $movement->item?->site_id === $user->current_site_id;
     }

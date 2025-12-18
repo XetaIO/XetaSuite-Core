@@ -48,10 +48,14 @@ class ItemMovementService
     public function getAllPaginatedMovements(int $siteId, array $filters = []): LengthAwarePaginator
     {
         $query = ItemMovement::query()
-            ->with(['item', 'supplier', 'creator'])
-            ->whereHas('item', function ($q) use ($siteId) {
+            ->with(['item', 'item.site', 'supplier', 'creator']);
+
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->whereHas('item', function ($q) use ($siteId) {
                 $q->where('site_id', $siteId);
             });
+        }
 
         // Filter by type
         if (! empty($filters['type'])) {
@@ -72,8 +76,8 @@ class ItemMovementService
                         ->orWhere('reference', 'ILIKE', "%{$search}%");
                 })
                     ->orWhereHas('supplier', function ($itemQ) use ($search) {
-                        $itemQ->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('description', 'LIKE', "%{$search}%");
+                        $itemQ->where('name', 'ILIKE', "%{$search}%")
+                            ->orWhere('description', 'ILIKE', "%{$search}%");
                     })
                     ->orWhere('supplier_name', 'ILIKE', "%{$search}%")
                     ->orWhere('supplier_invoice_number', 'ILIKE', "%{$search}%");

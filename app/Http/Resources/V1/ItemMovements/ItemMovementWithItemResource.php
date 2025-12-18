@@ -28,6 +28,13 @@ class ItemMovementWithItemResource extends JsonResource
                 'name' => $this->item->name,
                 'reference' => $this->item->reference,
                 'current_stock' => $this->item->current_stock,
+                'site' => $this->when(
+                    $this->item && $this->item->relationLoaded('site'),
+                    fn () => [
+                        'id' => $this->item->site->id,
+                        'name' => $this->item->site->name,
+                    ]
+                ),
             ]),
 
             // Supplier info
