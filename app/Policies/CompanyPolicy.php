@@ -13,20 +13,6 @@ class CompanyPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user is on the headquarters site before checking specific abilities.
-     * Companies can only be managed from the headquarters site.
-     */
-    public function before(User $user, string $ability): ?bool
-    {
-        // Companies can only be managed from the headquarters site
-        if (! isOnHeadquarters()) {
-            return false;
-        }
-
-        return null;
-    }
-
-    /**
      * Determine whether the user can view the list of companies.
      */
     public function viewAny(User $user): bool
@@ -47,7 +33,11 @@ class CompanyPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('company.create');
+        // Only HQ can create companies
+        if (isOnHeadquarters()) {
+            return $user->can('company.create');
+        }
+        return false;
     }
 
     /**
@@ -55,7 +45,11 @@ class CompanyPolicy
      */
     public function update(User $user, Company $company): bool
     {
-        return $user->can('company.update');
+        // Only HQ can update companies
+        if (isOnHeadquarters()) {
+            return $user->can('company.update');
+        }
+        return false;
     }
 
     /**
@@ -63,6 +57,10 @@ class CompanyPolicy
      */
     public function delete(User $user, Company $company): bool
     {
-        return $user->can('company.delete');
+        // Only HQ can delete companies
+        if (isOnHeadquarters()) {
+            return $user->can('company.delete');
+        }
+        return false;
     }
 }

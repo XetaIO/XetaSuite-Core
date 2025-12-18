@@ -50,6 +50,10 @@ class ItemMovementWithItemResource extends JsonResource
             // Creator info
             'created_by_id' => $this->created_by_id,
             'created_by_name' => $this->creator?->full_name ?? $this->created_by_name,
+            'creator' => $this->whenLoaded('creator', fn () => [
+                'id' => $this->creator->id,
+                'full_name' => $this->creator->full_name,
+            ]),
 
             // Related entity (maintenance, etc.)
             'movable_type' => $this->movable_type,

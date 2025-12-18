@@ -23,6 +23,12 @@ class ItemResource extends JsonResource
             'reference' => $this->reference,
             'description' => $this->description,
 
+            'site_id' => $this->site_id,
+            'site' => $this->whenLoaded('site', fn () => [
+                'id' => $this->site->id,
+                'name' => $this->site->name,
+            ]),
+
             // Supplier info
             'supplier_id' => $this->supplier_id,
             'supplier_name' => $this->supplier_name,

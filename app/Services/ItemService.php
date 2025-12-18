@@ -28,9 +28,15 @@ class ItemService
     {
         $currentSiteId = auth()->user()->current_site_id;
 
-        return Item::query()
-            ->with(['supplier', 'creator'])
-            ->where('site_id', $currentSiteId)
+        $query = Item::query()
+            ->with(['site', 'supplier', 'creator']);
+
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+
+        return $query
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when($filters['supplier_id'] ?? null, fn (Builder $query, int $supplierId) => $query->where('supplier_id', $supplierId))
             ->when($filters['stock_status'] ?? null, fn (Builder $query, string $status) => $this->applyStockStatusFilter($query, $status))

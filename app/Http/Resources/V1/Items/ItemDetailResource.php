@@ -25,6 +25,10 @@ class ItemDetailResource extends JsonResource
 
             // Site info
             'site_id' => $this->site_id,
+            'site' => $this->whenLoaded('site', fn () => [
+                'id' => $this->site->id,
+                'name' => $this->site->name,
+            ]),
 
             // Supplier info
             'supplier_id' => $this->supplier_id,

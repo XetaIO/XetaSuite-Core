@@ -13,20 +13,6 @@ class SupplierPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user is on the headquarters site before checking specific abilities.
-     * Suppliers can only be managed from the headquarters site.
-     */
-    public function before(User $user, string $ability): ?bool
-    {
-        // Suppliers can only be managed from the headquarters site
-        if (! isOnHeadquarters()) {
-            return false;
-        }
-
-        return null;
-    }
-
-    /**
      * Determine whether the user can view the list of suppliers.
      */
     public function viewAny(User $user): bool
@@ -47,7 +33,11 @@ class SupplierPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('supplier.create'); // && settings('supplier_create_enabled', true);
+        // Only HQ can create suppliers
+        if (isOnHeadquarters()) {
+            return $user->can('supplier.create');
+        }
+        return false;
     }
 
     /**
@@ -55,7 +45,11 @@ class SupplierPolicy
      */
     public function update(User $user, Supplier $supplier): bool
     {
-        return $user->can('supplier.update');
+        // Only HQ can update suppliers
+        if (isOnHeadquarters()) {
+            return $user->can('supplier.update');
+        }
+        return false;
     }
 
     /**
@@ -63,6 +57,10 @@ class SupplierPolicy
      */
     public function delete(User $user, Supplier $supplier): bool
     {
-        return $user->can('supplier.delete');
+        // Only HQ can delete suppliers
+        if (isOnHeadquarters()) {
+            return $user->can('supplier.delete');
+        }
+        return false;
     }
 }
