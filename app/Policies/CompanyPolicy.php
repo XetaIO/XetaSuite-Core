@@ -13,6 +13,19 @@ class CompanyPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from non-HQ
+        if (!isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of companies.
      */
     public function viewAny(User $user): bool
@@ -33,11 +46,7 @@ class CompanyPolicy
      */
     public function create(User $user): bool
     {
-        // Only HQ can create companies
-        if (isOnHeadquarters()) {
-            return $user->can('company.create');
-        }
-        return false;
+        return $user->can('company.create');
     }
 
     /**
@@ -45,11 +54,7 @@ class CompanyPolicy
      */
     public function update(User $user, Company $company): bool
     {
-        // Only HQ can update companies
-        if (isOnHeadquarters()) {
-            return $user->can('company.update');
-        }
-        return false;
+        return $user->can('company.update');
     }
 
     /**
@@ -57,10 +62,6 @@ class CompanyPolicy
      */
     public function delete(User $user, Company $company): bool
     {
-        // Only HQ can delete companies
-        if (isOnHeadquarters()) {
-            return $user->can('company.delete');
-        }
-        return false;
+        return $user->can('company.delete');
     }
 }

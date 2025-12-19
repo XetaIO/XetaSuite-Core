@@ -13,6 +13,24 @@ class ItemPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        // HQ : can see an item
+        if (isOnHeadquarters() && $ability === 'view') {
+            return $user->can('item.view');
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of items.
      * Items are filtered by current_site_id in the controller.
      */
@@ -27,10 +45,6 @@ class ItemPolicy
      */
     public function view(User $user, Item $item): bool
     {
-        if (isOnHeadquarters()) {
-            // HQ : can see all items
-            return $user->can('item.viewAny');
-        }
         return $user->can('item.viewAny')
             && $item->site_id === $user->current_site_id;
     }

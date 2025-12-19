@@ -13,6 +13,24 @@ class IncidentPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        // HQ : can see an incident
+        if (isOnHeadquarters() && $ability === 'view') {
+            return $user->can('incident.view');
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of incidents.
      * Incidents are filtered by current_site_id in the controller.
      */
@@ -27,10 +45,6 @@ class IncidentPolicy
      */
     public function view(User $user, Incident $incident): bool
     {
-        if (isOnHeadquarters()) {
-            // HQ : can see all incidents
-            return $user->can('incident.view');
-        }
         return $user->can('incident.viewAny') && $incident->site_id === $user->current_site_id;
     }
 
@@ -48,10 +62,6 @@ class IncidentPolicy
      */
     public function update(User $user, Incident $incident): bool
     {
-        // Disallow any modification from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('incident.update') && $incident->site_id === $user->current_site_id;
     }
 
@@ -61,10 +71,6 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
-        // Disallow any deletion from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('incident.delete') && $incident->site_id === $user->current_site_id;
     }
 }

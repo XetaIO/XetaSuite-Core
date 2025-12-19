@@ -13,6 +13,24 @@ class CleaningPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        // HQ : can see an cleaning
+        if (isOnHeadquarters() && $ability === 'view') {
+            return $user->can('cleaning.view');
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of cleanings.
      * Cleanings are filtered by current_site_id in the controller.
      */
@@ -27,10 +45,6 @@ class CleaningPolicy
      */
     public function view(User $user, Cleaning $cleaning): bool
     {
-        if (isOnHeadquarters()) {
-            // HQ : can see all cleanings
-            return $user->can('cleaning.view');
-        }
         return $user->can('cleaning.view') && $cleaning->site_id === $user->current_site_id;
     }
 
@@ -48,10 +62,6 @@ class CleaningPolicy
      */
     public function update(User $user, Cleaning $cleaning): bool
     {
-        // Disallow any modification from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('cleaning.update') && $cleaning->site_id === $user->current_site_id;
     }
 
@@ -61,10 +71,6 @@ class CleaningPolicy
      */
     public function delete(User $user, Cleaning $cleaning): bool
     {
-        // Disallow any modification from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('cleaning.delete') && $cleaning->site_id === $user->current_site_id;
     }
 }

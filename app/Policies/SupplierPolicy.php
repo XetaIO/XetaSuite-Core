@@ -13,11 +13,24 @@ class SupplierPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from non-HQ
+        if (!isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of suppliers.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('supplier.viewAny'); // && settings('supplier_manage_enabled', true);
+        return $user->can('supplier.viewAny');
     }
 
     /**
@@ -33,11 +46,7 @@ class SupplierPolicy
      */
     public function create(User $user): bool
     {
-        // Only HQ can create suppliers
-        if (isOnHeadquarters()) {
-            return $user->can('supplier.create');
-        }
-        return false;
+        return $user->can('supplier.create');
     }
 
     /**
@@ -45,11 +54,7 @@ class SupplierPolicy
      */
     public function update(User $user, Supplier $supplier): bool
     {
-        // Only HQ can update suppliers
-        if (isOnHeadquarters()) {
-            return $user->can('supplier.update');
-        }
-        return false;
+        return $user->can('supplier.update');
     }
 
     /**
@@ -57,10 +62,6 @@ class SupplierPolicy
      */
     public function delete(User $user, Supplier $supplier): bool
     {
-        // Only HQ can delete suppliers
-        if (isOnHeadquarters()) {
-            return $user->can('supplier.delete');
-        }
-        return false;
+        return $user->can('supplier.delete');
     }
 }

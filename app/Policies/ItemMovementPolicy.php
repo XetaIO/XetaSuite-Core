@@ -13,6 +13,19 @@ class ItemMovementPolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['view', 'update', 'delete'], true)) {
+            return $user->can('item-movement.' . $ability);
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view any movements.
      * Movements are scoped to items, which are scoped to sites.
      */
@@ -27,10 +40,6 @@ class ItemMovementPolicy
      */
     public function view(User $user, ItemMovement $movement): bool
     {
-        if (isOnHeadquarters()) {
-            // HQ : can see all item movements
-            return $user->can('item-movement.view');
-        }
         return $user->can('item-movement.view')
             && $movement->item?->site_id === $user->current_site_id;
     }
@@ -41,8 +50,7 @@ class ItemMovementPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('item-movement.create')
-            && $user->can('item.update');
+        return $user->can('item-movement.create');
     }
 
     /**
@@ -51,10 +59,6 @@ class ItemMovementPolicy
      */
     public function update(User $user, ItemMovement $movement): bool
     {
-        if (isOnHeadquarters()) {
-            // Disallow any modification from HQ
-            return $user->can('item-movement.update');
-        }
         return $user->can('item-movement.update')
             && $movement->item?->site_id === $user->current_site_id;
     }
@@ -65,10 +69,6 @@ class ItemMovementPolicy
      */
     public function delete(User $user, ItemMovement $movement): bool
     {
-        if (isOnHeadquarters()) {
-            // Disallow any modification from HQ
-            return $user->can('item-movement.delete');
-        }
         return $user->can('item-movement.delete')
             && $movement->item?->site_id === $user->current_site_id;
     }

@@ -13,6 +13,19 @@ class MaintenancePolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of maintenances.
      * Maintenances are filtered by current_site_id in the controller.
      */
@@ -27,11 +40,7 @@ class MaintenancePolicy
      */
     public function view(User $user, Maintenance $maintenance): bool
     {
-        if (isOnHeadquarters()) {
-            // HQ : can see all maintenances
-            return $user->can('maintenance.view');
-        }
-        return $user->can('maintenance.viewAny') && $maintenance->site_id === $user->current_site_id;
+        return $user->can('maintenance.view') && $maintenance->site_id === $user->current_site_id;
     }
 
     /**
@@ -48,10 +57,6 @@ class MaintenancePolicy
      */
     public function update(User $user, Maintenance $maintenance): bool
     {
-        // Disallow any modification from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('maintenance.update') && $maintenance->site_id === $user->current_site_id;
     }
 
@@ -61,10 +66,6 @@ class MaintenancePolicy
      */
     public function delete(User $user, Maintenance $maintenance): bool
     {
-        // Disallow any deletion from HQ
-        if (isOnHeadquarters()) {
-            return false;
-        }
         return $user->can('maintenance.delete') && $maintenance->site_id === $user->current_site_id;
     }
 }
