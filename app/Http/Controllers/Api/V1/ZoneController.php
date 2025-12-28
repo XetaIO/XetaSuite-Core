@@ -181,4 +181,72 @@ class ZoneController extends Controller
             ]),
         ]);
     }
+
+    /**
+     * Get hierarchical tree of zones for a site.
+     * On HQ: can view any site's zones via site_id query param.
+     * On regular site: only shows zones for current site.
+     */
+    public function tree(): JsonResponse
+    {
+        $this->authorize('viewAny', Zone::class);
+
+        // Determine which site to show zones for
+        $siteId = auth()->user()->current_site_id;
+
+        // If on HQ and site_id is provided, use that site
+        if (isOnHeadquarters() && request()->has('site_id')) {
+            $siteId = (int) request('site_id');
+        }
+
+        $zones = $this->zoneService->getZoneTree($siteId);
+
+        return response()->json([
+            'data' => $this->formatZoneTree($zones),
+            'meta' => [
+                'site_id' => $siteId,
+                'total_zones' => $this->countTotalZones($zones),
+            ],
+        ]);
+    }
+
+    /**
+     * Format zones tree for JSON response.
+     */
+    private function formatZoneTree($zones): array
+    {
+        return $zones->map(function ($zone) {
+            return [
+                'id' => $zone->id,
+                'name' => $zone->name,
+                'allow_material' => $zone->allow_material,
+                'children_count' => $zone->children_count ?? 0,
+                'material_count' => $zone->material_count ?? 0,
+                'children' => $zone->relationLoaded('childrenRecursive')
+                    ? $this->formatZoneTree($zone->childrenRecursive)
+                    : [],
+                'materials' => $zone->relationLoaded('materials')
+                    ? $zone->materials->map(fn ($m) => [
+                        'id' => $m->id,
+                        'name' => $m->name,
+                        'description' => $m->description,
+                    ])->toArray()
+                    : [],
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Count total zones in tree recursively.
+     */
+    private function countTotalZones($zones): int
+    {
+        $count = $zones->count();
+        foreach ($zones as $zone) {
+            if ($zone->relationLoaded('childrenRecursive')) {
+                $count += $this->countTotalZones($zone->childrenRecursive);
+            }
+        }
+        return $count;
+    }
 }

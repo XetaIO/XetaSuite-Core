@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Queue;
 use XetaSuite\Actions\ItemMovements\CreateItemMovement;
 use XetaSuite\Actions\ItemMovements\DeleteItemMovement;
 use XetaSuite\Actions\ItemMovements\UpdateItemMovement;
-use XetaSuite\Jobs\CheckItemCriticalStock;
+use XetaSuite\Jobs\Item\CheckItemCriticalStock;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;

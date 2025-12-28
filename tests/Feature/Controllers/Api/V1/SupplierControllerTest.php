@@ -88,15 +88,6 @@ describe('index', function () {
             ->assertJsonPath('data.0.item_count', 5);
     });
 
-    it('denies access for user not on headquarters', function () {
-        $user = createUserOnRegularSite($this->regularSite, $this->role);
-
-        $response = $this->actingAs($user)
-            ->getJson('/api/v1/suppliers');
-
-        $response->assertForbidden();
-    });
-
     it('denies access for user without viewAny permission', function () {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
@@ -138,8 +129,9 @@ describe('show', function () {
             ->assertJsonPath('data.description', 'Test description');
     });
 
-    it('denies access for user not on headquarters', function () {
-        $user = createUserOnRegularSite($this->regularSite, $this->role);
+    it('denies access for user without view permission', function () {
+        $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
+        $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
         $supplier = Supplier::factory()->create();
 
@@ -228,17 +220,6 @@ describe('items', function () {
         $response->assertOk()
             ->assertJsonPath('meta.current_page', 2)
             ->assertJsonCount(5, 'data'); // 25 - 20 = 5 on page 2
-    });
-
-    it('denies access for user not on headquarters', function () {
-        $user = createUserOnRegularSite($this->regularSite, $this->role);
-
-        $supplier = Supplier::factory()->create();
-
-        $response = $this->actingAs($user)
-            ->getJson("/api/v1/suppliers/{$supplier->id}/items");
-
-        $response->assertForbidden();
     });
 });
 

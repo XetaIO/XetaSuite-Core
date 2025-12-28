@@ -16,6 +16,10 @@ use XetaSuite\Actions\Materials\DeleteMaterial;
 use XetaSuite\Actions\Materials\UpdateMaterial;
 use XetaSuite\Http\Requests\V1\Materials\StoreMaterialRequest;
 use XetaSuite\Http\Requests\V1\Materials\UpdateMaterialRequest;
+use XetaSuite\Http\Resources\V1\Cleanings\CleaningResource;
+use XetaSuite\Http\Resources\V1\Incidents\IncidentResource;
+use XetaSuite\Http\Resources\V1\Items\ItemResource;
+use XetaSuite\Http\Resources\V1\Maintenances\MaintenanceResource;
 use XetaSuite\Http\Resources\V1\Materials\MaterialDetailResource;
 use XetaSuite\Http\Resources\V1\Materials\MaterialResource;
 use XetaSuite\Models\Material;
@@ -190,5 +194,73 @@ class MaterialController extends Controller
                 'size' => $size,
             ],
         ]);
+    }
+
+    /**
+     * Get incidents for a specific material.
+     *
+     * @param  Material  $material  The material to get incidents for.
+     */
+    public function incidents(Material $material): AnonymousResourceCollection
+    {
+        $this->authorize('view', $material);
+
+        $incidents = $this->materialService->getMaterialIncidents($material, [
+            'per_page' => request('per_page', 10),
+            'search' => request('search'),
+        ]);
+
+        return IncidentResource::collection($incidents);
+    }
+
+    /**
+     * Get maintenances for a specific material.
+     *
+     * @param  Material  $material  The material to get maintenances for.
+     */
+    public function maintenances(Material $material): AnonymousResourceCollection
+    {
+        $this->authorize('view', $material);
+
+        $maintenances = $this->materialService->getMaterialMaintenances($material, [
+            'per_page' => request('per_page', 10),
+            'search' => request('search'),
+        ]);
+
+        return MaintenanceResource::collection($maintenances);
+    }
+
+    /**
+     * Get cleanings for a specific material.
+     *
+     * @param  Material  $material  The material to get cleanings for.
+     */
+    public function cleanings(Material $material): AnonymousResourceCollection
+    {
+        $this->authorize('view', $material);
+
+        $cleanings = $this->materialService->getMaterialCleanings($material, [
+            'per_page' => request('per_page', 10),
+            'search' => request('search'),
+        ]);
+
+        return CleaningResource::collection($cleanings);
+    }
+
+    /**
+     * Get items for a specific material.
+     *
+     * @param  Material  $material  The material to get items for.
+     */
+    public function items(Material $material): AnonymousResourceCollection
+    {
+        $this->authorize('view', $material);
+
+        $items = $this->materialService->getMaterialItems($material, [
+            'per_page' => request('per_page', 10),
+            'search' => request('search'),
+        ]);
+
+        return ItemResource::collection($items);
     }
 }

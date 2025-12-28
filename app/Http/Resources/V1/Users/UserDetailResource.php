@@ -25,7 +25,6 @@ class UserDetailResource extends JsonResource
             'locale' => $this->locale,
             'office_phone' => $this->office_phone,
             'cell_phone' => $this->cell_phone,
-            'end_employment_contract' => $this->end_employment_contract?->toISOString(),
             'incident_count' => $this->incident_count,
             'maintenance_count' => $this->maintenance_count,
             'cleaning_count' => $this->cleaning_count,

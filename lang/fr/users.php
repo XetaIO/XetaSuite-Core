@@ -15,7 +15,6 @@ return [
     'locale' => 'Langue',
     'office_phone' => 'Téléphone bureau',
     'cell_phone' => 'Téléphone portable',
-    'end_employment_contract' => 'Fin de contrat de travail',
     'sites' => 'Sites',
     'site' => 'Site',
     'roles' => 'Rôles',

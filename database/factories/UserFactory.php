@@ -36,7 +36,6 @@ class UserFactory extends Factory
             'cell_phone' => $this->faker->optional()->phoneNumber(),
             'remember_token' => Str::random(10),
             'current_site_id' => null,
-            'end_employment_contract' => null,
             'password_setup_at' => now(),
             'locale' => 'en',
         ];

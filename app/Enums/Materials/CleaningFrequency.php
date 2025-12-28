@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace XetaSuite\Enums\Materials;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonImmutable;
 
 enum CleaningFrequency: string
 {
@@ -21,13 +21,9 @@ enum CleaningFrequency: string
         };
     }
 
-    public function nextCleaningDate(Carbon $lastCleaning): Carbon
+    public function nextCleaningDate(CarbonImmutable $lastCleaning, int $frequencyRepeatedly): CarbonImmutable
     {
-        return match ($this) {
-            self::DAILY => $lastCleaning->addDay(),
-            self::WEEKLY => $lastCleaning->addWeek(),
-            self::MONTHLY => $lastCleaning->addMonth(),
-        };
+        return $lastCleaning->addDays($this->frequencyInDays() * $frequencyRepeatedly);
     }
 
     public function frequencyInDays(): int

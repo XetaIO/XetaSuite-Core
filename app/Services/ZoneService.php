@@ -18,15 +18,20 @@ class ZoneService
      */
     public function getPaginatedZones(array $filters = []): LengthAwarePaginator
     {
-        return Zone::query()
+        $query = Zone::query()
             ->with(['site', 'parent'])
-            ->withCount(['children', 'materials'])
-            ->where('site_id', auth()->user()->current_site_id)
-            /* ->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->where('site_id', $siteId)) */
-            /*->when(
-                array_key_exists('parent_id', $filters),
-                fn (Builder $query) => $query->where('parent_id', $filters['parent_id'])
-            )*/
+            ->withCount(['children', 'materials']);
+
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+        /* ->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->where('site_id', $siteId)) */
+        /*->when(
+            array_key_exists('parent_id', $filters),
+            fn (Builder $query) => $query->where('parent_id', $filters['parent_id'])
+        )*/
+        return $query
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when(
                 $filters['sort_by'] ?? null,
@@ -105,5 +110,21 @@ class ZoneService
         }
 
         return $query;
+    }
+
+    /**
+     * Get hierarchical tree of zones for a site.
+     * Returns only root zones (parent_id = null) with nested children loaded recursively.
+     * Also includes materials for zones that allow them.
+     */
+    public function getZoneTree(int $siteId): Collection
+    {
+        return Zone::query()
+            ->where('site_id', $siteId)
+            ->whereNull('parent_id') // Only root zones
+            ->with(['childrenRecursive', 'materials:id,zone_id,name,description'])
+            ->withCount(['children', 'materials'])
+            ->orderBy('name')
+            ->get();
     }
 }

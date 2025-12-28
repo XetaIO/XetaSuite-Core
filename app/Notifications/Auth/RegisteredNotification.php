@@ -36,21 +36,23 @@ class RegisteredNotification extends Notification
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return (new MailMessage())
-            ->greeting(new HtmlString('<strong>Welcome to the '.config('APP_NAME').', '.$notifiable->full_name.' !</strong>'))
-            ->line(new HtmlString('Your account has just been created on the website '.config('APP_NAME').' .'))
-            ->line(new HtmlString('Before you can log in to the site, you must create a password for your account.'))
-            ->action('Create my password', $verificationUrl)
+            ->greeting(new HtmlString('<strong>'.__('notifications.registered.greeting', ['app' => config('app.name'), 'name' => $notifiable->full_name]).'</strong>'))
+            ->line(new HtmlString(__('notifications.registered.line1', ['app' => config('app.name')])))
+            ->line(new HtmlString(__('notifications.registered.line2')))
+            ->action(__('notifications.registered.action'), $verificationUrl)
             ->level('primary')
-            ->line(new HtmlString('<strong>Note: Never share your password with anyone. The IT team does not need your password to interact with your account if they need to.</strong>'))
-            ->subject('Welcome to the '.config('APP_NAME').', '.$notifiable->full_name.' !');
+            ->line(new HtmlString('<strong>'.__('notifications.registered.warning').'</strong>'))
+            ->subject(__('notifications.registered.subject', ['app' => config('app.name'), 'name' => $notifiable->full_name]));
     }
 
     /**
      * Get the verification URL for the given notifiable.
+     * Generates a URL pointing to the frontend app with signed query parameters.
      */
     protected function verificationUrl(User $notifiable): string
     {
-        return URL::temporarySignedRoute(
+        // Generate the signed URL with backend route for signature validation
+        $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(Config::get('auth.password_setup.timeout', 1440)),
             [
@@ -58,5 +60,14 @@ class RegisteredNotification extends Notification
                 'hash' => sha1($notifiable->getEmailForSetup()),
             ]
         );
+
+        // Extract query parameters (signature & expires) from signed URL
+        $parsedUrl = parse_url($signedUrl);
+        $queryString = $parsedUrl['query'] ?? '';
+
+        // Build frontend URL with the signed parameters
+        $frontendUrl = Config::get('app.frontend_url', 'http://localhost:5173');
+
+        return $frontendUrl.'/setup-password/'.$notifiable->getKey().'/'.sha1($notifiable->getEmailForSetup()).'?'.$queryString;
     }
 }

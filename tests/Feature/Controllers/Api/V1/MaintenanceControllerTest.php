@@ -25,6 +25,7 @@ beforeEach(function () {
 
     // Create permissions
     $permissions = [
+        'maintenance.view',
         'maintenance.viewAny',
         'maintenance.create',
         'maintenance.update',

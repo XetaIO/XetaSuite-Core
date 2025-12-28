@@ -21,7 +21,7 @@ class SettingFactory extends Factory
             'text' => $this->faker->sentence,
             'label' => $this->faker->word,
             'label_info' => $this->faker->sentence,
-            'last_updated_user_id' => null,
+            'updated_by_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -53,7 +53,7 @@ class SettingFactory extends Factory
     public function withLastUpdater(int $userId): self
     {
         return $this->state(fn () => [
-            'last_updated_user_id' => $userId,
+            'updated_by_id' => $userId,
         ]);
     }
 }

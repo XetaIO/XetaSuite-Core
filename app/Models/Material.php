@@ -61,6 +61,14 @@ class Material extends Model
     ];
 
     /**
+     * Get the site that owns the material.
+     */
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class);
+    }
+
+    /**
      * Get the zone that owns the material.
      */
     public function zone(): BelongsTo

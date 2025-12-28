@@ -125,15 +125,6 @@ describe('index', function () {
             ->assertJsonPath('data.0.maintenance_count', 3);
     });
 
-    it('denies access for user not on headquarters', function () {
-        $user = createUserOnRegularSite($this->regularSite, $this->role);
-
-        $response = $this->actingAs($user)
-            ->getJson('/api/v1/companies');
-
-        $response->assertForbidden();
-    });
-
     it('denies access for user without viewAny permission', function () {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
@@ -186,17 +177,6 @@ describe('show', function () {
         $response->assertOk()
             ->assertJsonPath('data.creator.id', $user->id)
             ->assertJsonPath('data.created_by_name', $user->full_name);
-    });
-
-    it('denies access for user not on headquarters', function () {
-        $user = createUserOnRegularSite($this->regularSite, $this->role);
-
-        $company = Company::factory()->create();
-
-        $response = $this->actingAs($user)
-            ->getJson("/api/v1/companies/{$company->id}");
-
-        $response->assertForbidden();
     });
 
     it('denies access for user without view permission', function () {

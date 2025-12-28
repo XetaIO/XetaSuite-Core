@@ -630,3 +630,130 @@ describe('availableParents', function () {
         expect($names)->toContain('Zone 3');
     });
 });
+
+// ============================================================================
+// TREE TESTS
+// ============================================================================
+
+describe('tree', function () {
+    it('returns hierarchical zone tree for user current site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        // Create hierarchical zones
+        $rootZone = Zone::factory()->forSite($this->regularSite)->create(['name' => 'Root Zone']);
+        $childZone = Zone::factory()->forSite($this->regularSite)->create([
+            'name' => 'Child Zone',
+            'parent_id' => $rootZone->id,
+        ]);
+        $grandchildZone = Zone::factory()->forSite($this->regularSite)->create([
+            'name' => 'Grandchild Zone',
+            'parent_id' => $childZone->id,
+        ]);
+
+        // Create zone on another site (should not appear)
+        Zone::factory()->forSite($this->otherSite)->create(['name' => 'Other Site Zone']);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/zones/tree');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'allow_material',
+                    'children_count',
+                    'material_count',
+                    'children',
+                ],
+            ],
+            'meta' => [
+                'site_id',
+                'total_zones',
+            ],
+        ]);
+
+        // Only root zones should be at top level
+        $topLevelNames = collect($response->json('data'))->pluck('name');
+        expect($topLevelNames)->toContain('Root Zone');
+        expect($topLevelNames)->not->toContain('Child Zone');
+        expect($topLevelNames)->not->toContain('Other Site Zone');
+
+        // Check total count
+        expect($response->json('meta.total_zones'))->toBe(3);
+    });
+
+    it('returns nested children recursively', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $rootZone = Zone::factory()->forSite($this->regularSite)->create(['name' => 'Root']);
+        $childZone = Zone::factory()->forSite($this->regularSite)->create([
+            'name' => 'Child',
+            'parent_id' => $rootZone->id,
+        ]);
+        Zone::factory()->forSite($this->regularSite)->create([
+            'name' => 'Grandchild',
+            'parent_id' => $childZone->id,
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/zones/tree');
+
+        $response->assertOk();
+
+        $data = $response->json('data');
+        expect($data)->toHaveCount(1);
+        expect($data[0]['name'])->toBe('Root');
+        expect($data[0]['children'])->toHaveCount(1);
+        expect($data[0]['children'][0]['name'])->toBe('Child');
+        expect($data[0]['children'][0]['children'])->toHaveCount(1);
+        expect($data[0]['children'][0]['children'][0]['name'])->toBe('Grandchild');
+    });
+
+    it('allows HQ users to view zones for any site', function () {
+        $user = createUserOnHeadquarters($this->headquarters, $this->role);
+
+        // Create zones on regular site
+        Zone::factory()->forSite($this->regularSite)->create(['name' => 'Regular Site Zone']);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/zones/tree?site_id={$this->regularSite->id}");
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('name');
+        expect($names)->toContain('Regular Site Zone');
+        expect($response->json('meta.site_id'))->toBe($this->regularSite->id);
+    });
+
+    it('ignores site_id parameter for non-HQ users', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        // Create zones on both sites
+        Zone::factory()->forSite($this->regularSite)->create(['name' => 'My Site Zone']);
+        Zone::factory()->forSite($this->otherSite)->create(['name' => 'Other Site Zone']);
+
+        // Try to access other site's zones
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/zones/tree?site_id={$this->otherSite->id}");
+
+        $response->assertOk();
+        $names = collect($response->json('data'))->pluck('name');
+        // Should only see current site's zones
+        expect($names)->toContain('My Site Zone');
+        expect($names)->not->toContain('Other Site Zone');
+    });
+
+    it('denies access for user without viewAny permission', function () {
+        $roleWithoutPermission = Role::create(['name' => 'no-zone-access', 'guard_name' => 'web']);
+        $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
+
+        $response = $this->actingAs($user)->getJson('/api/v1/zones/tree');
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $response = $this->getJson('/api/v1/zones/tree');
+
+        $response->assertUnauthorized();
+    });
+});

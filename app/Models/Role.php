@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace XetaSuite\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Models\Role as SpatieRole;
-use XetaSuite\Models\Presenters\RolePresenter;
 
 class Role extends SpatieRole
 {
-    use RolePresenter;
-
     /**
      * The accessors to append to the model's array form.
      *
@@ -19,4 +17,19 @@ class Role extends SpatieRole
     protected $appends = [
         'formatted_color',
     ];
+
+    /**
+     * A role belongs to some users.
+     * Override to explicitly use the User model class.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->morphedByMany(
+            User::class,
+            'model',
+            config('permission.table_names.model_has_roles'),
+            'role_id',
+            config('permission.column_names.model_morph_key')
+        )->withPivot('site_id');
+    }
 }

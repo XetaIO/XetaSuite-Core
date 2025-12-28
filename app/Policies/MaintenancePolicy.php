@@ -22,6 +22,11 @@ class MaintenancePolicy
             return false;
         }
 
+        // HQ : can see an maintenance
+        if (isOnHeadquarters() && $ability === 'view') {
+            return $user->can('maintenance.view');
+        }
+
         return null;
     }
 

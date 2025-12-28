@@ -85,4 +85,25 @@ class Zone extends Model
     {
         return $this->children()->with('descendants');
     }
+
+    /**
+     * Scope to load children recursively with counts.
+     */
+    public function scopeWithRecursiveChildren($query): void
+    {
+        $query->with(['children' => function ($q) {
+            $q->withRecursiveChildren();
+        }])->withCount(['children', 'materials']);
+    }
+
+    /**
+     * Get children with recursive loading for tree view.
+     */
+    public function childrenRecursive(): HasMany
+    {
+        return $this->children()
+            ->with(['childrenRecursive', 'materials:id,zone_id,name,description'])
+            ->withCount(['children', 'materials'])
+            ->orderBy('name');
+    }
 }

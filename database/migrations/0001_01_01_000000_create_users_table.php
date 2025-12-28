@@ -35,7 +35,6 @@ return new class () extends Migration {
             $table->unsignedInteger('item_entry_count')->default(0);
             $table->unsignedInteger('cleaning_count')->default(0);
 
-            $table->timestamp('end_employment_contract')->nullable();
             $table->ipAddress('last_login_ip')->nullable();
             $table->dateTime('last_login_date')->nullable();
             $table->timestamp('password_setup_at')->nullable();

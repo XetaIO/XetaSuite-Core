@@ -12,7 +12,10 @@ use XetaSuite\Http\Controllers\Api\V1\ItemController;
 use XetaSuite\Http\Controllers\Api\V1\ItemMovementController;
 use XetaSuite\Http\Controllers\Api\V1\MaintenanceController;
 use XetaSuite\Http\Controllers\Api\V1\MaterialController;
+use XetaSuite\Http\Controllers\Api\V1\NotificationController;
+use XetaSuite\Http\Controllers\Api\V1\PermissionController;
 use XetaSuite\Http\Controllers\Api\V1\QrCodeScanController;
+use XetaSuite\Http\Controllers\Api\V1\RoleController;
 use XetaSuite\Http\Controllers\Api\V1\SettingsController;
 use XetaSuite\Http\Controllers\Api\V1\SiteController;
 use XetaSuite\Http\Controllers\Api\V1\SupplierController;
@@ -44,6 +47,15 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     // Update user current site
     Route::patch('/user/site', UserSiteController::class);
 
+    // Notifications (authenticated user)
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread', [NotificationController::class, 'unread']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
+    Route::delete('notifications', [NotificationController::class, 'destroyAll']);
+
     // Sites (headquarters only - enforced by SitePolicy)
     Route::apiResource('sites', SiteController::class);
     Route::get('sites/{site}/users', [SiteController::class, 'users']);
@@ -60,6 +72,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
     // Zones (site-scoped - enforced by ZonePolicy)
     Route::get('zones/available-parents', [ZoneController::class, 'availableParents']);
+    Route::get('zones/tree', [ZoneController::class, 'tree']);
     Route::apiResource('zones', ZoneController::class);
     Route::get('zones/{zone}/children', [ZoneController::class, 'children']);
     Route::get('zones/{zone}/materials', [ZoneController::class, 'materials']);
@@ -74,6 +87,10 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::apiResource('materials', MaterialController::class);
     Route::get('materials/{material}/stats', [MaterialController::class, 'stats']);
     Route::get('materials/{material}/qr-code', [MaterialController::class, 'qrCode']);
+    Route::get('materials/{material}/incidents', [MaterialController::class, 'incidents']);
+    Route::get('materials/{material}/maintenances', [MaterialController::class, 'maintenances']);
+    Route::get('materials/{material}/cleanings', [MaterialController::class, 'cleanings']);
+    Route::get('materials/{material}/items', [MaterialController::class, 'items']);
 
     // Items (site-scoped - enforced by ItemPolicy)
     Route::get('items/available-suppliers', [ItemController::class, 'availableSuppliers']);
@@ -122,8 +139,27 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('maintenances/{maintenance}/incidents', [MaintenanceController::class, 'incidents']);
     Route::get('maintenances/{maintenance}/item-movements', [MaintenanceController::class, 'itemMovements']);
 
-    // Settings (global app settings for frontend)
-    Route::get('settings', [SettingsController::class, 'index']);
+    // Settings Management (headquarters only - enforced by SettingPolicy)
+    Route::get('settings/manage', [SettingsController::class, 'index']);
+    Route::get('settings/{setting}', [SettingsController::class, 'show']);
+    Route::put('settings/{setting}', [SettingsController::class, 'update']);
+
+    // Settings Public (simple key-value for frontend)
+    Route::get('settings', [SettingsController::class, 'public']);
+
+    // Roles (headquarters only - enforced by RolePolicy)
+    Route::get('roles/available-permissions', [RoleController::class, 'availablePermissions']);
+    Route::apiResource('roles', RoleController::class);
+    Route::get('roles/{role}/users', [RoleController::class, 'users']);
+
+    // Permissions (headquarters only - enforced by PermissionPolicy)
+    Route::get('permissions/available-roles', [PermissionController::class, 'availableRoles']);
+    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::post('permissions', [PermissionController::class, 'store']);
+    Route::get('permissions/{permission}', [PermissionController::class, 'show']);
+    Route::put('permissions/{permission}', [PermissionController::class, 'update']);
+    Route::delete('permissions/{permission}', [PermissionController::class, 'destroy']);
+    Route::get('permissions/{permission}/roles', [PermissionController::class, 'roles']);
 
     // Users (enforced by UserPolicy)
     Route::get('users/available-sites', [UserController::class, 'availableSites']);

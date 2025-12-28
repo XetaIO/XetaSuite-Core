@@ -888,3 +888,245 @@ describe('qrCode', function () {
         $response->assertUnauthorized();
     });
 });
+
+// ============================================================================
+// INCIDENTS ENDPOINT TESTS
+// ============================================================================
+
+describe('incidents', function () {
+    it('returns paginated incidents for a material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Incident::factory()->count(3)->forMaterial($material)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/incidents");
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'description', 'status', 'severity', 'material_id', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
+    });
+
+    it('filters incidents by search term', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Incident::factory()->forMaterial($material)->create(['description' => 'Broken door']);
+        Incident::factory()->forMaterial($material)->create(['description' => 'Leaking pipe']);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/incidents?search=door");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data');
+        expect($response->json('data.0.description'))->toBe('Broken door');
+    });
+
+    it('cannot view incidents for material from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$otherMaterial->id}/incidents");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/incidents");
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// MAINTENANCES ENDPOINT TESTS
+// ============================================================================
+
+describe('maintenances', function () {
+    it('returns paginated maintenances for a material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Maintenance::factory()->count(3)->forSite($this->regularSite)->forMaterial($material)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/maintenances");
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'description', 'reason', 'type', 'status', 'material_id', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
+    });
+
+    it('filters maintenances by search term', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Maintenance::factory()->forSite($this->regularSite)->forMaterial($material)->create(['reason' => 'Annual checkup']);
+        Maintenance::factory()->forSite($this->regularSite)->forMaterial($material)->create(['reason' => 'Emergency repair']);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/maintenances?search=checkup");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data');
+        expect($response->json('data.0.reason'))->toBe('Annual checkup');
+    });
+
+    it('cannot view maintenances for material from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$otherMaterial->id}/maintenances");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/maintenances");
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// CLEANINGS ENDPOINT TESTS
+// ============================================================================
+
+describe('cleanings', function () {
+    it('returns paginated cleanings for a material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Cleaning::factory()->count(3)->forSite($this->regularSite)->forMaterial($material)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/cleanings");
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'description', 'type', 'material_id', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
+    });
+
+    it('filters cleanings by search term', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        Cleaning::factory()->forSite($this->regularSite)->forMaterial($material)->create(['description' => 'Deep cleaning']);
+        Cleaning::factory()->forSite($this->regularSite)->forMaterial($material)->create(['description' => 'Quick wipe']);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/cleanings?search=deep");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data');
+        expect($response->json('data.0.description'))->toBe('Deep cleaning');
+    });
+
+    it('cannot view cleanings for material from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$otherMaterial->id}/cleanings");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/cleanings");
+
+        $response->assertUnauthorized();
+    });
+});
+
+// ============================================================================
+// ITEMS ENDPOINT TESTS
+// ============================================================================
+
+describe('items', function () {
+    it('returns paginated items for a material', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        $items = Item::factory()->count(3)->forSite($this->regularSite)->create();
+        $material->items()->attach($items->pluck('id'));
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/items");
+
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name', 'reference', 'current_stock', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
+    });
+
+    it('filters items by search term', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+        $item1 = Item::factory()->forSite($this->regularSite)->create(['name' => 'Filter Oil']);
+        $item2 = Item::factory()->forSite($this->regularSite)->create(['name' => 'Brake Pad']);
+        $material->items()->attach([$item1->id, $item2->id]);
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$material->id}/items?search=filter");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data');
+        expect($response->json('data.0.name'))->toBe('Filter Oil');
+    });
+
+    it('cannot view items for material from another site', function () {
+        $user = createUserOnRegularSite($this->regularSite, $this->role);
+
+        $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
+
+        $response = $this->actingAs($user)
+            ->getJson("/api/v1/materials/{$otherMaterial->id}/items");
+
+        $response->assertForbidden();
+    });
+
+    it('requires authentication', function () {
+        $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
+
+        $response = $this->getJson("/api/v1/materials/{$material->id}/items");
+
+        $response->assertUnauthorized();
+    });
+});

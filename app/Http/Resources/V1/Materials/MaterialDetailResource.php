@@ -18,6 +18,11 @@ class MaterialDetailResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'site_id' => $this->site_id,
+            'site' => $this->whenLoaded('site', fn () => [
+                'id' => $this->site->id,
+                'name' => $this->site->name,
+            ]),
 
             // Zone info
             'zone_id' => $this->zone_id,

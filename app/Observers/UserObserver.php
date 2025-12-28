@@ -19,6 +19,14 @@ use XetaSuite\Models\User;
 class UserObserver
 {
     /**
+     * Handle the User "created" event.
+     */
+    public function created(User $user): void
+    {
+        $user->sendEmailRegisteredNotification();
+    }
+
+    /**
      * Handle the User "deleting" event.
      */
     public function deleting(User $user): void

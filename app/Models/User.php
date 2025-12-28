@@ -55,7 +55,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'locale',
         'office_phone',
         'cell_phone',
-        'end_employment_contract',
         'current_site_id',
     ];
 
@@ -78,7 +77,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password_setup_at' => 'datetime',
         'password' => 'hashed',
         'last_login_date' => 'datetime',
-        'end_employment_contract' => 'datetime',
     ];
 
     /**
@@ -145,7 +143,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function notifications(): MorphMany
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')
-            ->orderBy('read_at', 'asc')
+            ->orderByRaw('read_at IS NOT NULL')  // Unread (NULL) first
             ->orderBy('created_at', 'desc');
     }
 

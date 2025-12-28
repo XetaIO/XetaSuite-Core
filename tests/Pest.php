@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Http;
 use Spatie\Permission\Models\Role;
 use XetaSuite\Models\Site;
 use XetaSuite\Models\User;
@@ -88,4 +89,31 @@ function createUserOnRegularSite(Site $site, Role $role): User
     ]);
 
     return $user;
+}
+
+/**
+ * Helper function to mock successful reCAPTCHA verification
+ */
+function mockSuccessfulRecaptcha(): void
+{
+    Http::fake([
+        'https://www.google.com/recaptcha/api/siteverify*' => Http::response([
+            'success' => true,
+            'score' => 0.9,
+            'action' => 'forgot_password',
+        ]),
+    ]);
+}
+
+/**
+ * Helper function to mock failed reCAPTCHA verification
+ */
+function mockFailedRecaptcha(): void
+{
+    Http::fake([
+        'https://www.google.com/recaptcha/api/siteverify*' => Http::response([
+            'success' => false,
+            'error-codes' => ['invalid-input-response'],
+        ]),
+    ]);
 }

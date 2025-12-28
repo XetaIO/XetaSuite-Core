@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Actions\Users;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use XetaSuite\Models\User;
 
@@ -22,30 +23,30 @@ class CreateUser
      *     locale?: string,
      *     office_phone?: string,
      *     cell_phone?: string,
-     *     end_employment_contract?: string,
      *     sites?: array<int, array{id: int, roles?: array<string>, permissions?: array<string>}>,
      * }  $data
      */
     public function handle(array $data): User
     {
-        $user = User::create([
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'password' => isset($data['password']) ? Hash::make($data['password']) : null,
-            'locale' => $data['locale'] ?? 'fr',
-            'office_phone' => $data['office_phone'] ?? null,
-            'cell_phone' => $data['cell_phone'] ?? null,
-            'end_employment_contract' => $data['end_employment_contract'] ?? null,
-        ]);
+        return DB::transaction(function () use ($data) {
+            $user = User::create([
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'password' => isset($data['password']) ? Hash::make($data['password']) : null,
+                'locale' => $data['locale'] ?? 'fr',
+                'office_phone' => $data['office_phone'] ?? null,
+                'cell_phone' => $data['cell_phone'] ?? null
+            ]);
 
-        // Assign sites with roles and permissions
-        if (! empty($data['sites'])) {
-            $this->assignSitesWithRolesAndPermissions($user, $data['sites']);
-        }
+            // Assign sites with roles and permissions
+            if (! empty($data['sites'])) {
+                $this->assignSitesWithRolesAndPermissions($user, $data['sites']);
+            }
 
-        return $user->fresh(['sites']);
+            return $user->fresh(['sites']);
+        });
     }
 
     /**

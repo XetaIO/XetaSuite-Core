@@ -45,7 +45,7 @@ class ItemPolicy
      */
     public function view(User $user, Item $item): bool
     {
-        return $user->can('item.viewAny')
+        return $user->can('item.view')
             && $item->site_id === $user->current_site_id;
     }
 
@@ -63,10 +63,6 @@ class ItemPolicy
      */
     public function update(User $user, Item $item): bool
     {
-        if (isOnHeadquarters()) {
-            // Disallow any modification from HQ
-            return false;
-        }
         return $user->can('item.update')
             && $item->site_id === $user->current_site_id;
     }
@@ -77,10 +73,6 @@ class ItemPolicy
      */
     public function delete(User $user, Item $item): bool
     {
-        if (isOnHeadquarters()) {
-            // Disallow any modification from HQ
-            return false;
-        }
         return $user->can('item.delete')
             && $item->site_id === $user->current_site_id;
     }

@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
 
+        // Register middleware aliases
+        $middleware->alias([
+            'recaptcha' => \XetaSuite\Http\Middleware\VerifyRecaptcha::class,
+        ]);
+
         // Middlewares for web routes
         $middleware->web(append: [
             \XetaSuite\Http\Middleware\SetLocale::class,

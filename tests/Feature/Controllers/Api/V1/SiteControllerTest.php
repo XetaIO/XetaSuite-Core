@@ -712,7 +712,7 @@ describe('managers', function () {
             ->assertJsonStructure([
                 'data' => [
                     'managers' => [
-                        '*' => ['id', 'first_name', 'last_name', 'full_name', 'avatar'],
+                        '*' => ['id', 'first_name', 'last_name', 'full_name'],
                     ],
                 ],
             ]);

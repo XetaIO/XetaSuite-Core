@@ -87,16 +87,16 @@ describe('index', function () {
     it('can search users by name or email', function () {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
-        User::factory()->withSite($this->headquarters)->create(['first_name' => 'John', 'last_name' => 'Doe']);
+        User::factory()->withSite($this->headquarters)->create(['first_name' => 'Zephyrin', 'last_name' => 'Doe']);
         User::factory()->withSite($this->headquarters)->create(['first_name' => 'Jane', 'last_name' => 'Smith']);
         User::factory()->withSite($this->headquarters)->create(['email' => 'unique@test.com']);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/users?search=John');
+            ->getJson('/api/v1/users?search=Zephyrin');
 
         $response->assertOk()
             ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.first_name', 'John');
+            ->assertJsonPath('data.0.first_name', 'Zephyrin');
     });
 
     it('denies access for user without viewAny permission', function () {

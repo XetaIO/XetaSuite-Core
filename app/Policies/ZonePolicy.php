@@ -13,6 +13,24 @@ class ZonePolicy
     use HandlesAuthorization;
 
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        // Disallow any creation, modification and deletion from HQ
+        if (isOnHeadquarters() && in_array($ability, ['create', 'update', 'delete'], true)) {
+            return false;
+        }
+
+        // HQ : can see an maintenance
+        if (isOnHeadquarters() && $ability === 'view') {
+            return $user->can('zone.view');
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view the list of zones.
      * Used for accessing the zones table/index page.
      * Zones are filtered by current_site_id in the controller.

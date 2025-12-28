@@ -7,7 +7,8 @@ namespace XetaSuite\Actions\ItemMovements;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use XetaSuite\Actions\ItemPrices\CreateItemPrice;
-use XetaSuite\Jobs\CheckItemCriticalStock;
+use XetaSuite\Jobs\Item\CheckItemCriticalStock;
+use XetaSuite\Jobs\Item\CheckItemWarningStock;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Supplier;
@@ -111,6 +112,15 @@ class CreateItemMovement
 
             // Note: item_entry_total/item_exit_total are updated by ItemMovementObserver
             // item_entry_count/item_exit_count are updated by xetaravel-counts package via getCountsConfig()
+
+            // Check if we need to send warning stock alert jobs
+            if ($item->number_warning_enabled) {
+                $item->refresh();
+                $currentStock = $item->item_entry_total - $item->item_exit_total;
+                if ($currentStock <= $item->number_warning_minimum) {
+                    CheckItemWarningStock::dispatch($item->id);
+                }
+            }
 
             // Check if we need to send critical stock alert jobs
             if ($item->number_critical_enabled) {

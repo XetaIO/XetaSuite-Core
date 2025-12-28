@@ -15,7 +15,6 @@ return [
     'locale' => 'Language',
     'office_phone' => 'Office phone',
     'cell_phone' => 'Cell phone',
-    'end_employment_contract' => 'End of employment contract',
     'sites' => 'Sites',
     'site' => 'Site',
     'roles' => 'Roles',

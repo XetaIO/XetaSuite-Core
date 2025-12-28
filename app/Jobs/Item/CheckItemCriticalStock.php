@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Jobs;
+namespace XetaSuite\Jobs\Item;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Notification;
 use XetaSuite\Models\Item;
-use XetaSuite\Notifications\ItemCriticalStockNotification;
+use XetaSuite\Notifications\Item\ItemCriticalStockNotification;
 
 class CheckItemCriticalStock implements ShouldQueue
 {
@@ -45,8 +46,6 @@ class CheckItemCriticalStock implements ShouldQueue
         }
 
         // Send notification to all recipients
-        foreach ($item->recipients as $recipient) {
-            $recipient->notify(new ItemCriticalStockNotification($item, $currentStock));
-        }
+        Notification::send($item->recipients, new ItemCriticalStockNotification($item, $currentStock));
     }
 }

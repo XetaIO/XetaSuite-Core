@@ -36,7 +36,7 @@ class SiteDetailResource extends JsonResource
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'full_name' => $user->full_name,
-                'avatar' => $user->avatar,
+                'email' => $user->email,
             ])),
             'users' => $this->whenLoaded('users', fn () => $this->users->map(fn ($user) => [
                 'id' => $user->id,

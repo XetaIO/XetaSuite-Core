@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Actions\Users;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use XetaSuite\Models\User;
 
@@ -22,36 +23,36 @@ class UpdateUser
      *     locale?: string,
      *     office_phone?: string,
      *     cell_phone?: string,
-     *     end_employment_contract?: string,
      *     sites?: array<int, array{id: int, roles?: array<string>, permissions?: array<string>}>,
      * }  $data
      */
     public function handle(User $user, array $data): User
     {
-        $updateData = [
-            'username' => $data['username'] ?? $user->username,
-            'email' => $data['email'] ?? $user->email,
-            'first_name' => $data['first_name'] ?? $user->first_name,
-            'last_name' => $data['last_name'] ?? $user->last_name,
-            'locale' => $data['locale'] ?? $user->locale,
-            'office_phone' => $data['office_phone'] ?? $user->office_phone,
-            'cell_phone' => $data['cell_phone'] ?? $user->cell_phone,
-            'end_employment_contract' => $data['end_employment_contract'] ?? $user->end_employment_contract,
-        ];
+        return DB::transaction(function () use ($user, $data) {
+            $updateData = [
+                'username' => $data['username'] ?? $user->username,
+                'email' => $data['email'] ?? $user->email,
+                'first_name' => $data['first_name'] ?? $user->first_name,
+                'last_name' => $data['last_name'] ?? $user->last_name,
+                'locale' => $data['locale'] ?? $user->locale,
+                'office_phone' => $data['office_phone'] ?? $user->office_phone,
+                'cell_phone' => $data['cell_phone'] ?? $user->cell_phone
+            ];
 
-        // Only update password if provided
-        if (! empty($data['password'])) {
-            $updateData['password'] = Hash::make($data['password']);
-        }
+            // Only update password if provided
+            if (! empty($data['password'])) {
+                $updateData['password'] = Hash::make($data['password']);
+            }
 
-        $user->update($updateData);
+            $user->update($updateData);
 
-        // Update sites with roles and permissions if provided
-        if (array_key_exists('sites', $data)) {
-            $this->updateSitesWithRolesAndPermissions($user, $data['sites'] ?? []);
-        }
+            // Update sites with roles and permissions if provided
+            if (array_key_exists('sites', $data)) {
+                $this->updateSitesWithRolesAndPermissions($user, $data['sites'] ?? []);
+            }
 
-        return $user->fresh(['sites']);
+            return $user->fresh(['sites']);
+        });
     }
 
     /**

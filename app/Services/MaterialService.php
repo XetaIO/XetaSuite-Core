@@ -14,6 +14,7 @@ use XetaSuite\Models\Incident;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
+use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
 class MaterialService
@@ -25,11 +26,15 @@ class MaterialService
      */
     public function getPaginatedMaterials(array $filters = []): LengthAwarePaginator
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $query = Material::query()
+            ->with(['site', 'zone', 'creator']);
 
-        return Material::query()
-            ->with(['zone', 'creator'])
-            ->whereHas('zone', fn (Builder $query) => $query->where('site_id', $currentSiteId))
+        // If not HQ, filter by current site
+        if (!isOnHeadquarters()) {
+            $query->where('site_id', auth()->user()->current_site_id);
+        }
+
+        return $query
             ->when($filters['zone_id'] ?? null, fn (Builder $query, int $zoneId) => $query->where('zone_id', $zoneId))
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when(
@@ -72,7 +77,7 @@ class MaterialService
     {
         $currentSiteId = auth()->user()->current_site_id;
 
-        return \XetaSuite\Models\User::query()
+        return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('site_id', $currentSiteId))
             ->orderBy('first_name')
             ->orderBy('last_name')
@@ -186,5 +191,76 @@ class MaterialService
             'cleanings' => $cleanings,
             'item_movements' => $itemMovements,
         ];
+    }
+
+    /**
+     * Get material incidents with pagination and search.
+     *
+     * @param  array{page?: int, per_page?: int, search?: string}  $filters
+     */
+    public function getMaterialIncidents(Material $material, array $filters = []): LengthAwarePaginator
+    {
+        return $material->incidents()
+            ->with(['reporter', 'maintenance'])
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where('description', 'ILIKE', "%{$search}%");
+            })
+            ->orderByDesc('created_at')
+            ->paginate($filters['per_page'] ?? 10);
+    }
+
+    /**
+     * Get material maintenances with pagination and search.
+     *
+     * @param  array{page?: int, per_page?: int, search?: string}  $filters
+     */
+    public function getMaterialMaintenances(Material $material, array $filters = []): LengthAwarePaginator
+    {
+        return $material->maintenances()
+            ->with(['creator', 'operators', 'companies', 'material'])
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where(function (Builder $q) use ($search) {
+                    $q->where('description', 'ILIKE', "%{$search}%")
+                        ->orWhere('reason', 'ILIKE', "%{$search}%");
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate($filters['per_page'] ?? 10);
+    }
+
+    /**
+     * Get material cleanings with pagination and search.
+     *
+     * @param  array{page?: int, per_page?: int, search?: string}  $filters
+     */
+    public function getMaterialCleanings(Material $material, array $filters = []): LengthAwarePaginator
+    {
+        return $material->cleanings()
+            ->with(['site', 'creator', 'material'])
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where('description', 'ILIKE', "%{$search}%")
+                    ->orWhere('id', 'ILIKE', "%{$search}%");
+            })
+            ->orderByDesc('created_at')
+            ->paginate($filters['per_page'] ?? 10);
+    }
+
+    /**
+     * Get material items with pagination and search.
+     *
+     * @param  array{page?: int, per_page?: int, search?: string}  $filters
+     */
+    public function getMaterialItems(Material $material, array $filters = []): LengthAwarePaginator
+    {
+        return $material->items()
+            ->with(['supplier'])
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where(function (Builder $q) use ($search) {
+                    $q->where('items.name', 'ILIKE', "%{$search}%")
+                        ->orWhere('items.reference', 'ILIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('items.name')
+            ->paginate($filters['per_page'] ?? 10);
     }
 }

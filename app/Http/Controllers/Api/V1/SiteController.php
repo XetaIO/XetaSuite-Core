@@ -32,6 +32,7 @@ class SiteController extends Controller
         $this->authorize('viewAny', Site::class);
 
         $sites = $this->siteService->getPaginatedSites([
+            'per_page' => request('per_page'),
             'search' => request('search'),
             'sort_by' => request('sort_by'),
             'sort_direction' => request('sort_direction'),

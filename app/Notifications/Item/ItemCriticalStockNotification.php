@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Notifications;
+namespace XetaSuite\Notifications\Item;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -54,20 +54,5 @@ class ItemCriticalStockNotification extends Notification implements ShouldQueue
             ]))
             ->action(__('items.notifications.view_item'), $itemUrl)
             ->line(__('items.notifications.critical_stock_line3'));
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            'item_id' => $this->item->id,
-            'item_name' => $this->item->name,
-            'current_stock' => $this->currentStock,
-            'critical_minimum' => $this->item->number_critical_minimum,
-        ];
     }
 }
