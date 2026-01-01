@@ -52,7 +52,7 @@ describe('index', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'type', 'title', 'message', 'icon', 'link', 'data', 'read_at', 'is_read', 'created_at', 'time_ago'],
+                    '*' => ['id', 'type', 'data', 'read_at', 'is_read', 'created_at', 'time_ago'],
                 ],
                 'links',
                 'meta',
@@ -73,8 +73,8 @@ describe('index', function () {
         $response->assertOk();
         $data = $response->json('data');
         // Unread (read_at = null) should come first with ASC ordering (nulls first in PostgreSQL)
-        expect($data[0]['title'])->toBe('Unread');
-        expect($data[1]['title'])->toBe('Read');
+        expect($data[0]['data']['title'])->toBe('Unread');
+        expect($data[1]['data']['title'])->toBe('Read');
     });
 
     it('requires authentication', function () {

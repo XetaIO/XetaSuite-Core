@@ -53,10 +53,6 @@ class ItemWarningStockNotification extends Notification implements ShouldQueue
             ]),
             'icon' => $type->icon(),
             'link' => $itemUrl,
-            'item_id' => $this->item->id,
-            'item_name' => $this->item->name,
-            'current_stock' => $this->currentStock,
-            'warning_minimum' => $this->item->number_warning_minimum,
         ];
     }
 }
