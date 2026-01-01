@@ -12,6 +12,24 @@ return [
         'subject' => 'Bienvenue sur :app, :name !',
     ],
 
+    // Types de notifications
+    'types' => [
+        'cleaning_alert' => 'Alerte de nettoyage',
+        'item_warning_stock' => 'Stock faible',
+    ],
+
+    // Notification d'alerte de nettoyage
+    'cleaning_alert' => [
+        'title' => 'Nettoyage requis',
+        'message' => 'Le matériel ":material" nécessite un nettoyage. Prochain nettoyage prévu le :next_cleaning.',
+    ],
+
+    // Notification de stock faible
+    'item_warning_stock' => [
+        'title' => 'Alerte stock faible',
+        'message' => 'L\'article ":item" a un stock faible (:current_stock unités). Le seuil minimum est de :minimum unités.',
+    ],
+
     // Réponses API
     'not_found' => 'Notification introuvable.',
     'marked_as_read' => 'Notification marquée comme lue.',

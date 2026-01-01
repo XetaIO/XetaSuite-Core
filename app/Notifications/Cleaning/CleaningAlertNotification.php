@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace XetaSuite\Notifications\Item;
+namespace XetaSuite\Notifications\Cleaning;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use XetaSuite\Enums\Notifications\NotificationType;
 use XetaSuite\Models\Material;
 
 class CleaningAlertNotification extends Notification implements ShouldQueue
@@ -17,15 +18,11 @@ class CleaningAlertNotification extends Notification implements ShouldQueue
 
     /**
      * The last cleaning date or null if no date.
-     *
-     * @var string|null
      */
     private CarbonImmutable $lastCleaning;
 
     /**
      * The next cleaning date for the material.
-     *
-     * @var string
      */
     private CarbonImmutable $nextCleaning;
 
@@ -87,12 +84,22 @@ class CleaningAlertNotification extends Notification implements ShouldQueue
      */
     public function toDatabase(object $notifiable): array
     {
+        $type = NotificationType::CleaningAlert;
+        $materialUrl = '/materials/' . $this->material->id;
+
         return [
-            'alert_type' => 'alert_cleaning',
+            'alert_type' => $type->value,
+            'title' => __('notifications.cleaning_alert.title'),
+            'message' => __('notifications.cleaning_alert.message', [
+                'material' => $this->material->name,
+                'next_cleaning' => $this->nextCleaning->format('d/m/Y'),
+            ]),
+            'icon' => $type->icon(),
+            'link' => $materialUrl,
             'material_id' => $this->material->id,
             'material_name' => $this->material->name,
-            'last_cleaning' => $this->lastCleaning,
-            'next_cleaning' => $this->nextCleaning,
+            'last_cleaning' => $this->lastCleaning->toISOString(),
+            'next_cleaning' => $this->nextCleaning->toISOString(),
         ];
     }
 }

@@ -21,6 +21,7 @@ use XetaSuite\Http\Controllers\Api\V1\SiteController;
 use XetaSuite\Http\Controllers\Api\V1\SupplierController;
 use XetaSuite\Http\Controllers\Api\V1\UserController;
 use XetaSuite\Http\Controllers\Api\V1\UserLocaleController;
+use XetaSuite\Http\Controllers\Api\V1\UserPasswordController;
 use XetaSuite\Http\Controllers\Api\V1\UserSiteController;
 use XetaSuite\Http\Controllers\Api\V1\ZoneController;
 use XetaSuite\Http\Resources\V1\Users\UserDetailResource;
@@ -46,6 +47,9 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
 
     // Update user current site
     Route::patch('/user/site', UserSiteController::class);
+
+    // Update user password
+    Route::put('/user/password', UserPasswordController::class);
 
     // Notifications (authenticated user)
     Route::get('notifications', [NotificationController::class, 'index']);
