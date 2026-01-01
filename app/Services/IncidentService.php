@@ -12,9 +12,14 @@ use XetaSuite\Enums\Incidents\IncidentStatus;
 use XetaSuite\Models\Incident;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class IncidentService
 {
+    use HasSearchAndSort;
+
+    private const array ALLOWED_SORTS = ['created_at', 'started_at', 'resolved_at', 'severity', 'status'];
+
     /**
      * Get a paginated list of incidents with optional search and sorting.
      *
@@ -22,22 +27,16 @@ class IncidentService
      */
     public function getPaginatedIncidents(array $filters = []): LengthAwarePaginator
     {
-        $query = Incident::query()
-            ->with(['site', 'material', 'maintenance', 'reporter']);
-
-        // If not HQ, filter by current site
-        if (!isOnHeadquarters()) {
-            $query->where('site_id', auth()->user()->current_site_id);
-        }
-
-        return $query
+        return Incident::query()
+            ->with(['site', 'material', 'maintenance', 'reporter'])
+            ->forCurrentSite()
             ->when($filters['material_id'] ?? null, fn (Builder $query, int $materialId) => $query->where('material_id', $materialId))
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
             ->when($filters['severity'] ?? null, fn (Builder $query, string $severity) => $query->where('severity', $severity))
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'desc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'desc', self::ALLOWED_SORTS, 'created_at', 'desc'),
                 fn (Builder $query) => $query->orderByDesc('created_at')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -48,10 +47,8 @@ class IncidentService
      */
     public function getAvailableMaterials(): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Material::query()
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->orderBy('name')
             ->get(['id', 'name']);
     }
@@ -61,11 +58,9 @@ class IncidentService
      */
     public function getAvailableMaintenances(?int $materialId = null, ?string $search = null): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Maintenance::query()
             ->with('material:id,name')
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->when($materialId, fn (Builder $query, int $id) => $query->where('material_id', $id))
             ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
                 $q->where('id', 'like', "%{$s}%")
@@ -114,20 +109,5 @@ class IncidentService
                 ->orWhereRaw('LOWER(material_name) LIKE ?', [$searchTerm])
                 ->orWhereRaw('LOWER(reported_by_name) LIKE ?', [$searchTerm]);
         });
-    }
-
-    /**
-     * Apply sorting to query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedFields = ['created_at', 'started_at', 'resolved_at', 'severity', 'status'];
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-
-        if (in_array($sortBy, $allowedFields, true)) {
-            return $query->orderBy($sortBy, $direction);
-        }
-
-        return $query->orderByDesc('created_at');
     }
 }

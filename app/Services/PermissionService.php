@@ -9,9 +9,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use XetaSuite\Models\Permission;
 use XetaSuite\Models\Role;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class PermissionService
 {
+    use HasSearchAndSort;
+
+    private const SEARCH_COLUMNS = ['name'];
+
+    private const ALLOWED_SORTS = ['name', 'created_at', 'roles_count'];
+
     /**
      * Get a paginated list of roles assigned to a permission.
      *
@@ -41,10 +48,10 @@ class PermissionService
             ->withCount('roles');
 
         return $query
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS, 'name'),
                 fn (Builder $query) => $query->orderBy('name', 'asc')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -73,27 +80,5 @@ class PermissionService
             'id' => $role->id,
             'name' => $role->name,
         ]);
-    }
-
-    /**
-     * Apply search filter to query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where('name', 'ILIKE', "%{$search}%");
-    }
-
-    /**
-     * Apply sorting to query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSortFields = ['name', 'created_at', 'roles_count'];
-
-        if (! in_array($sortBy, $allowedSortFields)) {
-            return $query->orderBy('name', 'asc');
-        }
-
-        return $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
     }
 }

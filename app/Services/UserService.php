@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Permission;
@@ -14,6 +15,12 @@ use XetaSuite\Models\User;
 
 class UserService
 {
+    use HasSearchAndSort;
+
+    private const array SEARCH_COLUMNS = ['first_name', 'last_name', 'email', 'username'];
+
+    private const array ALLOWED_SORTS = ['first_name', 'last_name', 'email', 'username', 'created_at'];
+
     /**
      * Get a paginated list of users with optional search and sorting.
      * Includes soft-deleted users and their roles on the current site.
@@ -25,11 +32,11 @@ class UserService
         return User::query()
             ->withTrashed()
             ->with(['sites', 'deleter', 'roles'])
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->whereHas('sites', fn (Builder $q) => $q->where('sites.id', $siteId)))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderBy('last_name')->orderBy('first_name')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -166,30 +173,4 @@ class UserService
             ->paginate($filters['per_page'] ?? 10);
     }
 
-    /**
-     * Apply search filter to users query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('first_name', 'ILIKE', "%{$search}%")
-                ->orWhere('last_name', 'ILIKE', "%{$search}%")
-                ->orWhere('email', 'ILIKE', "%{$search}%")
-                ->orWhere('username', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to users query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['first_name', 'last_name', 'email', 'username', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
-    }
 }

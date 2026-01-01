@@ -16,9 +16,15 @@ use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class ItemService
 {
+    use HasSearchAndSort;
+
+    private const SEARCH_COLUMNS = ['name', 'reference', 'description', 'supplier_reference'];
+
+    private const ALLOWED_SORTS = ['name', 'reference', 'current_price', 'created_at'];
     /**
      * Get a paginated list of items with optional search, filters and sorting.
      *
@@ -26,23 +32,17 @@ class ItemService
      */
     public function getPaginatedItems(array $filters = []): LengthAwarePaginator
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         $query = Item::query()
-            ->with(['site', 'supplier', 'creator']);
-
-        // If not HQ, filter by current site
-        if (!isOnHeadquarters()) {
-            $query->where('site_id', auth()->user()->current_site_id);
-        }
+            ->with(['site', 'supplier', 'creator'])
+            ->forCurrentSite();
 
         return $query
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when($filters['supplier_id'] ?? null, fn (Builder $query, int $supplierId) => $query->where('supplier_id', $supplierId))
             ->when($filters['stock_status'] ?? null, fn (Builder $query, string $status) => $this->applyStockStatusFilter($query, $status))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -56,7 +56,7 @@ class ItemService
         return Item::query()
             ->with(['site'])
             ->where('supplier_id', $supplier->id)
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->orderBy('name')
             ->paginate($filters['per_page'] ?? 20);
     }
@@ -257,19 +257,6 @@ class ItemService
     }
 
     /**
-     * Apply search filter to items query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $query) use ($search) {
-            $query->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('reference', 'ILIKE', "%{$search}%")
-                ->orWhere('description', 'ILIKE', "%{$search}%")
-                ->orWhere('supplier_reference', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
      * Apply stock status filter.
      */
     private function applyStockStatusFilter(Builder $query, string $status): Builder
@@ -289,17 +276,5 @@ class ItemService
                 }),
             default => $query,
         };
-    }
-
-    /**
-     * Apply sorting to items query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedColumns = ['name', 'reference', 'current_price', 'created_at'];
-        $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'name';
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-
-        return $query->orderBy($sortBy, $direction);
     }
 }

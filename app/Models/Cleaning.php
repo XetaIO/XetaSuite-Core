@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Cleanings\CleaningType;
+use XetaSuite\Models\Concerns\SiteScoped;
 use XetaSuite\Observers\CleaningObserver;
 
 #[ObservedBy([CleaningObserver::class])]
@@ -17,6 +18,7 @@ class Cleaning extends Model
 {
     use HasCounts;
     use HasFactory;
+    use SiteScoped;
 
     /**
      * The attributes that are mass assignable.

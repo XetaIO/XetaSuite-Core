@@ -15,6 +15,7 @@ use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Maintenances\MaintenanceRealization;
 use XetaSuite\Enums\Maintenances\MaintenanceStatus;
 use XetaSuite\Enums\Maintenances\MaintenanceType;
+use XetaSuite\Models\Concerns\SiteScoped;
 use XetaSuite\Observers\MaintenanceObserver;
 
 #[ObservedBy([MaintenanceObserver::class])]
@@ -22,6 +23,7 @@ class Maintenance extends Model
 {
     use HasCounts;
     use HasFactory;
+    use SiteScoped;
 
     /**
      * The attributes that are mass assignable.

@@ -8,9 +8,16 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use XetaSuite\Models\Zone;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class ZoneService
 {
+    use HasSearchAndSort;
+
+    private const SEARCH_COLUMNS = ['name'];
+
+    private const ALLOWED_SORTS = ['name', 'allow_material', 'children_count', 'material_count', 'created_at'];
+
     /**
      * Get a paginated list of zones with optional search and sorting.
      *
@@ -20,25 +27,19 @@ class ZoneService
     {
         $query = Zone::query()
             ->with(['site', 'parent'])
-            ->withCount(['children', 'materials']);
-
-        // If not HQ, filter by current site
-        if (!isOnHeadquarters()) {
-            $query->where('site_id', auth()->user()->current_site_id);
-        }
-        /* ->when($filters['site_id'] ?? null, fn (Builder $query, int $siteId) => $query->where('site_id', $siteId)) */
-        /*->when(
-            array_key_exists('parent_id', $filters),
-            fn (Builder $query) => $query->where('parent_id', $filters['parent_id'])
-        )*/
-        return $query
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->withCount(['children', 'materials'])
+            ->forCurrentSite()
+            ->when(
+                $filters['search'] ?? null,
+                fn (Builder $q, string $search) => $this->applySearchFilter($q, $search, self::SEARCH_COLUMNS)
+            )
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
-                fn (Builder $query) => $query->orderBy('name')
-            )
-            ->paginate($filters['per_page'] ?? 20);
+                fn (Builder $q, string $sortBy) => $this->applySortFilter($q, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
+                fn (Builder $q) => $q->orderBy('name')
+            );
+
+        return $query->paginate($filters['per_page'] ?? 20);
     }
 
     /**
@@ -88,28 +89,6 @@ class ZoneService
         }
 
         return $ids;
-    }
-
-    /**
-     * Apply search filter to zones query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where('name', 'ILIKE', "%{$search}%");
-    }
-
-    /**
-     * Apply sorting to zones query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['name', 'allow_material', 'children_count', 'material_count', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
     }
 
     /**

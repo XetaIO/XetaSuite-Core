@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -21,6 +22,10 @@ use XetaSuite\Models\User;
 
 class MaintenanceService
 {
+    use HasSearchAndSort;
+
+    private const ALLOWED_SORTS = ['started_at', 'resolved_at', 'status', 'type', 'created_at'];
+
     /**
      * Get a paginated list of maintenances with optional search and sorting.
      *
@@ -28,16 +33,10 @@ class MaintenanceService
      */
     public function getPaginatedMaintenances(array $filters = []): LengthAwarePaginator
     {
-        $query = Maintenance::query()
+        return Maintenance::query()
             ->with(['material', 'creator', 'operators', 'companies', 'site'])
-            ->withCount('incidents');
-
-        // If not HQ, filter by current site
-        if (!isOnHeadquarters()) {
-            $query->where('site_id', auth()->user()->current_site_id);
-        }
-
-        return $query
+            ->withCount('incidents')
+            ->forCurrentSite()
             ->when($filters['material_id'] ?? null, fn (Builder $query, int $materialId) => $query->where('material_id', $materialId))
             ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
             ->when($filters['type'] ?? null, fn (Builder $query, string $type) => $query->where('type', $type))
@@ -45,7 +44,7 @@ class MaintenanceService
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'desc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'desc', self::ALLOWED_SORTS, 'created_at', 'desc'),
                 fn (Builder $query) => $query->orderByDesc('created_at')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -92,10 +91,8 @@ class MaintenanceService
      */
     public function getAvailableMaterials(?string $search = null): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Material::query()
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->when($search, fn (Builder $query, string $s) => $query->where('name', 'ILIKE', "%{$s}%"))
             ->orderBy('name')
             ->limit(15)
@@ -107,10 +104,8 @@ class MaintenanceService
      */
     public function getAvailableIncidents(?int $maintenanceId = null, ?string $search = null): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Incident::query()
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->where(function (Builder $query) use ($maintenanceId) {
                 $query->whereNull('maintenance_id');
                 if ($maintenanceId) {
@@ -131,10 +126,8 @@ class MaintenanceService
      */
     public function getAvailableOperators(?string $search = null): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return User::query()
-            ->whereHas('sites', fn (Builder $query) => $query->where('site_id', $currentSiteId))
+            ->whereHas('sites', fn (Builder $query) => $query->where('site_id', auth()->user()->current_site_id))
             ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
                 $q->where('first_name', 'ILIKE', "%{$s}%")
                     ->orWhere('last_name', 'ILIKE', "%{$s}%")
@@ -165,10 +158,8 @@ class MaintenanceService
      */
     public function getAvailableItems(?string $search = null): SupportCollection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Item::query()
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->whereRaw('(item_entry_total - item_exit_total) > 0')
             ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
                 $q->where('name', 'ILIKE', "%{$s}%")
@@ -238,19 +229,4 @@ class MaintenanceService
         });
     }
 
-    /**
-     * Apply sorting to query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
-
-        return match ($sortBy) {
-            'started_at' => $query->orderBy('started_at', $direction),
-            'resolved_at' => $query->orderBy('resolved_at', $direction),
-            'status' => $query->orderBy('status', $direction),
-            'type' => $query->orderBy('type', $direction),
-            default => $query->orderBy('created_at', $direction),
-        };
-    }
 }

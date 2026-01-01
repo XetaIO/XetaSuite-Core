@@ -7,9 +7,20 @@ namespace XetaSuite\Services;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use XetaSuite\Models\Supplier;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class SupplierService
 {
+    use HasSearchAndSort;
+
+    private const array SEARCH_COLUMNS = ['name', 'description'];
+
+    private const array ALLOWED_SORTS = ['name', 'item_count', 'created_at'];
+
+    private const array ITEM_SEARCH_COLUMNS = ['name', 'reference', 'description'];
+
+    private const array ITEM_ALLOWED_SORTS = ['name', 'reference', 'current_price', 'created_at'];
+
     /**
      * Get a paginated list of suppliers with optional search and sorting.
      *
@@ -19,10 +30,10 @@ class SupplierService
     {
         return Supplier::query()
             ->with('creator')
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -37,63 +48,12 @@ class SupplierService
     {
         return $supplier->items()
             ->with('site')
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applyItemSearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::ITEM_SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applyItemSorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ITEM_ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
-    }
-
-    /**
-     * Apply search filter to suppliers query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('description', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to suppliers query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['name', 'item_count', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
-    }
-
-    /**
-     * Apply search filter to items query.
-     */
-    private function applyItemSearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('description', 'ILIKE', "%{$search}%")
-                ->orWhere('reference', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to items query.
-     */
-    private function applyItemSorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['name', 'description', 'reference', 'current_stock', 'current_price', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
     }
 }

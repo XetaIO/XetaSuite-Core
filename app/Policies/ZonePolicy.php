@@ -22,7 +22,7 @@ class ZonePolicy
             return false;
         }
 
-        // HQ : can see an maintenance
+        // HQ : can see a zone
         if (isOnHeadquarters() && $ability === 'view') {
             return $user->can('zone.view');
         }
@@ -46,8 +46,7 @@ class ZonePolicy
      */
     public function view(User $user, Zone $zone): bool
     {
-        return $user->can('zone.viewAny')
-            && $zone->site_id === $user->current_site_id;
+        return $user->can('zone.view') && $zone->site_id === $user->current_site_id;
     }
 
     /**
@@ -64,8 +63,7 @@ class ZonePolicy
      */
     public function update(User $user, Zone $zone): bool
     {
-        return $user->can('zone.update')
-            && $zone->site_id === $user->current_site_id;
+        return $user->can('zone.update') && $zone->site_id === $user->current_site_id;
     }
 
     /**
@@ -74,7 +72,6 @@ class ZonePolicy
      */
     public function delete(User $user, Zone $zone): bool
     {
-        return $user->can('zone.delete')
-            && $zone->site_id === $user->current_site_id;
+        return $user->can('zone.delete') && $zone->site_id === $user->current_site_id;
     }
 }

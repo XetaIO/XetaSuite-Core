@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Materials\CleaningFrequency;
+use XetaSuite\Models\Concerns\SiteScoped;
 use XetaSuite\Observers\MaterialObserver;
 
 #[ObservedBy([MaterialObserver::class])]
@@ -19,6 +20,7 @@ class Material extends Model
 {
     use HasCounts;
     use HasFactory;
+    use SiteScoped;
 
     /**
      * The attributes that are mass assignable.

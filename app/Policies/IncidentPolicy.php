@@ -45,7 +45,7 @@ class IncidentPolicy
      */
     public function view(User $user, Incident $incident): bool
     {
-        return $user->can('incident.viewAny') && $incident->site_id === $user->current_site_id;
+        return $user->can('incident.view') && $incident->site_id === $user->current_site_id;
     }
 
     /**

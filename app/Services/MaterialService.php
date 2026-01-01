@@ -16,9 +16,16 @@ use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class MaterialService
 {
+    use HasSearchAndSort;
+
+    private const SEARCH_COLUMNS = ['name', 'description'];
+
+    private const ALLOWED_SORTS = ['name', 'created_at', 'last_cleaning_at'];
+
     /**
      * Get a paginated list of materials with optional search and sorting.
      *
@@ -26,20 +33,14 @@ class MaterialService
      */
     public function getPaginatedMaterials(array $filters = []): LengthAwarePaginator
     {
-        $query = Material::query()
-            ->with(['site', 'zone', 'creator']);
-
-        // If not HQ, filter by current site
-        if (!isOnHeadquarters()) {
-            $query->where('site_id', auth()->user()->current_site_id);
-        }
-
-        return $query
+        return Material::query()
+            ->with(['site', 'zone', 'creator'])
+            ->forCurrentSite()
             ->when($filters['zone_id'] ?? null, fn (Builder $query, int $zoneId) => $query->where('zone_id', $zoneId))
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS, 'name'),
                 fn (Builder $query) => $query->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -61,10 +62,8 @@ class MaterialService
      */
     public function getAvailableZones(): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
-
         return Zone::query()
-            ->where('site_id', $currentSiteId)
+            ->forCurrentSite()
             ->where('allow_material', true)
             ->orderBy('name')
             ->get();
@@ -82,29 +81,6 @@ class MaterialService
             ->orderBy('first_name')
             ->orderBy('last_name')
             ->get(['id', 'first_name', 'last_name', 'email']);
-    }
-
-    /**
-     * Apply search filter to materials query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $query) use ($search) {
-            $query->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('description', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to materials query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedColumns = ['name', 'created_at', 'last_cleaning_at'];
-        $sortBy = in_array($sortBy, $allowedColumns) ? $sortBy : 'name';
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-
-        return $query->orderBy($sortBy, $direction);
     }
 
     /**

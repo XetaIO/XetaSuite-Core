@@ -24,6 +24,7 @@ beforeEach(function () {
     // Create permissions
     $permissions = [
         'zone.viewAny',
+        'zone.view',
         'zone.create',
         'zone.update',
         'zone.delete',

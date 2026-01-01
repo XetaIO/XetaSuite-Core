@@ -9,9 +9,25 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use XetaSuite\Models\Company;
 use XetaSuite\Models\Maintenance;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class CompanyService
 {
+    use HasSearchAndSort;
+
+    private const array SEARCH_COLUMNS = ['name', 'description'];
+
+    private const array ALLOWED_SORTS = ['name', 'maintenances_count', 'created_at'];
+
+    private const array MAINTENANCE_SEARCH_COLUMNS = ['description', 'reason'];
+
+    private const array MAINTENANCE_ALLOWED_SORTS = ['type', 'status', 'started_at', 'resolved_at', 'created_at'];
+
+    private const array MAINTENANCE_SEARCH_RELATIONS = [
+        'material' => 'name',
+        'site' => 'name',
+    ];
+
     /**
      * Get a paginated list of companies with optional search and sorting.
      *
@@ -22,38 +38,13 @@ class CompanyService
         return Company::query()
             ->with('creator')
             ->withCount('maintenances')
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
-    }
-
-    /**
-     * Apply search filter to companies query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('description', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to companies query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['name', 'maintenances_count', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
     }
 
     /**
@@ -65,40 +56,13 @@ class CompanyService
     {
         return $company->maintenances()
             ->with(['material', 'site', 'creator'])
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applyMaintenanceSearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::MAINTENANCE_SEARCH_COLUMNS, self::MAINTENANCE_SEARCH_RELATIONS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applyMaintenanceSorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::MAINTENANCE_ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderByDesc('created_at')
             )
             ->paginate($filters['per_page'] ?? 20);
-    }
-
-    /**
-     * Apply search filter to maintenances query.
-     */
-    private function applyMaintenanceSearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('description', 'ILIKE', "%{$search}%")
-                ->orWhere('reason', 'ILIKE', "%{$search}%")
-                ->orWhereHas('material', fn (Builder $m) => $m->where('name', 'ILIKE', "%{$search}%"))
-                ->orWhereHas('site', fn (Builder $s) => $s->where('name', 'ILIKE', "%{$search}%"));
-        });
-    }
-
-    /**
-     * Apply sorting to maintenances query.
-     */
-    private function applyMaintenanceSorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['type', 'status', 'started_at', 'resolved_at', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
     }
 
     /**

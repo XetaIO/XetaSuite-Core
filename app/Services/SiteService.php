@@ -7,9 +7,16 @@ namespace XetaSuite\Services;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use XetaSuite\Models\Site;
+use XetaSuite\Services\Concerns\HasSearchAndSort;
 
 class SiteService
 {
+    use HasSearchAndSort;
+
+    private const array SEARCH_COLUMNS = ['name', 'email', 'city', 'address'];
+
+    private const array ALLOWED_SORTS = ['name', 'city', 'is_headquarters', 'zones_count', 'users_count', 'created_at'];
+
     /**
      * Get a paginated list of sites with optional search and sorting.
      *
@@ -20,10 +27,10 @@ class SiteService
         return Site::query()
             ->with('managers', 'users')
             ->withCount(['zones', 'users'])
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
             ->when(
                 $filters['sort_by'] ?? null,
-                fn (Builder $query, string $sortBy) => $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'asc'),
+                fn (Builder $query, string $sortBy) => $this->applySortFilter($query, $sortBy, $filters['sort_direction'] ?? 'asc', self::ALLOWED_SORTS),
                 fn (Builder $query) => $query->orderByDesc('is_headquarters')->orderBy('name')
             )
             ->paginate($filters['per_page'] ?? 20);
@@ -40,30 +47,4 @@ class SiteService
             ->exists();
     }
 
-    /**
-     * Apply search filter to sites query.
-     */
-    private function applySearch(Builder $query, string $search): Builder
-    {
-        return $query->where(function (Builder $q) use ($search) {
-            $q->where('name', 'ILIKE', "%{$search}%")
-                ->orWhere('email', 'ILIKE', "%{$search}%")
-                ->orWhere('city', 'ILIKE', "%{$search}%")
-                ->orWhere('address', 'ILIKE', "%{$search}%");
-        });
-    }
-
-    /**
-     * Apply sorting to sites query.
-     */
-    private function applySorting(Builder $query, string $sortBy, string $direction): Builder
-    {
-        $allowedSorts = ['name', 'city', 'is_headquarters', 'zones_count', 'users_count', 'created_at'];
-
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $direction === 'desc' ? 'desc' : 'asc');
-        }
-
-        return $query;
-    }
 }

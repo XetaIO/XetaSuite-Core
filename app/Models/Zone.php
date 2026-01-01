@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Xetaio\Counts\Concerns\HasCounts;
+use XetaSuite\Models\Concerns\SiteScoped;
 use XetaSuite\Observers\ZoneObserver;
 
 #[ObservedBy([ZoneObserver::class])]
@@ -17,6 +18,7 @@ class Zone extends Model
 {
     use HasCounts;
     use HasFactory;
+    use SiteScoped;
 
     /**
      * The attributes that are mass assignable.

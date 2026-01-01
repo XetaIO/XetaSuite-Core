@@ -10,11 +10,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Xetaio\Counts\Concerns\HasCounts;
 use XetaSuite\Enums\Incidents\IncidentSeverity;
 use XetaSuite\Enums\Incidents\IncidentStatus;
+use XetaSuite\Models\Concerns\SiteScoped;
 
 class Incident extends Model
 {
     use HasCounts;
     use HasFactory;
+    use SiteScoped;
 
     /**
      * The attributes that are mass assignable.
