@@ -17,9 +17,9 @@ class SupplierService
 
     private const ALLOWED_SORTS = ['name', 'item_count', 'created_at'];
 
-    private const array ITEM_SEARCH_COLUMNS = ['name', 'reference', 'description'];
+    private const ITEM_SEARCH_COLUMNS = ['name', 'reference', 'description'];
 
-    private const array ITEM_ALLOWED_SORTS = ['name', 'reference', 'current_price', 'created_at'];
+    private const ITEM_ALLOWED_SORTS = ['name', 'reference', 'current_price', 'created_at'];
 
     /**
      * Get a paginated list of suppliers with optional search and sorting.

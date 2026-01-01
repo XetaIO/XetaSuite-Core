@@ -19,11 +19,11 @@ class CompanyService
 
     private const ALLOWED_SORTS = ['name', 'maintenances_count', 'created_at'];
 
-    private const array MAINTENANCE_SEARCH_COLUMNS = ['description', 'reason'];
+    private const MAINTENANCE_SEARCH_COLUMNS = ['description', 'reason'];
 
-    private const array MAINTENANCE_ALLOWED_SORTS = ['type', 'status', 'started_at', 'resolved_at', 'created_at'];
+    private const MAINTENANCE_ALLOWED_SORTS = ['type', 'status', 'started_at', 'resolved_at', 'created_at'];
 
-    private const array MAINTENANCE_SEARCH_RELATIONS = [
+    private const MAINTENANCE_SEARCH_RELATIONS = [
         'material' => 'name',
         'site' => 'name',
     ];
