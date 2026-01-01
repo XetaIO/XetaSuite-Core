@@ -13,9 +13,9 @@ class SiteService
 {
     use HasSearchAndSort;
 
-    private const array SEARCH_COLUMNS = ['name', 'email', 'city', 'address'];
+    private const SEARCH_COLUMNS = ['name', 'email', 'city', 'address'];
 
-    private const array ALLOWED_SORTS = ['name', 'city', 'is_headquarters', 'zones_count', 'users_count', 'created_at'];
+    private const ALLOWED_SORTS = ['name', 'city', 'is_headquarters', 'zones_count', 'users_count', 'created_at'];
 
     /**
      * Get a paginated list of sites with optional search and sorting.

@@ -13,9 +13,9 @@ class SupplierService
 {
     use HasSearchAndSort;
 
-    private const array SEARCH_COLUMNS = ['name', 'description'];
+    private const SEARCH_COLUMNS = ['name', 'description'];
 
-    private const array ALLOWED_SORTS = ['name', 'item_count', 'created_at'];
+    private const ALLOWED_SORTS = ['name', 'item_count', 'created_at'];
 
     private const array ITEM_SEARCH_COLUMNS = ['name', 'reference', 'description'];
 

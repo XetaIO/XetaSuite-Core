@@ -15,9 +15,9 @@ class CompanyService
 {
     use HasSearchAndSort;
 
-    private const array SEARCH_COLUMNS = ['name', 'description'];
+    private const SEARCH_COLUMNS = ['name', 'description'];
 
-    private const array ALLOWED_SORTS = ['name', 'maintenances_count', 'created_at'];
+    private const ALLOWED_SORTS = ['name', 'maintenances_count', 'created_at'];
 
     private const array MAINTENANCE_SEARCH_COLUMNS = ['description', 'reason'];
 

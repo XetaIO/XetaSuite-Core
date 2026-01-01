@@ -17,9 +17,9 @@ class UserService
 {
     use HasSearchAndSort;
 
-    private const array SEARCH_COLUMNS = ['first_name', 'last_name', 'email', 'username'];
+    private const SEARCH_COLUMNS = ['first_name', 'last_name', 'email', 'username'];
 
-    private const array ALLOWED_SORTS = ['first_name', 'last_name', 'email', 'username', 'created_at'];
+    private const ALLOWED_SORTS = ['first_name', 'last_name', 'email', 'username', 'created_at'];
 
     /**
      * Get a paginated list of users with optional search and sorting.

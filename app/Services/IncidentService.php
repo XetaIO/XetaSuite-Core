@@ -18,7 +18,7 @@ class IncidentService
 {
     use HasSearchAndSort;
 
-    private const array ALLOWED_SORTS = ['created_at', 'started_at', 'resolved_at', 'severity', 'status'];
+    private const ALLOWED_SORTS = ['created_at', 'started_at', 'resolved_at', 'severity', 'status'];
 
     /**
      * Get a paginated list of incidents with optional search and sorting.
