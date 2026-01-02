@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/XetaIO/XetaSuite-core/main/.github/logo.svg" width="400" alt="XetaSuite Logo">
+  <img src=".github/logos/logo.svg#gh-light-mode-only" width="400" alt="XetaSuite Logo">
+  <img src=".github/logos/logo-dark.svg#gh-dark-mode-only" width="400" alt="XetaSuite Logo">
 </p>
 
 <p align="center">
@@ -10,6 +11,7 @@
   <a href="#"><img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 8.2+"></a>
   <a href="#"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel 12"></a>
   <a href="#"><img src="https://img.shields.io/badge/PostgreSQL-16+-336791?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
+  <a href="#"><img src="https://img.shields.io/github/actions/workflow/status/XetaIO/XetaSuite-Core/tests.yml?style=flat-square" alt="Tests"></a>
   <a href="#"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License MIT"></a>
 </p>
 

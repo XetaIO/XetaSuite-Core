@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use XetaSuite\Http\Controllers\Api\V1\AppConfigController;
 use XetaSuite\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use XetaSuite\Http\Controllers\Api\V1\Auth\SetupPasswordController;
 
@@ -11,6 +12,8 @@ Route::get('/', function () {
 });
 
 Route::prefix('api/v1')->middleware(['web'])->group(function () {
+    // Public route to get app configuration
+    Route::get('/app/config', AppConfigController::class);
 
     Route::prefix('auth')->group(function () {
         // Auth
