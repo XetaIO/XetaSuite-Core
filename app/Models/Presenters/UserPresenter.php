@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace XetaSuite\Models\Presenters;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Cache;
 use Laravolt\Avatar\Facade as Avatar;
 use XetaSuite\Models\Session;
 
@@ -12,14 +13,33 @@ trait UserPresenter
 {
     /**
      * Get the user's avatar.
+     * Cached for 7 days, invalidated when name changes via UserObserver.
      */
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                return Avatar::create($this->full_name)->toBase64(); // TODO : Cache  the avatar or save it into database at creations
-            }
+            get: fn () => Cache::remember(
+                $this->getAvatarCacheKey(),
+                now()->addDays(7),
+                fn () => Avatar::create($this->full_name)->toBase64()
+            )
         );
+    }
+
+    /**
+     * Get the cache key for this user's avatar.
+     */
+    public function getAvatarCacheKey(): string
+    {
+        return "user:{$this->id}:avatar";
+    }
+
+    /**
+     * Clear the cached avatar.
+     */
+    public function clearAvatarCache(): void
+    {
+        Cache::forget($this->getAvatarCacheKey());
     }
 
     /**

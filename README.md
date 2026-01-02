@@ -132,10 +132,10 @@ app/
 ├── Actions/{Domain}/          # Single-responsibility action classes
 ├── Enums/{Domain}/            # PHP enums with labels
 ├── Http/
-│   ├── Controllers/Api/V1/   # Versioned API controllers
-│   ├── Requests/V1/          # Form Requests with validation
-│   ├── Resources/V1/         # JSON transformers
-│   └── Middleware/           # Custom middleware
+│   ├── Controllers/Api/V1/    # Versioned API controllers
+│   ├── Requests/V1/           # Form Requests with validation
+│   ├── Resources/V1/          # JSON transformers
+│   └── Middleware/            # Custom middleware
 ├── Models/                    # Eloquent models
 ├── Observers/                 # Lifecycle hooks
 ├── Policies/                  # Resource authorization
@@ -151,9 +151,9 @@ Site (tenant)
 │   │   ├── Cleanings
 │   │   ├── Incidents
 │   │   └── Maintenances
-│   └── Items (stock)
-│       ├── ItemMovements
-│       └── ItemPrices
+├── Items (stock)
+│   ├── ItemMovements
+│   └── ItemPrices
 └── Users (with per-site roles)
 
 Headquarters (HQ Site)

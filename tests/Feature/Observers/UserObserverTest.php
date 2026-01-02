@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use XetaSuite\Models\Cleaning;
 use XetaSuite\Models\Company;
 use XetaSuite\Models\Incident;
@@ -94,4 +95,49 @@ it('saves created_by_name in companies when user is force deleted', function () 
     $company->refresh();
     expect($company->created_by_id)->toBeNull();
     expect($company->created_by_name)->toBe('John Doe');
+});
+
+it('invalidates avatar cache when first_name changes', function () {
+    $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
+    $cacheKey = $user->getAvatarCacheKey();
+
+    // Access avatar to populate cache
+    $originalAvatar = $user->avatar;
+    expect(Cache::has($cacheKey))->toBeTrue();
+
+    // Update first_name
+    $user->update(['first_name' => 'Jane']);
+
+    // Cache should be invalidated
+    expect(Cache::has($cacheKey))->toBeFalse();
+});
+
+it('invalidates avatar cache when last_name changes', function () {
+    $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
+    $cacheKey = $user->getAvatarCacheKey();
+
+    // Access avatar to populate cache
+    $user->avatar;
+    expect(Cache::has($cacheKey))->toBeTrue();
+
+    // Update last_name
+    $user->update(['last_name' => 'Smith']);
+
+    // Cache should be invalidated
+    expect(Cache::has($cacheKey))->toBeFalse();
+});
+
+it('does not invalidate avatar cache when unrelated field changes', function () {
+    $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
+    $cacheKey = $user->getAvatarCacheKey();
+
+    // Access avatar to populate cache
+    $user->avatar;
+    expect(Cache::has($cacheKey))->toBeTrue();
+
+    // Update unrelated field
+    $user->update(['email' => 'newemail@example.com']);
+
+    // Cache should still exist
+    expect(Cache::has($cacheKey))->toBeTrue();
 });

@@ -27,6 +27,17 @@ class UserObserver
     }
 
     /**
+     * Handle the User "updated" event.
+     */
+    public function updated(User $user): void
+    {
+        //Invalidate avatar cache when name changes.
+        if ($user->wasChanged(['first_name', 'last_name'])) {
+            $user->clearAvatarCache();
+        }
+    }
+
+    /**
      * Handle the User "deleting" event.
      */
     public function deleting(User $user): void
