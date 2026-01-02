@@ -16,33 +16,52 @@ class UserRolesSeeder extends Seeder
      */
     public function run(): void
     {
-        // Assign roles to users per site
-        // Get all sites and users
         $sites = Site::all();
-        $users = User::all();
 
-        // Assignment:
-        // - First user is admin on all sites
-        // - Other users get different roles on different sites
-        $firstUser = $users->first();
-        $otherUsers = $users->skip(1);
+        // Get demo users by username
+        $admin = User::where('username', 'admin')->first();
+        $manager = User::where('username', 'manager')->first();
+        $user = User::where('username', 'user')->first();
 
         foreach ($sites as $site) {
-            // Assign admin role to the first user on all sites
-            $adminRole = Role::where('name', 'admin')
-                ->where('site_id', $site->id)
-                ->first();
+            // Admin gets admin role on all sites
+            if ($admin) {
+                $adminRole = Role::where('name', 'admin')
+                    ->where('site_id', $site->id)
+                    ->first();
 
-            if ($adminRole) {
-                $firstUser->assignRolesToSites($adminRole, [$site->id]);
+                if ($adminRole) {
+                    $admin->assignRolesToSites($adminRole, [$site->id]);
+                }
             }
 
-            // Assign different roles to other users
-            $otherUsers->each(function (User $user, int $index) use ($site) {
-                if ($site->is_headquarters) {
-                    return true;
-                }
+            // Manager gets manager role on headquarters
+            if ($manager && $site->is_headquarters) {
+                $managerRole = Role::where('name', 'manager')
+                    ->where('site_id', $site->id)
+                    ->first();
 
+                if ($managerRole) {
+                    $manager->assignRolesToSites($managerRole, [$site->id]);
+                }
+            }
+
+            // User gets operator role on non-headquarters sites
+            if ($user && ! $site->is_headquarters) {
+                $operatorRole = Role::where('name', 'operator')
+                    ->where('site_id', $site->id)
+                    ->first();
+
+                if ($operatorRole) {
+                    $user->assignRolesToSites($operatorRole, [$site->id]);
+                }
+            }
+        }
+
+        // Assign random roles to other users (non-demo users)
+        $otherUsers = User::whereNotIn('username', ['admin', 'manager', 'user'])->get();
+        $otherUsers->each(function (User $otherUser, int $index) use ($sites) {
+            $sites->where('is_headquarters', false)->each(function (Site $site) use ($otherUser, $index) {
                 $roleNames = ['manager', 'technician', 'operator'];
                 $roleName = $roleNames[$index % count($roleNames)];
 
@@ -51,9 +70,9 @@ class UserRolesSeeder extends Seeder
                     ->first();
 
                 if ($role) {
-                    $user->assignRolesToSites($role, [$site->id]);
+                    $otherUser->assignRolesToSites($role, [$site->id]);
                 }
             });
-        }
+        });
     }
 }

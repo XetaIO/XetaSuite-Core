@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \XetaSuite\Http\Middleware\SetLocale::class,
             \XetaSuite\Http\Middleware\SetCurrentSite::class,
             \XetaSuite\Http\Middleware\SetCurrentPermissionsAndRoles::class,
+            \XetaSuite\Http\Middleware\DemoModeRestriction::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
