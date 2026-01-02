@@ -72,7 +72,7 @@ class CleaningAlertNotification extends Notification implements ShouldQueue
             ->line('<strong>' . $this->material->name . '</strong>')
             ->line(__('cleanings.notifications.cleaning_alert_line2', [
                 'next_cleaning' => $this->nextCleaning,
-                'message' => $$this->lastCleaning === null ? '.' : __('cleanings.notifications.cleaning_alert_line2_1', ['last_cleaning' => $this->lastCleaning]),
+                'message' => $this->lastCleaning === null ? '.' : __('cleanings.notifications.cleaning_alert_line2_1', ['last_cleaning' => $this->lastCleaning]),
             ]))
             ->action(__('cleanings.notifications.view_material'), $materialUrl);
     }

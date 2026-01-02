@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(function () {
             $rule = Password::min(8);
 
-            return App::isProduction() || App::isLocal()
+            return App::isProduction()
                 ? $rule->letters()
                     ->mixedCase()
                     ->numbers()
