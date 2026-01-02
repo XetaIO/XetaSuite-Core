@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use XetaSuite\Http\Controllers\Api\V1\CleaningController;
 use XetaSuite\Http\Controllers\Api\V1\CompanyController;
 use XetaSuite\Http\Controllers\Api\V1\DashboardController;
+use XetaSuite\Http\Controllers\Api\V1\GlobalSearchController;
 use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
 use XetaSuite\Http\Controllers\Api\V1\ItemMovementController;
@@ -36,6 +37,10 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     // Dashboard stats & charts
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/dashboard/charts', [DashboardController::class, 'chartsData']);
+
+    // Global Search
+    Route::get('/search', [GlobalSearchController::class, 'search']);
+    Route::get('/search/types', [GlobalSearchController::class, 'types']);
 
     // Get authenticated user
     Route::get('/auth/user', function (Request $request) {
