@@ -108,6 +108,14 @@ XetaSuite is ideal for:
 - **Notification center**: Searchable history
 - **Read/unread marking**: Individual and bulk management
 
+### 🔍 Global Search
+
+- **Unified search**: Search across all resources from a single endpoint
+- **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, suppliers, sites
+- **Permission-aware**: Results filtered based on user's permissions
+- **Site-scoped**: Regular users see only their site's data, HQ users see all
+- **Configurable limits**: Control results per type with `per_type` parameter
+
 ---
 
 ## 🏗️ Technical Architecture
