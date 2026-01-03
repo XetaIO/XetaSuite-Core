@@ -20,7 +20,7 @@ class ZoneFactory extends Factory
         return [
             'site_id' => null,
             'parent_id' => null,
-            'name' => $this->faker->unique()->word(),
+            'name' => fake()->unique()->word(),
             'allow_material' => false,
             'material_count' => 0,
         ];
@@ -36,7 +36,7 @@ class ZoneFactory extends Factory
     {
         return $this->state(fn () => [
             'site_id' => $site instanceof Site ? $site->id : $site,
-            'name' => $this->faker->unique()->word(),
+            'name' => fake()->unique()->word(),
         ]);
     }
 

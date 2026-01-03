@@ -27,9 +27,9 @@ class ItemPriceFactory extends Factory
             'created_by_id' => null,
             'created_by_name' => null,
 
-            'price' => $this->faker->randomFloat(2, 0.5, 5000),
-            'effective_date' => $this->faker->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
-            'notes' => $this->faker->optional()->sentence(),
+            'price' => fake()->randomFloat(2, 0.5, 5000),
+            'effective_date' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
+            'notes' => fake()->optional()->sentence(),
         ];
     }
 

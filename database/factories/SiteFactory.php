@@ -17,20 +17,20 @@ class SiteFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->company(),
+            'name' => fake()->unique()->company(),
 
             'is_headquarters' => false,
 
             'zone_count' => 0,
 
-            'email' => $this->faker->optional()->companyEmail(),
-            'office_phone' => $this->faker->optional()->phoneNumber(),
-            'cell_phone' => $this->faker->optional()->phoneNumber(),
+            'email' => fake()->optional()->companyEmail(),
+            'office_phone' => fake()->optional()->phoneNumber(),
+            'cell_phone' => fake()->optional()->phoneNumber(),
 
-            'address' => $this->faker->optional()->streetAddress(),
-            'zip_code' => $this->faker->optional()->postcode(),
-            'city' => $this->faker->optional()->city(),
-            'country' => $this->faker->optional()->country(),
+            'address' => fake()->optional()->streetAddress(),
+            'zip_code' => fake()->optional()->postcode(),
+            'city' => fake()->optional()->city(),
+            'country' => fake()->optional()->country(),
         ];
     }
 
