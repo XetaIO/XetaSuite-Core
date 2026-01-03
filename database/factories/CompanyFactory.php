@@ -23,12 +23,12 @@ class CompanyFactory extends Factory
         return [
             'created_by_id' => null,
             'created_by_name' => null,
-            'name' => \fake()->unique()->company(),
-            'description' => \fake()->optional(0.7)->paragraph(),
+            'name' => fake()->unique()->company(),
+            'description' => fake()->optional(0.7)->paragraph(),
             'types' => [CompanyType::MAINTENANCE_PROVIDER->value],
-            'email' => \fake()->optional(0.7)->companyEmail(),
-            'phone' => \fake()->optional(0.5)->phoneNumber(),
-            'address' => \fake()->optional(0.5)->address(),
+            'email' => fake()->optional(0.7)->companyEmail(),
+            'phone' => fake()->optional(0.5)->phoneNumber(),
+            'address' => fake()->optional(0.5)->address(),
             'maintenance_count' => 0,
             'item_count' => 0,
         ];

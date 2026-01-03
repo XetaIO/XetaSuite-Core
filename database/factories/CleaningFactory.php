@@ -29,8 +29,8 @@ class CleaningFactory extends Factory
             'created_by_name' => null,
             'edited_by_id' => null,
 
-            'description' => \fake()->paragraph(),
-            'type' => \fake()->randomElement(CleaningType::cases())->value,
+            'description' => fake()->paragraph(),
+            'type' => fake()->randomElement(CleaningType::cases())->value,
         ];
     }
 

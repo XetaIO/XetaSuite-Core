@@ -25,13 +25,13 @@ class ItemFactory extends Factory
             'created_by_name' => null,
             'company_id' => null,
             'company_name' => null,
-            'company_reference' => \fake()->optional()->word(),
+            'company_reference' => fake()->optional()->word(),
             'edited_by_id' => null,
 
-            'name' => \fake()->unique()->name(),
-            'description' => \fake()->optional()->paragraph(),
-            'reference' => \fake()->unique()->bothify('REF-####'),
-            'current_price' => \fake()->randomFloat(2, 0, 5000),
+            'name' => fake()->unique()->name(),
+            'description' => fake()->optional()->paragraph(),
+            'reference' => fake()->unique()->bothify('REF-####'),
+            'current_price' => fake()->randomFloat(2, 0, 5000),
 
             'item_entry_total' => 0,
             'item_exit_total' => 0,
@@ -39,7 +39,7 @@ class ItemFactory extends Factory
             'item_exit_count' => 0,
 
             'material_count' => 0,
-            'qrcode_flash_count' => \fake()->numberBetween(0, 10),
+            'qrcode_flash_count' => fake()->numberBetween(0, 10),
 
             'number_warning_enabled' => false,
             'number_warning_minimum' => 0,

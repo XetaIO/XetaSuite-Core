@@ -22,7 +22,7 @@ class MaintenanceFactory extends Factory
      */
     public function definition(): array
     {
-        $status = \fake()->randomElement(MaintenanceStatus::cases());
+        $status = fake()->randomElement(MaintenanceStatus::cases());
 
         return [
             'site_id' => null,
@@ -33,18 +33,18 @@ class MaintenanceFactory extends Factory
             'created_by_name' => null,
             'edited_by_id' => null,
 
-            'description' => \fake()->paragraph(),
-            'reason' => \fake()->sentence(),
+            'description' => fake()->paragraph(),
+            'reason' => fake()->sentence(),
 
-            'type' => \fake()->randomElement(MaintenanceType::cases())->value,
-            'realization' => \fake()->randomElement(MaintenanceRealization::cases())->value,
+            'type' => fake()->randomElement(MaintenanceType::cases())->value,
+            'realization' => fake()->randomElement(MaintenanceRealization::cases())->value,
             'status' => $status->value,
 
             'started_at' => $status === MaintenanceStatus::IN_PROGRESS || $status === MaintenanceStatus::COMPLETED
-                ? \fake()->dateTimeBetween('-3 months', '-1 month')
+                ? fake()->dateTimeBetween('-3 months', '-1 month')
                 : null,
             'resolved_at' => $status === MaintenanceStatus::COMPLETED
-                ? \fake()->dateTimeBetween('-1 month', 'now')
+                ? fake()->dateTimeBetween('-1 month', 'now')
                 : null,
 
             'incident_count' => 0,
@@ -204,7 +204,7 @@ class MaintenanceFactory extends Factory
     public function inProgress(): static
     {
         return $this->withStatus(MaintenanceStatus::IN_PROGRESS)->state(fn () => [
-            'started_at' => \fake()->dateTimeBetween('-1 month', 'now'),
+            'started_at' => fake()->dateTimeBetween('-1 month', 'now'),
         ]);
     }
 
@@ -214,8 +214,8 @@ class MaintenanceFactory extends Factory
     public function completed(): static
     {
         return $this->withStatus(MaintenanceStatus::COMPLETED)->state(fn () => [
-            'started_at' => \fake()->dateTimeBetween('-2 months', '-1 month'),
-            'resolved_at' => \fake()->dateTimeBetween('-1 month', 'now'),
+            'started_at' => fake()->dateTimeBetween('-2 months', '-1 month'),
+            'resolved_at' => fake()->dateTimeBetween('-1 month', 'now'),
         ]);
     }
 
@@ -225,7 +225,7 @@ class MaintenanceFactory extends Factory
     public function canceled(): static
     {
         return $this->withStatus(MaintenanceStatus::CANCELED)->state(fn () => [
-            'resolved_at' => \fake()->dateTimeBetween('-1 month', 'now'),
+            'resolved_at' => fake()->dateTimeBetween('-1 month', 'now'),
         ]);
     }
 
