@@ -27,10 +27,10 @@ class MaterialFactory extends Factory
             'created_by_id' => null,
             'created_by_name' => null,
 
-            'name' => fake()->unique()->word(),
-            'description' => fake()->optional()->sentence(),
+            'name' => \fake()->unique()->word(),
+            'description' => \fake()->optional()->sentence(),
 
-            'qrcode_flash_count' => fake()->numberBetween(0, 10),
+            'qrcode_flash_count' => \fake()->numberBetween(0, 10),
             'incident_count' => 0,
             'item_count' => 0,
             'maintenance_count' => 0,
@@ -39,12 +39,12 @@ class MaterialFactory extends Factory
             'cleaning_alert' => false,
             'cleaning_alert_email' => false,
             'cleaning_alert_frequency_repeatedly' => 0,
-            'cleaning_alert_frequency_type' => fake()->randomElement(
+            'cleaning_alert_frequency_type' => \fake()->randomElement(
                 CleaningFrequency::cases()
             )->value,
 
-            'last_cleaning_at' => fake()->optional()->dateTimeBetween('-1 year', 'now'),
-            'last_cleaning_alert_send_at' => fake()->optional()->dateTimeBetween('-1 year', 'now'),
+            'last_cleaning_at' => \fake()->optional()->dateTimeBetween('-1 year', 'now'),
+            'last_cleaning_alert_send_at' => \fake()->optional()->dateTimeBetween('-1 year', 'now'),
         ];
     }
 

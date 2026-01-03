@@ -28,8 +28,8 @@ class ItemMovementFactory extends Factory
 
         // Entry movement
         if ($type === 'entry') {
-            $invoiceNumber = fake()->optional()->bothify('INV-####');
-            $invoiceDate = fake()->optional()->date();
+            $invoiceNumber = \fake()->optional()->bothify('INV-####');
+            $invoiceDate = \fake()->optional()->date();
         }
 
         return [
@@ -54,8 +54,8 @@ class ItemMovementFactory extends Factory
             'created_by_id' => null,
             'created_by_name' => null,
 
-            'notes' => fake()->optional()->sentence(),
-            'movement_date' => fake()->dateTimeBetween('-1 year', 'now'),
+            'notes' => \fake()->optional()->sentence(),
+            'movement_date' => \fake()->dateTimeBetween('-1 year', 'now'),
         ];
     }
 
@@ -102,8 +102,8 @@ class ItemMovementFactory extends Factory
     {
         return $this->state(fn () => [
             'company_id' => $company instanceof Company ? $company->id : $company,
-            'company_invoice_number' => fake()->bothify('INV-####'),
-            'invoice_date' => fake()->date(),
+            'company_invoice_number' => \fake()->bothify('INV-####'),
+            'invoice_date' => \fake()->date(),
         ]);
     }
 

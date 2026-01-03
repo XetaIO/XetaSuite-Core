@@ -22,7 +22,7 @@ class IncidentFactory extends Factory
      */
     public function definition(): array
     {
-        $status = fake()->randomElement(IncidentStatus::cases());
+        $status = \fake()->randomElement(IncidentStatus::cases());
 
         return [
             'site_id' => null,
@@ -34,18 +34,18 @@ class IncidentFactory extends Factory
 
             'edited_by_id' => null,
 
-            'description' => fake()->paragraph(),
+            'description' => \fake()->paragraph(),
             'started_at' => $status === IncidentStatus::OPEN
                 || $status === IncidentStatus::IN_PROGRESS
                 || $status === IncidentStatus::RESOLVED
-                ? fake()->dateTimeBetween('-3 months', '-1 month')
+                ? \fake()->dateTimeBetween('-3 months', '-1 month')
                 : null,
             'resolved_at' => $status === IncidentStatus::RESOLVED
-                ? fake()->dateTimeBetween('-1 month', 'now')
+                ? \fake()->dateTimeBetween('-1 month', 'now')
                 : null,
 
             'status' => $status->value,
-            'severity' => fake()->randomElement(IncidentSeverity::cases())->value,
+            'severity' => \fake()->randomElement(IncidentSeverity::cases())->value,
 
             'maintenance_id' => null,
         ];
@@ -106,7 +106,7 @@ class IncidentFactory extends Factory
             return [
                 'status' => $value,
                 'resolved_at' => $value === IncidentStatus::RESOLVED->value
-                    ? fake()->dateTimeBetween($attributes['started_at'], 'now')
+                    ? \fake()->dateTimeBetween($attributes['started_at'], 'now')
                     : null,
             ];
         });
