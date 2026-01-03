@@ -61,7 +61,7 @@ class UserService
     public function getAvailableRoles(?string $search = null): Collection
     {
         return Role::query()
-            ->select(['id', 'name'])
+            ->select(['id', 'name', 'site_id'])
             ->when($search, fn (Builder $query) => $query->where('name', 'ILIKE', "%{$search}%"))
             ->orderBy('name')
             ->limit(50)

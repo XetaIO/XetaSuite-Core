@@ -60,6 +60,7 @@ class RoleService
     {
         $query = Role::query()
             ->where('guard_name', 'web')
+            ->with('site:id,name')
             ->withCount(['permissions', 'users']);
 
         return $query

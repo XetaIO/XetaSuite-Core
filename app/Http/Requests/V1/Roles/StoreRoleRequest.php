@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace XetaSuite\Http\Requests\V1\Roles;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use XetaSuite\Models\Role;
 
 class StoreRoleRequest extends FormRequest
@@ -30,8 +29,9 @@ class StoreRoleRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('roles', 'name')->where('guard_name', 'web'),
             ],
+            'level' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:100'],
+            'site_id' => ['sometimes', 'nullable', 'integer', 'exists:sites,id'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => ['integer', 'exists:permissions,id'],
         ];

@@ -23,6 +23,14 @@ class RoleResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'guard_name' => $this->guard_name,
+            'level' => $this->level,
+            'site_id' => $this->site_id,
+            'site' => $this->when($this->site_id !== null, function () {
+                return $this->site ? [
+                    'id' => $this->site->id,
+                    'name' => $this->site->name,
+                ] : null;
+            }),
             'permissions_count' => $this->whenCounted('permissions', $this->permissions_count ?? $this->permissions->count()),
             'users_count' => $this->whenCounted('users', $this->users_count ?? 0),
             'created_at' => $this->created_at?->toIso8601String(),

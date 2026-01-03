@@ -17,9 +17,7 @@ class ItemMovementsSeeder extends Seeder
     public function run(): void
     {
         $items = Item::with('company')->get();
-
-        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
-        $user = User::firstWhere('email', "admin@{$emailDomain}");
+        $user = User::firstWhere('email', "admin@xetasuite.demo");
 
         foreach ($items as $item) {
             // Create Entries Item Movements

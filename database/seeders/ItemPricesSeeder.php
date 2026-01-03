@@ -17,7 +17,7 @@ class ItemPricesSeeder extends Seeder
     public function run(): void
     {
         $items = Item::all();
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+        $user = User::firstWhere('email', "admin@xetasuite.demo");
 
         foreach ($items as $item) {
             $prices = random_int(1, 3);

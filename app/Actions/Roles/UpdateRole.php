@@ -12,6 +12,7 @@ class UpdateRole
 {
     /**
      * Update an existing role.
+     * Note: site_id cannot be changed after creation.
      *
      * @param  Role  $role  The role to update.
      * @param  array  $data  The data to update.
@@ -19,10 +20,18 @@ class UpdateRole
     public function handle(Role $role, array $data): Role
     {
         return DB::transaction(function () use ($role, $data) {
+            $updateData = [];
+
             if (isset($data['name'])) {
-                $role->update([
-                    'name' => $data['name'],
-                ]);
+                $updateData['name'] = $data['name'];
+            }
+
+            if (array_key_exists('level', $data)) {
+                $updateData['level'] = $data['level'];
+            }
+
+            if (! empty($updateData)) {
+                $role->update($updateData);
             }
 
             // Sync permissions if provided

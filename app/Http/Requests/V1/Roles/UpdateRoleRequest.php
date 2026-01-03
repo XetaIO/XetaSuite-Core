@@ -36,6 +36,7 @@ class UpdateRoleRequest extends FormRequest
                     ->where('guard_name', 'web')
                     ->ignore($roleId),
             ],
+            'level' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:100'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => ['integer', 'exists:permissions,id'],
         ];

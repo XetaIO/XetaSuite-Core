@@ -24,6 +24,7 @@ class DemoModeRestriction
     private const BLOCKED_PATTERNS = [
         // User deletion and password changes
         'DELETE:api\/v1\/users\/[^\/]+',
+        'PUT:api\/v1\/users\/[^\/]+',
         'PUT:api\/v1\/user\/password',
 
         // Site deletion

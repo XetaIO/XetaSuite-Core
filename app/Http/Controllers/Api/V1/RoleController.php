@@ -46,9 +46,7 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request, CreateRole $action): RoleDetailResource
     {
-        $role = $action->handle($request->validated());
-
-        return new RoleDetailResource($role);
+        return new RoleDetailResource($action->handle($request->validated()));
     }
 
     /**

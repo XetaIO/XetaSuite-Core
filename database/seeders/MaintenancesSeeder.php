@@ -17,7 +17,7 @@ class MaintenancesSeeder extends Seeder
     public function run(): void
     {
         $itemMovements = ItemMovement::with('item', 'item.materials')->where('type', 'exit')->get();
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+        $user = User::firstWhere('email', "admin@xetasuite.demo");
 
         foreach ($itemMovements as $itemMovement) {
             $maintenance = Maintenance::factory()

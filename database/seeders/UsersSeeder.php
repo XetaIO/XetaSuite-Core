@@ -12,9 +12,13 @@ class UsersSeeder extends Seeder
 {
     public function run(): void
     {
-        $isDemoMode = config('app.demo_mode', false);
-        $emailDomain = $isDemoMode ? 'xetasuite.demo' : 'xetasuite.test';
         $headquarters = Site::where('is_headquarters', true)->first();
+
+        $randomSiteIds = Site::inRandomOrder()
+                ->where('is_headquarters', false)
+                ->take(rand(1, Site::where('is_headquarters', false)->count()))
+                ->pluck('id')
+                ->toArray();
 
         // Admin - has access to all sites
         $admin = User::factory()->admin()->create([
@@ -22,44 +26,28 @@ class UsersSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Demo',
             'current_site_id' => $headquarters->id,
-            'email' => "admin@{$emailDomain}",
+            'email' => "admin@xetasuite.demo",
         ]);
         $admin->sites()->sync(Site::pluck('id')->toArray());
 
-        // Manager - has access to headquarters
+        // Manager - has access to a regular site with more permissions
         $manager = User::factory()->create([
             'username' => 'manager',
             'first_name' => 'Manager',
             'last_name' => 'Demo',
-            'current_site_id' => $headquarters->id,
-            'email' => "manager@{$emailDomain}",
+            'current_site_id' => $randomSiteIds[0],
+            'email' => "manager@xetasuite.demo",
         ]);
-        $manager->sites()->sync([$headquarters->id]);
+        $manager->sites()->sync($randomSiteIds);
 
-        // Regular user - has access to a regular site
-        $regularSite = Site::where('is_headquarters', false)->first();
+        // Regular user - has access to a regular site with less permissions
         $user = User::factory()->create([
-            'username' => 'user',
-            'first_name' => 'User',
+            'username' => 'operator',
+            'first_name' => 'Operator',
             'last_name' => 'Demo',
-            'current_site_id' => $regularSite?->id ?? $headquarters->id,
-            'email' => "user@{$emailDomain}",
+            'current_site_id' => $randomSiteIds[0],
+            'email' => "operator@xetasuite.demo",
         ]);
-        $user->sites()->sync([$regularSite?->id ?? $headquarters->id]);
-
-        // Additional random users (only in non-demo mode for variety)
-        if (! $isDemoMode) {
-            $users = User::factory()->count(3)->create();
-            $users->each(function (User $user) {
-                $siteIds = Site::inRandomOrder()
-                    ->where('is_headquarters', false)
-                    ->take(rand(1, Site::where('is_headquarters', false)->count()))
-                    ->pluck('id')
-                    ->toArray();
-                $user->sites()->sync($siteIds);
-                $user->current_site_id = $siteIds[0] ?? null;
-                $user->save();
-            });
-        }
+        $user->sites()->sync($randomSiteIds);
     }
 }
