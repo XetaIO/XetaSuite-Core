@@ -74,7 +74,7 @@ class MaterialService
      */
     public function getAvailableRecipients(): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('site_id', $currentSiteId))
@@ -229,7 +229,7 @@ class MaterialService
     public function getMaterialItems(Material $material, array $filters = []): LengthAwarePaginator
     {
         return $material->items()
-            ->with(['supplier'])
+            ->with(['company'])
             ->when($filters['search'] ?? null, function (Builder $query, string $search) {
                 $query->where(function (Builder $q) use ($search) {
                     $q->where('items.name', 'ILIKE', "%{$search}%")

@@ -10,7 +10,7 @@ use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
@@ -26,8 +26,8 @@ beforeEach(function () {
     // Create another regular site
     $this->otherSite = Site::factory()->create(['is_headquarters' => false]);
 
-    // Create a supplier (on HQ)
-    $this->supplier = Supplier::factory()->create();
+    // Create a company as item provider
+    $this->company = Company::factory()->asItemProvider()->create();
 
     // Create permissions
     $permissions = [
@@ -98,8 +98,8 @@ describe('index', function () {
                         'name',
                         'reference',
                         'description',
-                        'supplier_id',
-                        'supplier_name',
+                        'company_id',
+                        'company_name',
                         'current_price',
                         'stock_status',
                         'created_by_id',
@@ -141,17 +141,17 @@ describe('index', function () {
             ->assertJsonPath('data.0.reference', 'REF-001');
     });
 
-    it('can filter items by supplier', function () {
+    it('can filter items by company', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
-        $supplier2 = Supplier::factory()->create();
+        $company2 = Company::factory()->asItemProvider()->create();
 
         Item::factory()->forSite($this->regularSite)->createdBy($user)
-            ->fromSupplier($this->supplier)->count(2)->create();
+            ->fromCompany($this->company)->count(2)->create();
         Item::factory()->forSite($this->regularSite)->createdBy($user)
-            ->fromSupplier($supplier2)->create();
+            ->fromCompany($company2)->create();
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/items?supplier_id='.$this->supplier->id);
+            ->getJson('/api/v1/items?company_id='.$this->company->id);
 
         $response->assertOk()
             ->assertJsonCount(2, 'data');
@@ -185,7 +185,7 @@ describe('show', function () {
         $item = Item::factory()
             ->forSite($this->regularSite)
             ->createdBy($user)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->create();
 
         $response = $this->actingAs($user)
@@ -199,10 +199,10 @@ describe('show', function () {
                     'reference',
                     'description',
                     'site_id',
-                    'supplier_id',
-                    'supplier_name',
-                    'supplier_reference',
-                    'supplier',
+                    'company_id',
+                    'company_name',
+                    'company_reference',
+                    'company',
                     'current_price',
                     'stock_status',
                     'item_entry_total',
@@ -278,8 +278,8 @@ describe('store', function () {
                 'name' => 'Full Item',
                 'reference' => 'REF-FULL-001',
                 'description' => 'A full item description',
-                'supplier_id' => $this->supplier->id,
-                'supplier_reference' => 'SUP-REF-001',
+                'company_id' => $this->company->id,
+                'company_reference' => 'COMP-REF-001',
                 'current_price' => 99.99,
                 'number_warning_enabled' => true,
                 'number_warning_minimum' => 10,
@@ -289,7 +289,7 @@ describe('store', function () {
 
         $response->assertStatus(201)
             ->assertJsonPath('data.name', 'Full Item')
-            ->assertJsonPath('data.supplier_id', $this->supplier->id)
+            ->assertJsonPath('data.company_id', $this->company->id)
             ->assertJsonPath('data.number_warning_enabled', true)
             ->assertJsonPath('data.number_critical_enabled', true);
     });
@@ -615,8 +615,8 @@ describe('movements', function () {
                         'total_price',
                         'movement_date',
                         'notes',
-                        'supplier_id',
-                        'supplier_name',
+                        'company_id',
+                        'company_name',
                         'created_by_id',
                         'created_by_name',
                         'created_at',
@@ -1050,17 +1050,17 @@ describe('materials', function () {
 // AVAILABLE ENDPOINTS TESTS
 // ============================================================================
 
-describe('availableSuppliers', function () {
-    it('returns list of suppliers', function () {
+describe('availableCompanies', function () {
+    it('returns list of item provider companies', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
-        Supplier::factory()->count(3)->create();
+        Company::factory()->asItemProvider()->count(3)->create();
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/items/available-suppliers');
+            ->getJson('/api/v1/items/available-companies');
 
         $response->assertOk()
-            ->assertJsonCount(4, 'suppliers'); // 3 + 1 from beforeEach
+            ->assertJsonCount(4, 'companies'); // 3 + 1 from beforeEach
     });
 
     it('requires item.viewAny permission', function () {
@@ -1068,7 +1068,7 @@ describe('availableSuppliers', function () {
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/items/available-suppliers');
+            ->getJson('/api/v1/items/available-companies');
 
         $response->assertForbidden();
     });

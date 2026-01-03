@@ -12,7 +12,6 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\Zone;
 
 class GlobalSearchService
@@ -43,7 +42,7 @@ class GlobalSearchService
             'model' => Item::class,
             'permission' => 'item.view',
             'columns' => ['name', 'reference', 'description'],
-            'relations' => ['site', 'supplier'],
+            'relations' => ['site', 'company'],
             'hq_only' => false,
         ],
         'incidents' => [
@@ -63,13 +62,6 @@ class GlobalSearchService
         'companies' => [
             'model' => Company::class,
             'permission' => 'company.view',
-            'columns' => ['name', 'description'],
-            'relations' => [],
-            'hq_only' => false,
-        ],
-        'suppliers' => [
-            'model' => Supplier::class,
-            'permission' => 'supplier.view',
             'columns' => ['name', 'description'],
             'relations' => [],
             'hq_only' => false,
@@ -209,7 +201,7 @@ class GlobalSearchService
                 'description' => $item->description,
                 'meta' => [
                     'site' => $item->site?->name,
-                    'supplier' => $item->supplier?->name,
+                    'company' => $item->company?->name,
                     'stock' => $item->item_entry_total - $item->item_exit_total,
                 ],
             ],
@@ -247,15 +239,6 @@ class GlobalSearchService
                 'description' => $item->description,
                 'meta' => [
                     'maintenance_count' => $item->maintenance_count,
-                ],
-            ],
-            'suppliers' => [
-                ...$baseResult,
-                'url' => "/suppliers/{$item->id}",
-                'title' => $item->name,
-                'subtitle' => null,
-                'description' => $item->description,
-                'meta' => [
                     'item_count' => $item->item_count,
                 ],
             ],

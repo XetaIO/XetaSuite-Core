@@ -24,7 +24,7 @@ class StoreIncidentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $currentSiteId = $this->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         return [
             'material_id' => [

@@ -24,7 +24,7 @@ class StoreItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        $siteId = $this->user()->current_site_id;
+        $siteId = session('current_site_id');
 
         return [
             'name' => [
@@ -40,8 +40,8 @@ class StoreItemRequest extends FormRequest
                 Rule::unique('items')->where('site_id', $siteId),
             ],
             'description' => 'nullable|string|max:2000',
-            'supplier_id' => 'nullable|integer|exists:suppliers,id',
-            'supplier_reference' => 'nullable|string|max:100',
+            'company_id' => 'nullable|integer|exists:companies,id',
+            'company_reference' => 'nullable|string|max:100',
             'current_price' => 'nullable|numeric|min:0|max:9999999.99',
             'number_warning_enabled' => 'boolean',
             'number_warning_minimum' => 'nullable|integer|min:0',
@@ -83,8 +83,8 @@ class StoreItemRequest extends FormRequest
             'name' => __('items.name'),
             'reference' => __('items.reference'),
             'description' => __('items.description'),
-            'supplier_id' => __('items.supplier'),
-            'supplier_reference' => __('items.supplier_reference'),
+            'company_id' => __('items.company'),
+            'company_reference' => __('items.company_reference'),
             'current_price' => __('items.current_price'),
             'number_warning_enabled' => __('items.number_warning_enabled'),
             'number_warning_minimum' => __('items.number_warning_minimum'),

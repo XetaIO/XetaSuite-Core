@@ -127,7 +127,7 @@ class MaintenanceService
     public function getAvailableOperators(?string $search = null): Collection
     {
         return User::query()
-            ->whereHas('sites', fn (Builder $query) => $query->where('site_id', auth()->user()->current_site_id))
+            ->whereHas('sites', fn (Builder $query) => $query->where('site_id', session('current_site_id')))
             ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
                 $q->where('first_name', 'ILIKE', "%{$s}%")
                     ->orWhere('last_name', 'ILIKE', "%{$s}%")

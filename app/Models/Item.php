@@ -32,9 +32,9 @@ class Item extends Model
         'site_id',
         'created_by_id',
         'created_by_name',
-        'supplier_id',
-        'supplier_name',
-        'supplier_reference',
+        'company_id',
+        'company_name',
+        'company_reference',
         'edited_by_id',
         'name',
         'description',
@@ -63,7 +63,7 @@ class Item extends Model
      * The relations to be counted.
      */
     protected static array $countsConfig = [
-        'supplier' => 'item_count',
+        'company' => 'item_count',
         'creator' => 'item_count',
     ];
 
@@ -76,11 +76,11 @@ class Item extends Model
     }
 
     /**
-     * Get the supplier that owns the item.
+     * Get the company (item provider) that supplies the item.
      */
-    public function supplier(): BelongsTo
+    public function company(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Company::class);
     }
 
     /**

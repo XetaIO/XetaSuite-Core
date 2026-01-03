@@ -29,7 +29,7 @@ class ItemMovementService
     public function getPaginatedMovements(Item $item, array $filters = []): LengthAwarePaginator
     {
         return $item->movements()
-            ->with(['supplier', 'creator'])
+            ->with(['company', 'creator'])
             ->when(! empty($filters['type']), fn (Builder $query) => $query->where('type', $filters['type']))
             ->when(
                 $filters['sort_by'] ?? null,
@@ -48,7 +48,7 @@ class ItemMovementService
     public function getAllPaginatedMovements(int $siteId, array $filters = []): LengthAwarePaginator
     {
         $query = ItemMovement::query()
-            ->with(['item', 'item.site', 'supplier', 'creator']);
+            ->with(['item', 'item.site', 'company', 'creator']);
 
         // If not HQ, filter by item's site
         if (! isOnHeadquarters()) {
@@ -78,11 +78,11 @@ class ItemMovementService
             $q->whereHas('item', fn (Builder $itemQ) => $itemQ
                 ->where('name', 'ILIKE', "%{$search}%")
                 ->orWhere('reference', 'ILIKE', "%{$search}%"))
-                ->orWhereHas('supplier', fn (Builder $supplierQ) => $supplierQ
+                ->orWhereHas('company', fn (Builder $companyQ) => $companyQ
                     ->where('name', 'ILIKE', "%{$search}%")
                     ->orWhere('description', 'ILIKE', "%{$search}%"))
-                ->orWhere('supplier_name', 'ILIKE', "%{$search}%")
-                ->orWhere('supplier_invoice_number', 'ILIKE', "%{$search}%");
+                ->orWhere('company_name', 'ILIKE', "%{$search}%")
+                ->orWhere('company_invoice_number', 'ILIKE', "%{$search}%");
         });
     }
 }

@@ -38,12 +38,12 @@ class UpdateItemMovement
             $unitPrice = $updateData['unit_price'] ?? $movement->unit_price;
             $updateData['total_price'] = $quantity * $unitPrice;
 
-            if (array_key_exists('supplier_id', $data)) {
-                $updateData['supplier_id'] = $data['supplier_id'];
+            if (array_key_exists('company_id', $data)) {
+                $updateData['company_id'] = $data['company_id'];
             }
 
-            if (array_key_exists('supplier_invoice_number', $data)) {
-                $updateData['supplier_invoice_number'] = $data['supplier_invoice_number'];
+            if (array_key_exists('company_invoice_number', $data)) {
+                $updateData['company_invoice_number'] = $data['company_invoice_number'];
             }
 
             if (array_key_exists('invoice_date', $data)) {

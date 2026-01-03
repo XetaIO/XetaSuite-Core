@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Material;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 use XetaSuite\Services\Concerns\HasSearchAndSort;
 
@@ -22,23 +22,24 @@ class ItemService
 {
     use HasSearchAndSort;
 
-    private const SEARCH_COLUMNS = ['name', 'reference', 'description', 'supplier_reference'];
+    private const SEARCH_COLUMNS = ['name', 'reference', 'description', 'company_reference'];
 
     private const ALLOWED_SORTS = ['name', 'reference', 'current_price', 'created_at'];
+
     /**
      * Get a paginated list of items with optional search, filters and sorting.
      *
-     * @param  array{search?: string, supplier_id?: int, stock_status?: string, sort_by?: string, sort_direction?: string, per_page?: int}  $filters
+     * @param  array{search?: string, company_id?: int, stock_status?: string, sort_by?: string, sort_direction?: string, per_page?: int}  $filters
      */
     public function getPaginatedItems(array $filters = []): LengthAwarePaginator
     {
         $query = Item::query()
-            ->with(['site', 'supplier', 'creator'])
+            ->with(['site', 'company', 'creator'])
             ->forCurrentSite();
 
         return $query
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
-            ->when($filters['supplier_id'] ?? null, fn (Builder $query, int $supplierId) => $query->where('supplier_id', $supplierId))
+            ->when($filters['company_id'] ?? null, fn (Builder $query, int $companyId) => $query->where('company_id', $companyId))
             ->when($filters['stock_status'] ?? null, fn (Builder $query, string $status) => $this->applyStockStatusFilter($query, $status))
             ->when(
                 $filters['sort_by'] ?? null,
@@ -48,57 +49,35 @@ class ItemService
             ->paginate($filters['per_page'] ?? 20);
     }
 
-    /**
-     * Get items for a specific supplier.
-     */
-    public function getItemsForSupplier(Supplier $supplier, array $filters = []): LengthAwarePaginator
-    {
-        return Item::query()
-            ->with(['site'])
-            ->where('supplier_id', $supplier->id)
-            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $this->applySearchFilter($query, $search, self::SEARCH_COLUMNS))
-            ->orderBy('name')
-            ->paginate($filters['per_page'] ?? 20);
-    }
 
     /**
-     * Get items for a specific material.
-     */
-    public function getItemsForMaterial(Material $material): EloquentCollection
-    {
-        return $material->items()
-            ->with(['supplier'])
-            ->orderBy('name')
-            ->get();
-    }
-
-    /**
-     * Get available suppliers for item creation (global suppliers from HQ).
+     * Get available companies for item creation (companies with item_provider type).
      *
-     * @param  string|null  $search  Search term to filter suppliers by name
-     * @param  int|null  $includeId  Always include this supplier ID (even if not in search results)
+     * @param  string|null  $search  Search term to filter companies by name
+     * @param  int|null  $includeId  Always include this company ID (even if not in search results)
      */
-    public function getAvailableSuppliers(?string $search = null, ?int $includeId = null): EloquentCollection
+    public function getAvailableCompanies(?string $search = null, ?int $includeId = null): EloquentCollection
     {
-        $suppliers = Supplier::query()
+        $companies = Company::query()
+            ->itemProviders()
             ->when($search, fn (Builder $query) => $query->where('name', 'ILIKE', "%{$search}%"))
             ->when($includeId, fn (Builder $query) => $query->where('id', '!=', $includeId))
             ->orderBy('name')
             ->limit($includeId ? 19 : 20)
             ->get(['id', 'name']);
 
-        // If includeId is provided, fetch that supplier and prepend it to the list
+        // If includeId is provided, fetch that company and prepend it to the list
         if ($includeId) {
-            $includedSupplier = Supplier::query()
+            $includedCompany = Company::query()
                 ->where('id', $includeId)
                 ->first(['id', 'name']);
 
-            if ($includedSupplier) {
-                $suppliers->prepend($includedSupplier);
+            if ($includedCompany) {
+                $companies->prepend($includedCompany);
             }
         }
 
-        return $suppliers;
+        return $companies;
     }
 
     /**
@@ -107,7 +86,7 @@ class ItemService
      */
     public function getAvailableMaterials(?string $search = null): EloquentCollection
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         return Material::query()
             ->where('site_id', $currentSiteId)
@@ -123,7 +102,7 @@ class ItemService
      */
     public function getAvailableRecipients(?string $search = null): Collection
     {
-        $currentSiteId = auth()->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('sites.id', $currentSiteId))

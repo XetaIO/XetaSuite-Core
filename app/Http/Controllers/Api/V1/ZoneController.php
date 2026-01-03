@@ -32,7 +32,7 @@ class ZoneController extends Controller
         $this->authorize('viewAny', Zone::class);
 
         $zones = $this->zoneService->getPaginatedZones([
-            'site_id' => auth()->user()->current_site_id,
+            'site_id' => session('current_site_id'),
             'parent_id' => request()->has('parent_id') ? request('parent_id') : null,
             'search' => request('search'),
             'sort_by' => request('sort_by'),
@@ -128,7 +128,7 @@ class ZoneController extends Controller
     {
         $this->authorize('viewAny', Zone::class);
 
-        $siteId = auth()->user()->current_site_id;
+        $siteId = session('current_site_id');
         $excludeZoneId = request('exclude_zone_id');
 
         $excludeZone = $excludeZoneId ? Zone::find($excludeZoneId) : null;
@@ -192,7 +192,7 @@ class ZoneController extends Controller
         $this->authorize('viewAny', Zone::class);
 
         // Determine which site to show zones for
-        $siteId = auth()->user()->current_site_id;
+        $siteId = session('current_site_id');
 
         // If on HQ and site_id is provided, use that site
         if (isOnHeadquarters() && request()->has('site_id')) {

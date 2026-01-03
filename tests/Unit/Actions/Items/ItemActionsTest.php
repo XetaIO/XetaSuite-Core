@@ -10,8 +10,8 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Material;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 use XetaSuite\Models\Zone;
 
@@ -39,20 +39,20 @@ describe('CreateItem', function () {
             ->and($item->created_by_id)->toBe($user->id);
     });
 
-    it('creates an item with supplier', function () {
+    it('creates an item with company', function () {
         $site = Site::factory()->create();
-        $supplier = Supplier::factory()->create();
+        $company = Company::factory()->asItemProvider()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $action = app(CreateItem::class);
 
         $item = $action->handle($user, [
-            'name' => 'Item with Supplier',
-            'supplier_id' => $supplier->id,
-            'supplier_reference' => 'SUP-REF-001',
+            'name' => 'Item with Company',
+            'company_id' => $company->id,
+            'company_reference' => 'COMP-REF-001',
         ]);
 
-        expect($item->supplier_id)->toBe($supplier->id)
-            ->and($item->supplier_reference)->toBe('SUP-REF-001');
+        expect($item->company_id)->toBe($company->id)
+            ->and($item->company_reference)->toBe('COMP-REF-001');
     });
 
     it('creates an item with current price and creates price history', function () {
@@ -167,19 +167,19 @@ describe('UpdateItem', function () {
         expect((float) $updatedItem->current_price)->toBe(75.0);
     });
 
-    it('updates supplier', function () {
+    it('updates company', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
-        $oldSupplier = Supplier::factory()->create();
-        $newSupplier = Supplier::factory()->create();
-        $item = Item::factory()->forSite($site)->createdBy($user)->fromSupplier($oldSupplier)->create();
+        $oldCompany = Company::factory()->asItemProvider()->create();
+        $newCompany = Company::factory()->asItemProvider()->create();
+        $item = Item::factory()->forSite($site)->createdBy($user)->fromCompany($oldCompany)->create();
         $action = app(UpdateItem::class);
 
         $updatedItem = $action->handle($item, $user, [
-            'supplier_id' => $newSupplier->id,
+            'company_id' => $newCompany->id,
         ]);
 
-        expect($updatedItem->supplier_id)->toBe($newSupplier->id);
+        expect($updatedItem->company_id)->toBe($newCompany->id);
     });
 
     it('syncs materials', function () {

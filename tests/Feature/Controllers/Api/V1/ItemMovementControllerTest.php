@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
+use XetaSuite\Models\Company;
 
 uses(RefreshDatabase::class);
 
@@ -22,9 +22,9 @@ beforeEach(function () {
     // Create another regular site
     $this->otherSite = Site::factory()->create(['is_headquarters' => false]);
 
-    // Create suppliers (on HQ)
-    $this->supplier = Supplier::factory()->create(['name' => 'Test Supplier']);
-    $this->supplier2 = Supplier::factory()->create(['name' => 'Other Supplier']);
+    // Create companies as item providers
+    $this->company = Company::factory()->asItemProvider()->create(['name' => 'Test Company']);
+    $this->company2 = Company::factory()->asItemProvider()->create(['name' => 'Other Company']);
 
     // Create permissions
     $permissions = [
@@ -69,7 +69,7 @@ describe('index', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -99,7 +99,7 @@ describe('index', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -116,9 +116,9 @@ describe('index', function () {
                         'quantity',
                         'unit_price',
                         'total_price',
-                        'supplier_id',
-                        'supplier_name',
-                        'supplier_invoice_number',
+                        'company_id',
+                        'company_name',
+                        'company_invoice_number',
                         'invoice_date',
                         'movement_date',
                         'notes',
@@ -143,7 +143,7 @@ describe('index', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->count(3)
@@ -218,7 +218,7 @@ describe('show', function () {
         $movement = ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -234,9 +234,9 @@ describe('show', function () {
                     'quantity',
                     'unit_price',
                     'total_price',
-                    'supplier_id',
-                    'supplier_name',
-                    'supplier_invoice_number',
+                    'company_id',
+                    'company_name',
+                    'company_invoice_number',
                     'invoice_date',
                     'movement_date',
                     'notes',
@@ -318,7 +318,7 @@ describe('store', function () {
         expect($item->item_entry_count)->toBe(1);
     });
 
-    it('can create entry movement with supplier', function () {
+    it('can create entry movement with company', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -332,14 +332,14 @@ describe('store', function () {
                 'quantity' => 5,
                 'unit_price' => 10.00,
                 'movement_date' => now()->toDateString(),
-                'supplier_id' => $this->supplier->id,
-                'supplier_invoice_number' => 'INV-2024-001',
+                'company_id' => $this->company->id,
+                'company_invoice_number' => 'INV-2024-001',
                 'invoice_date' => now()->toDateString(),
             ]);
 
         $response->assertStatus(201)
-            ->assertJsonPath('data.supplier_id', $this->supplier->id)
-            ->assertJsonPath('data.supplier_invoice_number', 'INV-2024-001');
+            ->assertJsonPath('data.company_id', $this->company->id)
+            ->assertJsonPath('data.company_invoice_number', 'INV-2024-001');
     });
 
     it('can create exit movement', function () {
@@ -491,7 +491,7 @@ describe('update', function () {
         expect($item->item_entry_total)->toBe($initialTotal + 5);
     });
 
-    it('can update movement supplier', function () {
+    it('can update movement company', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -502,7 +502,7 @@ describe('update', function () {
         $movement = ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -512,11 +512,11 @@ describe('update', function () {
                 'quantity' => 10,
                 'unit_price' => 5.00,
                 'movement_date' => now()->toDateString(),
-                'supplier_id' => $this->supplier2->id,
+                'company_id' => $this->company2->id,
             ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.supplier_id', $this->supplier2->id);
+            ->assertJsonPath('data.company_id', $this->company2->id);
     });
 
     it('cannot update movement from another site item', function () {
@@ -674,11 +674,11 @@ describe('destroy', function () {
 });
 
 // ============================================================================
-// AVAILABLE SUPPLIERS TESTS
+// AVAILABLE COMPANIES TESTS
 // ============================================================================
 
-describe('availableSuppliers', function () {
-    it('returns list of suppliers', function () {
+describe('availableCompanies', function () {
+    it('returns list of item provider companies', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -687,17 +687,17 @@ describe('availableSuppliers', function () {
             ->create();
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/items/available-suppliers');
+            ->getJson('/api/v1/items/available-companies');
 
         $response->assertOk()
             ->assertJsonStructure([
-                'suppliers' => [
+                'companies' => [
                     '*' => ['id', 'name'],
                 ],
             ]);
 
-        // Should have at least our 2 suppliers
-        expect(count($response->json('suppliers')))->toBeGreaterThanOrEqual(2);
+        // Should have at least our 2 companies
+        expect(count($response->json('companies')))->toBeGreaterThanOrEqual(2);
     });
 
     it('requires item.viewAny permission', function () {
@@ -705,7 +705,7 @@ describe('availableSuppliers', function () {
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
         $response = $this->actingAs($user)
-            ->getJson('/api/v1/items/available-suppliers');
+            ->getJson('/api/v1/items/available-companies');
 
         $response->assertForbidden();
     });
@@ -734,7 +734,7 @@ describe('all', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item1)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -775,7 +775,7 @@ describe('all', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -792,9 +792,9 @@ describe('all', function () {
                         'quantity',
                         'unit_price',
                         'total_price',
-                        'supplier_id',
-                        'supplier_name',
-                        'supplier_invoice_number',
+                        'company_id',
+                        'company_name',
+                        'company_invoice_number',
                         'invoice_date',
                         'movement_date',
                         'notes',
@@ -828,7 +828,7 @@ describe('all', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier)
+            ->fromCompany($this->company)
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->count(3)
@@ -889,7 +889,7 @@ describe('all', function () {
             ->assertJsonCount(1, 'data');
     });
 
-    it('can search by supplier name', function () {
+    it('can search by company name', function () {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -900,7 +900,7 @@ describe('all', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier) // Test Supplier
+            ->fromCompany($this->company) // Test Company
             ->withQuantity(10, 5.00)
             ->createdBy($user)
             ->create();
@@ -908,7 +908,7 @@ describe('all', function () {
         ItemMovement::factory()
             ->entry()
             ->forItem($item)
-            ->fromSupplier($this->supplier2) // Other Supplier
+            ->fromCompany($this->company2) // Other Company
             ->withQuantity(5, 10.00)
             ->createdBy($user)
             ->create();

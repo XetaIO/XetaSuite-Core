@@ -26,6 +26,18 @@ return new class () extends Migration {
 
             $table->string('name')->unique();
             $table->text('description')->nullable();
+
+            // Company types (item_provider, maintenance_provider)
+            $table->json('types')->default('[]')
+                ->comment('Array of company types: item_provider, maintenance_provider');
+
+            // Contact information
+            $table->string('email')->nullable();
+            $table->string('phone', 20)->nullable();
+            $table->text('address')->nullable();
+
+            // Counts
+            $table->unsignedInteger('item_count')->default(0);
             $table->unsignedInteger('maintenance_count')->default(0);
 
             $table->timestamps();

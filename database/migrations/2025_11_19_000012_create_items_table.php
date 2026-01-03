@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 return new class () extends Migration {
@@ -30,16 +30,16 @@ return new class () extends Migration {
                 ->nullable()
                 ->comment('The name of the user who created the item if the user is deleted.');
 
-            $table->foreignIdFor(Supplier::class)
+            $table->foreignIdFor(Company::class)
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            $table->string('supplier_name', 150)
+            $table->string('company_name', 150)
                 ->nullable()
-                ->comment('The name of the supplier who supplied the item if the supplier is deleted.');
-            $table->string('supplier_reference', 100)
+                ->comment('The name of the company who supplied the item if the company is deleted.');
+            $table->string('company_reference', 100)
                 ->nullable()
-                ->comment('The supplier reference for this item.');
+                ->comment('The company reference for this item.');
 
             $table->foreignIdFor(User::class, 'edited_by_id')
                 ->nullable()

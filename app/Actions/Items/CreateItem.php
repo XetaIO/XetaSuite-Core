@@ -6,8 +6,8 @@ namespace XetaSuite\Actions\Items;
 
 use Illuminate\Support\Facades\DB;
 use XetaSuite\Actions\ItemPrices\CreateItemPrice;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class CreateItem
@@ -21,7 +21,7 @@ class CreateItem
     public function handle(User $user, array $data): Item
     {
         return DB::transaction(function () use ($user, $data) {
-            $supplier = isset($data['supplier_id']) ? Supplier::find($data['supplier_id']) : null;
+            $company = isset($data['company_id']) ? Company::find($data['company_id']) : null;
 
             $item = Item::create([
                 'site_id' => $user->current_site_id,
@@ -29,8 +29,8 @@ class CreateItem
                 'name' => $data['name'],
                 'reference' => $data['reference'] ?? null,
                 'description' => $data['description'] ?? null,
-                'supplier_id' => $supplier?->id,
-                'supplier_reference' => $data['supplier_reference'] ?? null,
+                'company_id' => $company?->id,
+                'company_reference' => $data['company_reference'] ?? null,
                 'current_price' => $data['current_price'] ?? 0,
                 'number_warning_enabled' => $data['number_warning_enabled'] ?? false,
                 'number_warning_minimum' => $data['number_warning_minimum'] ?? 0,
@@ -51,7 +51,7 @@ class CreateItem
             // Create initial price history if current_price is set
             if (($data['current_price'] ?? 0) > 0) {
                 $data['notes'] = __('items.initial_price');
-                $data['supplier'] = $supplier;
+                $data['company'] = $company;
 
                 app(CreateItemPrice::class)->handle($item, $user, $data);
             }

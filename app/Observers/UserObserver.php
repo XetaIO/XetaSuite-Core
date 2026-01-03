@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace XetaSuite\Observers;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use XetaSuite\Models\Cleaning;
 use XetaSuite\Models\Company;
@@ -13,7 +14,6 @@ use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class UserObserver
@@ -23,7 +23,9 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        $user->sendEmailRegisteredNotification();
+        if (App::isProduction()) {
+            $user->sendEmailRegisteredNotification();
+        }
     }
 
     /**
@@ -88,10 +90,6 @@ class UserObserver
             ->update(['created_by_name' => $name]);
 
         Material::query()
-            ->where('created_by_id', $user->id)
-            ->update(['created_by_name' => $name]);
-
-        Supplier::query()
             ->where('created_by_id', $user->id)
             ->update(['created_by_name' => $name]);
 

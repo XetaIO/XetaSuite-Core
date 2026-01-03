@@ -30,13 +30,13 @@ class ItemDetailResource extends JsonResource
                 'name' => $this->site->name,
             ]),
 
-            // Supplier info
-            'supplier_id' => $this->supplier_id,
-            'supplier_name' => $this->supplier_name,
-            'supplier_reference' => $this->supplier_reference,
-            'supplier' => $this->whenLoaded('supplier', fn () => [
-                'id' => $this->supplier->id,
-                'name' => $this->supplier->name,
+            // Company info
+            'company_id' => $this->company_id,
+            'company_name' => $this->company_name,
+            'company_reference' => $this->company_reference,
+            'company' => $this->whenLoaded('company', fn () => [
+                'id' => $this->company->id,
+                'name' => $this->company->name,
             ]),
 
             // Creator info

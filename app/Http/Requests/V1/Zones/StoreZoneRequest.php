@@ -24,7 +24,7 @@ class StoreZoneRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'site_id' => $this->user()->current_site_id,
+            'site_id' => session('current_site_id'),
         ]);
     }
 

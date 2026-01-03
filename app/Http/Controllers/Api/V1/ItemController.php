@@ -45,7 +45,7 @@ class ItemController extends Controller
 
         $items = $this->itemService->getPaginatedItems([
             'search' => request('search'),
-            'supplier_id' => request('supplier_id'),
+            'company_id' => request('company_id'),
             'stock_status' => request('stock_status'),
             'sort_by' => request('sort_by'),
             'sort_direction' => request('sort_direction'),
@@ -65,7 +65,7 @@ class ItemController extends Controller
         $item = $action->handle($request->user(), $request->validated());
 
         return new ItemDetailResource(
-            $item->load(['supplier', 'creator', 'materials', 'recipients'])
+            $item->load(['company', 'creator', 'materials', 'recipients'])
         );
     }
 
@@ -78,7 +78,7 @@ class ItemController extends Controller
     {
         $this->authorize('view', $item);
 
-        $item->load(['supplier', 'creator', 'editor', 'materials', 'recipients']);
+        $item->load(['company', 'creator', 'editor', 'materials', 'recipients']);
 
         return new ItemDetailResource($item);
     }
@@ -95,7 +95,7 @@ class ItemController extends Controller
         $item = $action->handle($item, $request->user(), $request->validated());
 
         return new ItemDetailResource(
-            $item->load(['supplier', 'creator', 'editor', 'materials', 'recipients'])
+            $item->load(['company', 'creator', 'editor', 'materials', 'recipients'])
         );
     }
 
@@ -224,21 +224,21 @@ class ItemController extends Controller
     }
 
     /**
-     * Get available suppliers for item assignment.
+     * Get available companies (item providers) for item assignment.
      *
      * @param  Request  $request  The incoming request.
      */
-    public function availableSuppliers(Request $request): JsonResponse
+    public function availableCompanies(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Item::class);
 
-        $suppliers = $this->itemService->getAvailableSuppliers(
+        $companies = $this->itemService->getAvailableCompanies(
             $request->query('search'),
             $request->query('include_id') ? (int) $request->query('include_id') : null
         );
 
         return response()->json([
-            'suppliers' => $suppliers,
+            'companies' => $companies,
         ]);
     }
 

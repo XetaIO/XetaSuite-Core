@@ -18,7 +18,8 @@ class CleaningsSeeder extends Seeder
     {
         $materials = Material::inRandomOrder()->take(10)->get();
 
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
+        $user = User::firstWhere('email', "admin@{$emailDomain}");
 
         foreach ($materials as $material) {
             Cleaning::factory()

@@ -63,11 +63,17 @@ XetaSuite is ideal for:
 ### 📦 Stock & Inventory Management
 
 - **Items catalog**: Complete catalog with references, descriptions, units
-- **Suppliers**: Centralized database (headquarters management only)
 - **Stock movements**: Entries, exits, transfers with full traceability
 - **QR Codes**: Automatic generation for quick identification
 - **Price history**: Track purchase cost evolution
 - **Stock alerts**: Configurable thresholds for reordering
+
+### 🏢 Company Management
+
+- **Unified company model**: Companies can be item providers, maintenance contractors, or both
+- **Type-based filtering**: Filter companies by their role (ITEM_PROVIDER, MAINTENANCE_PROVIDER)
+- **Headquarters management**: Centralized database managed from HQ site
+- **Full traceability**: Track all items and maintenances linked to each company
 
 ### 🛠️ Maintenance & Interventions
 
@@ -111,7 +117,7 @@ XetaSuite is ideal for:
 ### 🔍 Global Search
 
 - **Unified search**: Search across all resources from a single endpoint
-- **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, suppliers, sites
+- **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, sites
 - **Permission-aware**: Results filtered based on user's permissions
 - **Site-scoped**: Regular users see only their site's data, HQ users see all
 - **Configurable limits**: Control results per type with `per_type` parameter
@@ -165,8 +171,10 @@ Site (tenant)
 └── Users (with per-site roles)
 
 Headquarters (HQ Site)
-├── Suppliers (global suppliers)
-└── Companies (global contractors)
+└── Companies (unified: item providers + maintenance contractors)
+    ├── types: [ITEM_PROVIDER, MAINTENANCE_PROVIDER]
+    ├── → Items (as supplier)
+    └── → Maintenances (as contractor)
 ```
 
 ---
@@ -239,7 +247,7 @@ XetaSuite uses **Pest PHP** for testing with comprehensive coverage:
 php artisan test
 
 # Run tests with filter
-php artisan test --filter=SupplierController
+php artisan test --filter=CompanyController
 
 # Run tests by directory
 php artisan test tests/Feature/Observers/
@@ -263,8 +271,7 @@ The API follows REST conventions with versioning (`/api/v1/`). Main endpoints:
 | `GET /api/v1/maintenances` | Maintenances |
 | `GET /api/v1/incidents` | Incidents |
 | `GET /api/v1/cleanings` | Cleanings |
-| `GET /api/v1/suppliers` | Suppliers (HQ only) |
-| `GET /api/v1/companies` | Contractors |
+| `GET /api/v1/companies` | Companies (item providers + contractors, HQ only) |
 
 ---
 

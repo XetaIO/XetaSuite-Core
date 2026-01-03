@@ -27,7 +27,7 @@ class UpdateMaterialRequest extends FormRequest
     {
         /** @var Material $material */
         // $material = $this->route('material');
-        $currentSiteId = $this->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         return [
             'zone_id' => [

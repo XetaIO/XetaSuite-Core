@@ -103,12 +103,12 @@ trait ItemPresenter
     }
 
     /**
-     * Check if item has supplier.
+     * Check if item has company.
      */
-    protected function hasSupplier(): Attribute
+    protected function hasCompany(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->supplier_id !== null || $this->supplier_name !== null
+            get: fn () => $this->company_id !== null || $this->company_name !== null
         );
     }
 }

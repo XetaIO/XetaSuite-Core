@@ -19,8 +19,8 @@ class ItemPrice extends Model
      */
     protected $fillable = [
         'item_id',
-        'supplier_id',
-        'supplier_name',
+        'company_id',
+        'company_name',
         'created_by_id',
         'created_by_name',
         'price',
@@ -47,11 +47,11 @@ class ItemPrice extends Model
     }
 
     /**
-     * Get the supplier that owns the price.
+     * Get the company (item provider) that owns the price.
      */
-    public function supplier(): BelongsTo
+    public function company(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Company::class);
     }
 
     /**

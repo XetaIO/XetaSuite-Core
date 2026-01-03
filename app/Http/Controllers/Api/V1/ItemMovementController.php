@@ -32,7 +32,7 @@ class ItemMovementController extends Controller
     {
         $this->authorize('viewAny', ItemMovement::class);
 
-        $siteId = auth()->user()->current_site_id;
+        $siteId = session('current_site_id');
 
         $movements = $this->movementService->getAllPaginatedMovements($siteId, [
             'type' => request('type'),
@@ -60,7 +60,7 @@ class ItemMovementController extends Controller
         $movement = $action->handle($item, $request->user(), $request->validated());
 
         return new ItemMovementResource(
-            $movement->load(['supplier', 'creator'])
+            $movement->load(['company', 'creator'])
         );
     }
 
@@ -75,7 +75,7 @@ class ItemMovementController extends Controller
         $this->authorize('view', $movement);
 
         return new ItemMovementResource(
-            $movement->load(['supplier', 'creator'])
+            $movement->load(['company', 'creator'])
         );
     }
 
@@ -96,7 +96,7 @@ class ItemMovementController extends Controller
         $movement = $action->handle($movement, $request->validated());
 
         return new ItemMovementResource(
-            $movement->load(['supplier', 'creator'])
+            $movement->load(['company', 'creator'])
         );
     }
 

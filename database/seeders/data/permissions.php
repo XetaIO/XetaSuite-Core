@@ -103,14 +103,6 @@ return [
     'item-movement.export' => 'Export items entries',
     'item-movement.viewOthersSites' => 'View items entries from other sites',
 
-    // Suppliers
-    'supplier.viewAny' => 'View all suppliers',
-    'supplier.view' => 'View supplier',
-    'supplier.create' => 'Create suppliers',
-    'supplier.update' => 'Update suppliers',
-    'supplier.delete' => 'Delete suppliers',
-    'supplier.export' => 'Export suppliers',
-
     // Companies
     'company.viewAny' => 'View companies list',
     'company.view' => 'View companies',

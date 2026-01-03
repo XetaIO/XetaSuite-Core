@@ -40,7 +40,7 @@ trait SiteScoped
         // Get the table name to avoid ambiguity in joins
         $table = $this->getTable();
 
-        return $query->where("{$table}.site_id", auth()->user()->current_site_id);
+        return $query->where("{$table}.site_id", session('current_site_id'));
     }
 
     /**
@@ -65,6 +65,6 @@ trait SiteScoped
             return true;
         }
 
-        return $this->site_id === auth()->user()->current_site_id;
+        return $this->site_id === session('current_site_id');
     }
 }

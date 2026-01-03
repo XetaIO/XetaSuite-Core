@@ -29,8 +29,8 @@ class StoreItemMovementRequest extends FormRequest
         return [
             'type' => ['required', 'string', Rule::in(['entry', 'exit'])],
             'quantity' => 'required|integer|min:1|max:999999',
-            'supplier_id' => 'nullable|integer|exists:suppliers,id',
-            'supplier_invoice_number' => 'nullable|string|max:100',
+            'company_id' => 'nullable|integer|exists:companies,id',
+            'company_invoice_number' => 'nullable|string|max:100',
             'invoice_date' => 'nullable|date',
             'unit_price' => 'nullable|numeric|min:0|max:9999999.99',
             'notes' => 'nullable|string|max:2000',
@@ -48,8 +48,8 @@ class StoreItemMovementRequest extends FormRequest
         return [
             'type' => __('items.movement_type'),
             'quantity' => __('items.quantity'),
-            'supplier_id' => __('items.supplier'),
-            'supplier_invoice_number' => __('items.invoice_number'),
+            'company_id' => __('items.company'),
+            'company_invoice_number' => __('items.invoice_number'),
             'invoice_date' => __('items.invoice_date'),
             'unit_price' => __('items.unit_price'),
             'notes' => __('items.notes'),

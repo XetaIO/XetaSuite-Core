@@ -7,7 +7,7 @@ use XetaSuite\Actions\ItemPrices\CreateItemPrice;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
@@ -25,7 +25,7 @@ describe('CreateItemPrice', function () {
 
         $price = $action->handle($item, $user, [
             'current_price' => 25.50,
-            'supplier' => null,
+            'company' => null,
         ]);
 
         expect($price)->toBeInstanceOf(ItemPrice::class)
@@ -35,19 +35,19 @@ describe('CreateItemPrice', function () {
             ->and($price->created_by_name)->toBe($user->full_name);
     });
 
-    it('creates a price entry with supplier', function () {
+    it('creates a price entry with company', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
-        $supplier = Supplier::factory()->create();
+        $company = Company::factory()->asItemProvider()->create();
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
         $action = app(CreateItemPrice::class);
 
         $price = $action->handle($item, $user, [
             'current_price' => 50.00,
-            'supplier' => $supplier,
+            'company' => $company,
         ]);
 
-        expect($price->supplier_id)->toBe($supplier->id);
+        expect($price->company_id)->toBe($company->id);
     });
 
     it('creates a price entry with notes', function () {
@@ -59,7 +59,7 @@ describe('CreateItemPrice', function () {
         $price = $action->handle($item, $user, [
             'current_price' => 75.00,
             'notes' => 'Price increase due to inflation',
-            'supplier' => null,
+            'company' => null,
         ]);
 
         expect($price->notes)->toBe('Price increase due to inflation');
@@ -75,7 +75,7 @@ describe('CreateItemPrice', function () {
         $price = $action->handle($item, $user, [
             'current_price' => 60.00,
             'effective_date' => $effectiveDate,
-            'supplier' => null,
+            'company' => null,
         ]);
 
         expect($price->effective_date->toDateString())->toBe($effectiveDate->toDateString());
@@ -89,27 +89,27 @@ describe('CreateItemPrice', function () {
 
         $action->handle($item, $user, [
             'current_price' => 99.99,
-            'supplier' => null,
+            'company' => null,
         ]);
 
         $item->refresh();
         expect((float) $item->current_price)->toBe(99.99);
     });
 
-    it('updates item supplier after creating price entry with supplier', function () {
+    it('updates item company after creating price entry with company', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
-        $supplier = Supplier::factory()->create();
-        $item = Item::factory()->forSite($site)->createdBy($user)->create(['supplier_id' => null]);
+        $company = Company::factory()->asItemProvider()->create();
+        $item = Item::factory()->forSite($site)->createdBy($user)->create(['company_id' => null]);
         $action = app(CreateItemPrice::class);
 
         $action->handle($item, $user, [
             'current_price' => 50.00,
-            'supplier' => $supplier,
+            'company' => $company,
         ]);
 
         $item->refresh();
-        expect($item->supplier_id)->toBe($supplier->id);
+        expect($item->company_id)->toBe($company->id);
     });
 
     it('uses current date as effective date when not specified', function () {
@@ -120,7 +120,7 @@ describe('CreateItemPrice', function () {
 
         $price = $action->handle($item, $user, [
             'current_price' => 45.00,
-            'supplier' => null,
+            'company' => null,
         ]);
 
         expect($price->effective_date->toDateString())->toBe(now()->toDateString());
@@ -132,9 +132,9 @@ describe('CreateItemPrice', function () {
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 0]);
         $action = app(CreateItemPrice::class);
 
-        $action->handle($item, $user, ['current_price' => 10.00, 'supplier' => null]);
-        $action->handle($item, $user, ['current_price' => 15.00, 'supplier' => null]);
-        $action->handle($item, $user, ['current_price' => 20.00, 'supplier' => null]);
+        $action->handle($item, $user, ['current_price' => 10.00, 'company' => null]);
+        $action->handle($item, $user, ['current_price' => 15.00, 'company' => null]);
+        $action->handle($item, $user, ['current_price' => 20.00, 'company' => null]);
 
         expect(ItemPrice::where('item_id', $item->id)->count())->toBe(3);
         expect((float) $item->fresh()->current_price)->toBe(20.0);

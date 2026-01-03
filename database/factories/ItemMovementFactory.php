@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\Maintenance;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class ItemMovementFactory extends Factory
@@ -41,10 +41,10 @@ class ItemMovementFactory extends Factory
             'unit_price' => 0,
             'total_price' => 0,
 
-            // Entry (supplier)
-            'supplier_id' => null,
-            'supplier_name' => null,
-            'supplier_invoice_number' => $invoiceNumber,
+            // Entry (company)
+            'company_id' => null,
+            'company_name' => null,
+            'company_invoice_number' => $invoiceNumber,
             'invoice_date' => $invoiceDate,
 
             // Polymorph (maintenance)
@@ -61,8 +61,6 @@ class ItemMovementFactory extends Factory
 
     /**
      * For the type of the movement to be an Entry.
-     *
-     * @return ItemMovementFactory
      */
     public function entry(): static
     {
@@ -75,25 +73,20 @@ class ItemMovementFactory extends Factory
 
     /**
      * For the type of the movement to be an Exit.
-     *
-     * @return ItemMovementFactory
      */
     public function exit(): static
     {
         return $this->state(fn () => ['type' => 'exit'])
             ->afterMaking(function (ItemMovement $movement) {
-                $movement->supplier_id = null;
-                $movement->supplier_name = null;
-                $movement->supplier_invoice_number = null;
+                $movement->company_id = null;
+                $movement->company_name = null;
+                $movement->company_invoice_number = null;
                 $movement->invoice_date = null;
             });
     }
 
     /**
      * Associates an Item to the movement.
-     *
-     *
-     * @return ItemMovementFactory
      */
     public function forItem(Item|int $item): static
     {
@@ -103,25 +96,19 @@ class ItemMovementFactory extends Factory
     }
 
     /**
-     * Associates a Supplier to the movement. (For Entries)
-     *
-     *
-     * @return ItemMovementFactory
+     * Associates a Company to the movement. (For Entries)
      */
-    public function fromSupplier(Supplier|int $supplier): static
+    public function fromCompany(Company|int $company): static
     {
         return $this->state(fn () => [
-            'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
-            'supplier_invoice_number' => $this->faker->bothify('INV-####'),
+            'company_id' => $company instanceof Company ? $company->id : $company,
+            'company_invoice_number' => $this->faker->bothify('INV-####'),
             'invoice_date' => $this->faker->date(),
         ]);
     }
 
     /**
      * Link the movement to a Maintenance via the polymorphic column. (For Exits)
-     *
-     *
-     * @return ItemMovementFactory
      */
     public function forMaintenance(Maintenance|int $maintenance): static
     {
@@ -133,9 +120,6 @@ class ItemMovementFactory extends Factory
 
     /**
      * Defines quantity and unit price for the movement.
-     *
-     *
-     * @return ItemMovementFactory
      */
     public function withQuantity(int $quantity, float $unitPrice): static
     {
@@ -150,9 +134,6 @@ class ItemMovementFactory extends Factory
 
     /**
      * Defines a creator (User).
-     *
-     *
-     * @return ItemMovementFactory
      */
     public function createdBy(User|int $user): static
     {

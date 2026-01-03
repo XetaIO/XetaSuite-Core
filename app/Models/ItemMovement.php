@@ -29,9 +29,9 @@ class ItemMovement extends Model
         'quantity',
         'unit_price',
         'total_price',
-        'supplier_id',
-        'supplier_name',
-        'supplier_invoice_number',
+        'company_id',
+        'company_name',
+        'company_invoice_number',
         'invoice_date',
         'movable_type',
         'movable_id',
@@ -76,11 +76,11 @@ class ItemMovement extends Model
     }
 
     /**
-     * Get the supplier associated with the item movement. (Entries)
+     * Get the company (item provider) associated with the item movement. (Entries)
      */
-    public function supplier(): BelongsTo
+    public function company(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Company::class);
     }
 
     /**

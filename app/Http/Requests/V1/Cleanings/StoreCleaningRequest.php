@@ -30,7 +30,7 @@ class StoreCleaningRequest extends FormRequest
             'material_id' => [
                 'required',
                 'integer',
-                Rule::exists('materials', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('materials', 'id')->where('site_id', session('current_site_id')),
             ],
             'description' => ['required', 'string', 'max:5000'],
             'type' => ['required', Rule::enum(CleaningType::class)],

@@ -11,8 +11,8 @@ return [
     'name' => 'Name',
     'reference' => 'Reference',
     'description' => 'Description',
-    'supplier' => 'Supplier',
-    'supplier_reference' => 'Supplier Reference',
+    'company' => 'Company',
+    'company_reference' => 'Company Reference',
     'current_price' => 'Purchase Price',
     'stock' => 'Stock',
     'current_stock' => 'Current Stock',
@@ -84,7 +84,7 @@ return [
     'stock_below_warning' => 'Stock is below warning threshold (:current/:minimum)',
     'initial_price' => 'Initial price set for the item.',
     'price_updated' => 'Item price updated.',
-    'supplier_changed' => 'Item supplier changed.',
+    'company_changed' => 'Item company changed.',
 
     // Validation
     'reference_unique' => 'This reference already exists for this site.',

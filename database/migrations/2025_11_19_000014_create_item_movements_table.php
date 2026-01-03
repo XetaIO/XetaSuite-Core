@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 return new class () extends Migration {
@@ -25,12 +25,12 @@ return new class () extends Migration {
             $table->decimal('total_price', 10, 2); // Total price = quantity * unit_price
 
             // Entries
-            $table->foreignIdFor(Supplier::class)
+            $table->foreignIdFor(Company::class)
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            $table->string('supplier_name', 150)->nullable();
-            $table->string('supplier_invoice_number', 100)->nullable();
+            $table->string('company_name', 150)->nullable();
+            $table->string('company_invoice_number', 100)->nullable();
             $table->date('invoice_date')->nullable();
 
             // For linking to maintenance

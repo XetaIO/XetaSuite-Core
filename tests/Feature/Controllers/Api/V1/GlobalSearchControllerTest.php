@@ -11,7 +11,6 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Material;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
@@ -27,7 +26,6 @@ beforeEach(function () {
         'item.view',
         'incident.view',
         'maintenance.view',
-        'supplier.view',
         'company.view',
         'site.view',
     ];
@@ -47,9 +45,9 @@ beforeEach(function () {
     $this->incident = Incident::factory()->for($this->regularSite)->for($this->material)->create(['description' => 'Incident Delta Problem']);
     $this->maintenance = Maintenance::factory()->for($this->regularSite)->for($this->material)->create(['description' => 'Maintenance Epsilon Work']);
 
-    // Suppliers and Companies (no longer HQ-only)
-    $this->supplier = Supplier::factory()->create(['name' => 'Supplier Zeta']);
+    // Companies (no longer HQ-only)
     $this->company = Company::factory()->create(['name' => 'Company Eta']);
+    $this->itemProviderCompany = Company::factory()->asItemProvider()->create(['name' => 'ItemProvider Omega']);
 
     // Create roles with specific permissions for regular site
     $this->materialRole = Role::create(['name' => 'material-viewer', 'site_id' => $this->regularSite->id]);
@@ -71,10 +69,7 @@ beforeEach(function () {
     $this->multiRole = Role::create(['name' => 'multi-viewer', 'site_id' => $this->regularSite->id]);
     $this->multiRole->givePermissionTo(['material.view', 'zone.view', 'item.view']);
 
-    // Roles for suppliers/companies on regular site (no longer HQ-only)
-    $this->supplierRole = Role::create(['name' => 'supplier-viewer', 'site_id' => $this->regularSite->id]);
-    $this->supplierRole->givePermissionTo('supplier.view');
-
+    // Role for companies on regular site (no longer HQ-only)
     $this->companyRole = Role::create(['name' => 'company-viewer', 'site_id' => $this->regularSite->id]);
     $this->companyRole->givePermissionTo('company.view');
 
@@ -86,7 +81,7 @@ beforeEach(function () {
     $this->hqMaterialRole->givePermissionTo('material.view');
 
     $this->hqMultiRole = Role::create(['name' => 'hq-multi-viewer', 'site_id' => $this->headquarters->id]);
-    $this->hqMultiRole->givePermissionTo(['supplier.view', 'company.view', 'site.view']);
+    $this->hqMultiRole->givePermissionTo(['company.view', 'site.view']);
 });
 
 describe('GlobalSearchController', function () {
@@ -171,25 +166,6 @@ describe('GlobalSearchController', function () {
 
             $response->assertSuccessful()
                 ->assertJsonPath('results.maintenances.count', 1);
-        });
-
-        it('returns suppliers for regular site users with permission', function () {
-            $user = createUserOnRegularSite($this->regularSite, $this->supplierRole);
-
-            $response = $this->actingAs($user)->getJson('/api/v1/search?q=Zeta');
-
-            $response->assertSuccessful()
-                ->assertJsonPath('results.suppliers.count', 1)
-                ->assertJsonPath('results.suppliers.items.0.title', 'Supplier Zeta');
-        });
-
-        it('does not return suppliers when user lacks permission', function () {
-            $user = createUserOnRegularSite($this->regularSite, $this->materialRole);
-
-            $response = $this->actingAs($user)->getJson('/api/v1/search?q=Zeta');
-
-            $response->assertSuccessful();
-            expect($response->json('results'))->not->toHaveKey('suppliers');
         });
 
         it('returns companies for regular site users with permission', function () {
@@ -310,7 +286,7 @@ describe('GlobalSearchController', function () {
 
         it('excludes HQ-only types for regular site users', function () {
             $roleWithMixed = Role::create(['name' => 'mixed-perms', 'site_id' => $this->regularSite->id]);
-            $roleWithMixed->givePermissionTo(['material.view', 'supplier.view', 'company.view', 'site.view']);
+            $roleWithMixed->givePermissionTo(['material.view', 'company.view', 'site.view']);
             $user = createUserOnRegularSite($this->regularSite, $roleWithMixed);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search/types');
@@ -318,9 +294,8 @@ describe('GlobalSearchController', function () {
             $response->assertSuccessful();
 
             $types = $response->json('types');
-            // Only sites is HQ-only, suppliers and companies are accessible
+            // Only sites is HQ-only, companies are accessible
             expect($types)->not->toContain('sites')
-                ->toContain('suppliers')
                 ->toContain('companies');
         });
 
@@ -332,8 +307,7 @@ describe('GlobalSearchController', function () {
             $response->assertSuccessful();
 
             $types = $response->json('types');
-            expect($types)->toContain('suppliers')
-                ->toContain('companies')
+            expect($types)->toContain('companies')
                 ->toContain('sites');
         });
 

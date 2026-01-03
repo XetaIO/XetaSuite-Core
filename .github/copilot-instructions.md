@@ -1,6 +1,6 @@
 # XetaSuite Core - Project Instructions
 
-> **Last updated**: December 2025
+> **Last updated**: January 2026
 
 ## Architecture Overview
 
@@ -19,14 +19,15 @@ XetaSuite is a **multi-tenant ERP backend** (Laravel 12, PHP 8.2+) serving a Rea
 ```
 Site (tenant) → Zone (nested, self-referential) → Material → Cleanings/Incidents/Maintenances
      ↓
-   Items ← Supplier (Management in HQ-only)
+   Items ← Company (types: item_provider, maintenance_provider)
      ↓
   ItemMovements / ItemPrices
 ```
 
 ### Key Concepts
-- **Headquarters Site**: Central admin site (`is_headquarters = true`) - manages Suppliers, Companies globally
+- **Headquarters Site**: Central admin site (`is_headquarters = true`) - manages Companies globally
 - **Regular Sites**: Operational sites with their own zones, materials, items
+- **Company Types**: Unified model with `types` array containing `ITEM_PROVIDER` and/or `MAINTENANCE_PROVIDER`
 - **Team Permissions**: Roles scoped to sites via `site_id`; use `setPermissionsTeamId($site->id)` before role operations
 
 ## Sanctum SPA Authentication
@@ -79,9 +80,9 @@ $user->assignRole($role);
 ### Checking Permissions in Policies
 ```php
 // Permissions are automatically scoped to current site via middleware
-public function view(User $user, Supplier $supplier): bool
+public function view(User $user, Company $company): bool
 {
-    return $user->can('supplier.view');  // Checks permission for current site
+    return $user->can('company.view');  // Checks permission for current site
 }
 ```
 
@@ -119,35 +120,35 @@ app/
 ### 1. Action Classes over Fat Controllers
 ```php
 // Controllers delegate to single-purpose actions
-public function store(StoreSupplierRequest $request, CreateSupplier $action): SupplierDetailResource
+public function store(StoreCompanyRequest $request, CreateCompany $action): CompanyDetailResource
 {
-    return new SupplierDetailResource($action->handle($request->user(), $request->validated()));
+    return new CompanyDetailResource($action->handle($request->user(), $request->validated()));
 }
 ```
 
 ### 2. Observer-Based Data Integrity
 FKs use `nullOnDelete()` but observers preserve names BEFORE deletion:
 ```php
-// SupplierObserver::deleting - preserves supplier_name in items/item_movements/item_prices
-public function deleting(Supplier $supplier): void {
-    Item::where('supplier_id', $supplier->id)->update(['supplier_name' => $supplier->name]);
+// CompanyObserver::deleting - preserves company_name in items/item_movements/item_prices
+public function deleting(Company $company): void {
+    Item::where('company_id', $company->id)->update(['company_name' => $company->name]);
 }
 ```
 - Use `deleting`/`forceDeleting` events (BEFORE DB nullifies FK), not `deleted`
 - Return `false` from `deleting()` to block deletion (e.g., `SiteObserver` blocks if zones exist)
-- Observers are attached via `#[ObservedBy([SiteObserver::class])]` attribute on models
+- Observers are attached via `#[ObservedBy([CompanyObserver::class])]` attribute on models
 
 ### 3. Count Caching via `xetaio/xetaravel-counts`
 ```php
 use Xetaio\Counts\Concerns\HasCounts;
 
 protected static array $countsConfig = [
-    'supplier' => 'item_count',  // Creates Item → Supplier.item_count sync
+    'company' => 'item_count',  // Creates Item → Company.item_count sync
 ];
 ```
 **Never test count caching directly** - it's package functionality.
 
-### 4. HQ-Only Resources (Suppliers, Companies)
+### 4. HQ-Only Resources (Companies)
 Policies use `before()` to restrict access:
 ```php
 public function before(User $user, string $ability): ?bool {
@@ -161,7 +162,7 @@ Use semantic state methods, not raw attributes:
 ```php
 Item::factory()
     ->forSite($site)
-    ->fromSupplier($supplier)
+    ->fromCompany($company)
     ->createdBy($user)
     ->create();
 ```
@@ -182,7 +183,7 @@ $user = createUserOnRegularSite($site, $role);           // Regular site user
 
 ### Run Tests
 ```bash
-php artisan test --filter=SupplierController  # Specific pattern
+php artisan test --filter=CompanyController  # Specific pattern
 php artisan test tests/Feature/Observers/     # Directory
 ```
 

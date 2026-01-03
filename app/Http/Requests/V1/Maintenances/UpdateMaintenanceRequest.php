@@ -42,7 +42,7 @@ class UpdateMaintenanceRequest extends FormRequest
             'incident_ids' => ['sometimes', 'array'],
             'incident_ids.*' => [
                 'integer',
-                Rule::exists('incidents', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('incidents', 'id')->where('site_id', session('current_site_id')),
             ],
 
             'operator_ids' => ['sometimes', 'array'],
@@ -98,7 +98,7 @@ class UpdateMaintenanceRequest extends FormRequest
             return;
         }
 
-        $currentSiteId = $this->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         foreach ($operatorIds as $operatorId) {
             $user = User::find($operatorId);

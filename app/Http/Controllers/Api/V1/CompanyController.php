@@ -12,6 +12,7 @@ use XetaSuite\Actions\Companies\UpdateCompany;
 use XetaSuite\Http\Requests\V1\Companies\StoreCompanyRequest;
 use XetaSuite\Http\Requests\V1\Companies\UpdateCompanyRequest;
 use XetaSuite\Http\Resources\V1\Companies\CompanyDetailResource;
+use XetaSuite\Http\Resources\V1\Items\ItemResource;
 use XetaSuite\Http\Resources\V1\Maintenances\MaintenanceResource;
 use XetaSuite\Models\Company;
 use XetaSuite\Services\CompanyService;
@@ -35,6 +36,7 @@ class CompanyController extends Controller
             'search' => request('search'),
             'sort_by' => request('sort_by'),
             'sort_direction' => request('sort_direction'),
+            'type' => request('type'), // Filter by type: item_provider, maintenance_provider
         ]);
 
         return CompanyDetailResource::collection($companies);
@@ -63,7 +65,7 @@ class CompanyController extends Controller
         $this->authorize('view', $company);
 
         $company->load('creator');
-        $company->loadCount('maintenances');
+        $company->loadCount(['maintenances', 'items']);
 
         return new CompanyDetailResource($company);
     }
@@ -103,6 +105,24 @@ class CompanyController extends Controller
         return response()->json([
             'message' => $result['message'],
         ]);
+    }
+
+    /**
+     * Get paginated items for the company (when item provider).
+     *
+     * @param  Company  $company  The company.
+     */
+    public function items(Company $company): AnonymousResourceCollection
+    {
+        $this->authorize('view', $company);
+
+        $items = $this->companyService->getPaginatedItems($company, [
+            'search' => request('search'),
+            'sort_by' => request('sort_by'),
+            'sort_direction' => request('sort_direction'),
+        ]);
+
+        return ItemResource::collection($items);
     }
 
     /**

@@ -17,7 +17,9 @@ class MaterialsSeeder extends Seeder
     public function run(): void
     {
         $zones = Zone::where('allow_material', true)->get();
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+
+        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
+        $user = User::firstWhere('email', "admin@{$emailDomain}");
 
         foreach ($zones as $zone) {
             Material::factory()

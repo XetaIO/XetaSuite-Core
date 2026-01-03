@@ -11,8 +11,8 @@ return [
     'name' => 'Nom',
     'reference' => 'Référence',
     'description' => 'Description',
-    'supplier' => 'Fournisseur',
-    'supplier_reference' => 'Référence fournisseur',
+    'company' => 'Entreprise',
+    'company_reference' => 'Référence entreprise',
     'current_price' => 'Prix d\'achat',
     'stock' => 'Stock',
     'current_stock' => 'Stock actuel',
@@ -84,7 +84,7 @@ return [
     'stock_below_warning' => 'Le stock est en dessous du seuil d\'avertissement (:current/:minimum)',
     'initial_price' => 'Prix initial défini pour l\'article.',
     'price_updated' => 'Prix de l\'article mis à jour.',
-    'supplier_changed' => 'Fournisseur de l\'article modifié.',
+    'company_changed' => 'Entreprise de l\'article modifiée.',
 
     // Validation
     'reference_unique' => 'Cette référence existe déjà pour ce site.',

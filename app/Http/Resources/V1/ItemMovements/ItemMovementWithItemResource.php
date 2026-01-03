@@ -37,13 +37,13 @@ class ItemMovementWithItemResource extends JsonResource
                 ),
             ]),
 
-            // Supplier info
-            'supplier_id' => $this->supplier_id,
-            'supplier_name' => $this->supplier_name,
-            'supplier_invoice_number' => $this->supplier_invoice_number,
-            'supplier' => $this->whenLoaded('supplier', fn () => [
-                'id' => $this->supplier->id,
-                'name' => $this->supplier->name,
+            // Company info
+            'company_id' => $this->company_id,
+            'company_name' => $this->company_name,
+            'company_invoice_number' => $this->company_invoice_number,
+            'company' => $this->whenLoaded('company', fn () => [
+                'id' => $this->company->id,
+                'name' => $this->company->name,
             ]),
             'invoice_date' => $this->invoice_date?->toDateString(),
 

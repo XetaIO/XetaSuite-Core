@@ -19,7 +19,6 @@ use XetaSuite\Http\Controllers\Api\V1\QrCodeScanController;
 use XetaSuite\Http\Controllers\Api\V1\RoleController;
 use XetaSuite\Http\Controllers\Api\V1\SettingsController;
 use XetaSuite\Http\Controllers\Api\V1\SiteController;
-use XetaSuite\Http\Controllers\Api\V1\SupplierController;
 use XetaSuite\Http\Controllers\Api\V1\UserController;
 use XetaSuite\Http\Controllers\Api\V1\UserLocaleController;
 use XetaSuite\Http\Controllers\Api\V1\UserPasswordController;
@@ -70,12 +69,9 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('sites/{site}/users', [SiteController::class, 'users']);
     Route::get('sites/{site}/members', [SiteController::class, 'members']);
 
-    // Suppliers (headquarters only - enforced by SupplierPolicy)
-    Route::apiResource('suppliers', SupplierController::class);
-    Route::get('suppliers/{supplier}/items', [SupplierController::class, 'items']);
-
-    // Companies (headquarters only - enforced by CompanyPolicy)
+    // Companies (headquarters only for management - enforced by CompanyPolicy)
     Route::apiResource('companies', CompanyController::class);
+    Route::get('companies/{company}/items', [CompanyController::class, 'items']);
     Route::get('companies/{company}/maintenances', [CompanyController::class, 'maintenances']);
     Route::get('companies/{company}/stats', [CompanyController::class, 'stats']);
 
@@ -102,7 +98,7 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('materials/{material}/items', [MaterialController::class, 'items']);
 
     // Items (site-scoped - enforced by ItemPolicy)
-    Route::get('items/available-suppliers', [ItemController::class, 'availableSuppliers']);
+    Route::get('items/available-companies', [ItemController::class, 'availableCompanies']);
     Route::get('items/available-materials', [ItemController::class, 'availableMaterials']);
     Route::get('items/available-recipients', [ItemController::class, 'availableRecipients']);
     Route::apiResource('items', ItemController::class);

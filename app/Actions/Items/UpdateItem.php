@@ -6,8 +6,8 @@ namespace XetaSuite\Actions\Items;
 
 use Illuminate\Support\Facades\DB;
 use XetaSuite\Actions\ItemPrices\CreateItemPrice;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class UpdateItem
@@ -23,20 +23,20 @@ class UpdateItem
     {
         return DB::transaction(function () use ($item, $user, $data) {
             $oldPrice = (float) $item->current_price;
-            $oldSupplierId = $item->supplier_id;
+            $oldCompanyId = $item->company_id;
             $newPrice = isset($data['current_price']) ? (float) $data['current_price'] : $oldPrice;
-            $newSupplierId = $data['supplier_id'] ?? $oldSupplierId;
+            $newCompanyId = $data['company_id'] ?? $oldCompanyId;
             // Check if price has changed
             $priceChanged = abs($newPrice - $oldPrice) > 0.001;
-            $supplierChanged = $newSupplierId !== $oldSupplierId;
+            $companyChanged = $newCompanyId !== $oldCompanyId;
 
             $item->update([
                 'edited_by_id' => $user->id,
                 'name' => $data['name'] ?? $item->name,
                 'reference' => array_key_exists('reference', $data) ? $data['reference'] : $item->reference,
                 'description' => array_key_exists('description', $data) ? $data['description'] : $item->description,
-                'supplier_id' => $newSupplierId,
-                'supplier_reference' => array_key_exists('supplier_reference', $data) ? $data['supplier_reference'] : $item->supplier_reference,
+                'company_id' => $newCompanyId,
+                'company_reference' => array_key_exists('company_reference', $data) ? $data['company_reference'] : $item->company_reference,
                 'current_price' => $newPrice,
                 'number_warning_enabled' => $data['number_warning_enabled'] ?? $item->number_warning_enabled,
                 'number_warning_minimum' => $data['number_warning_minimum'] ?? $item->number_warning_minimum,
@@ -54,10 +54,10 @@ class UpdateItem
                 $item->recipients()->sync($data['recipient_ids'] ?? []);
             }
 
-            // Record price change in history via queue if price or supplier changed
-            if ($priceChanged || $supplierChanged) {
-                $data['notes'] = $priceChanged ? __('items.price_updated') : __('items.supplier_changed');
-                $data['supplier'] = $newSupplierId ? Supplier::find($newSupplierId) : null;
+            // Record price change in history via queue if price or company changed
+            if ($priceChanged || $companyChanged) {
+                $data['notes'] = $priceChanged ? __('items.price_updated') : __('items.company_changed');
+                $data['company'] = $newCompanyId ? Company::find($newCompanyId) : null;
                 $data['current_price'] = $newPrice;
 
                 app(CreateItemPrice::class)->handle($item, $user, $data);

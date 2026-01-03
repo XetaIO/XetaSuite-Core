@@ -12,7 +12,7 @@ use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
 use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
@@ -46,10 +46,10 @@ describe('CreateItemMovement', function () {
             ->and($movement->created_by_id)->toBe($user->id);
     });
 
-    it('creates an entry movement with supplier', function () {
+    it('creates an entry movement with company', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
-        $supplier = Supplier::factory()->create();
+        $company = Company::factory()->asItemProvider()->create();
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
         $action = app(CreateItemMovement::class);
 
@@ -57,13 +57,13 @@ describe('CreateItemMovement', function () {
             'type' => 'entry',
             'quantity' => 5,
             'unit_price' => 10.00,
-            'supplier_id' => $supplier->id,
-            'supplier_invoice_number' => 'INV-001',
+            'company_id' => $company->id,
+            'company_invoice_number' => 'INV-001',
             'invoice_date' => '2025-01-15',
         ]);
 
-        expect($movement->supplier_id)->toBe($supplier->id)
-            ->and($movement->supplier_invoice_number)->toBe('INV-001')
+        expect($movement->company_id)->toBe($company->id)
+            ->and($movement->company_invoice_number)->toBe('INV-001')
             ->and($movement->invoice_date->toDateString())->toBe('2025-01-15');
     });
 
@@ -240,20 +240,20 @@ describe('UpdateItemMovement', function () {
             ->and((float) $updatedMovement->total_price)->toBe(75.0);
     });
 
-    it('updates movement supplier', function () {
+    it('updates movement company', function () {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
-        $oldSupplier = Supplier::factory()->create();
-        $newSupplier = Supplier::factory()->create();
-        $movement = ItemMovement::factory()->forItem($item)->entry()->fromSupplier($oldSupplier)->withQuantity(5, 10.00)->createdBy($user)->create();
+        $oldCompany = Company::factory()->asItemProvider()->create();
+        $newCompany = Company::factory()->asItemProvider()->create();
+        $movement = ItemMovement::factory()->forItem($item)->entry()->fromCompany($oldCompany)->withQuantity(5, 10.00)->createdBy($user)->create();
         $action = app(UpdateItemMovement::class);
 
         $updatedMovement = $action->handle($movement, [
-            'supplier_id' => $newSupplier->id,
+            'company_id' => $newCompany->id,
         ]);
 
-        expect($updatedMovement->supplier_id)->toBe($newSupplier->id);
+        expect($updatedMovement->company_id)->toBe($newCompany->id);
     });
 
     it('updates movement invoice fields', function () {
@@ -264,11 +264,11 @@ describe('UpdateItemMovement', function () {
         $action = app(UpdateItemMovement::class);
 
         $updatedMovement = $action->handle($movement, [
-            'supplier_invoice_number' => 'NEW-INV-001',
+            'company_invoice_number' => 'NEW-INV-001',
             'invoice_date' => '2025-03-15',
         ]);
 
-        expect($updatedMovement->supplier_invoice_number)->toBe('NEW-INV-001')
+        expect($updatedMovement->company_invoice_number)->toBe('NEW-INV-001')
             ->and($updatedMovement->invoice_date->toDateString())->toBe('2025-03-15');
     });
 

@@ -19,7 +19,8 @@ class CompaniesSeeder extends Seeder
     {
         $maintenances = Maintenance::whereIn('realization', [MaintenanceRealization::BOTH->value, MaintenanceRealization::EXTERNAL->value])->get();
 
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
+        $user = User::firstWhere('email', "admin@{$emailDomain}");
 
         foreach ($maintenances as $maintenance) {
             $companies = Company::factory()

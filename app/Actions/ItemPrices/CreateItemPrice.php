@@ -21,7 +21,7 @@ class CreateItemPrice
     {
         $itemPrice = ItemPrice::create([
             'item_id' => $item->id,
-            'supplier_id' => $data['supplier']?->id,
+            'company_id' => $data['company']?->id,
             'created_by_id' => $user->id,
             'created_by_name' => $user->full_name,
             'price' => $data['current_price'],
@@ -29,10 +29,10 @@ class CreateItemPrice
             'notes' => $data['notes'] ?? null,
         ]);
 
-        // Update item's current price and supplier info
+        // Update item's current price and company info
         $item->update([
             'current_price' => $data['current_price'],
-            'supplier_id' => $data['supplier']?->id,
+            'company_id' => $data['company']?->id,
         ]);
 
         return $itemPrice;

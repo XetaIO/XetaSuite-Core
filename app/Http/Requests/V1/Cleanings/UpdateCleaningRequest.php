@@ -34,7 +34,7 @@ class UpdateCleaningRequest extends FormRequest
                 'sometimes',
                 'required',
                 'integer',
-                Rule::exists('materials', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('materials', 'id')->where('site_id', session('current_site_id')),
             ],
             'description' => ['sometimes', 'required', 'string', 'max:5000'],
             'type' => ['sometimes', 'required', Rule::enum(CleaningType::class)],

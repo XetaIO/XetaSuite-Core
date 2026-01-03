@@ -10,7 +10,6 @@ use XetaSuite\Models\Incident;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\Maintenance;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
@@ -69,19 +68,6 @@ it('saves reported_by_name in incidents when user is force deleted', function ()
     $incident->refresh();
     expect($incident->reported_by_id)->toBeNull();
     expect($incident->reported_by_name)->toBe('John Doe');
-});
-
-it('saves created_by_name in suppliers when user is force deleted', function () {
-    $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
-    $supplier = Supplier::factory()->create(['created_by_id' => $user->id]);
-
-    expect($supplier->created_by_name)->toBeNull();
-
-    $user->forceDelete();
-
-    $supplier->refresh();
-    expect($supplier->created_by_id)->toBeNull();
-    expect($supplier->created_by_name)->toBe('John Doe');
 });
 
 it('saves created_by_name in companies when user is force deleted', function () {

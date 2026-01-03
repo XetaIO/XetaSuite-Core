@@ -34,7 +34,7 @@ class StoreMaintenanceRequest extends FormRequest
             'material_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('materials', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('materials', 'id')->where('site_id', session('current_site_id')),
             ],
             'description' => ['required', 'string', 'max:5000'],
             'reason' => ['required', 'string', 'max:5000'],
@@ -48,7 +48,7 @@ class StoreMaintenanceRequest extends FormRequest
             'incident_ids' => ['nullable', 'array'],
             'incident_ids.*' => [
                 'integer',
-                Rule::exists('incidents', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('incidents', 'id')->where('site_id', session('current_site_id')),
             ],
 
             'operator_ids' => ['nullable', 'array'],
@@ -62,7 +62,7 @@ class StoreMaintenanceRequest extends FormRequest
             'item_movements.*.item_id' => [
                 'required_with:item_movements',
                 'integer',
-                Rule::exists('items', 'id')->where('site_id', $this->user()->current_site_id),
+                Rule::exists('items', 'id')->where('site_id', session('current_site_id')),
             ],
             'item_movements.*.quantity' => ['required_with:item_movements', 'integer', 'min:1'],
         ];
@@ -112,7 +112,7 @@ class StoreMaintenanceRequest extends FormRequest
             return;
         }
 
-        $currentSiteId = $this->user()->current_site_id;
+        $currentSiteId = session('current_site_id');
 
         foreach ($operatorIds as $operatorId) {
             $user = User::find($operatorId);

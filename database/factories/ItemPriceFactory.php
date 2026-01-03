@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use XetaSuite\Models\ItemPrice;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
-use XetaSuite\Models\Supplier;
+use XetaSuite\Models\ItemPrice;
 use XetaSuite\Models\User;
 
 class ItemPriceFactory extends Factory
@@ -16,16 +16,14 @@ class ItemPriceFactory extends Factory
 
     /**
      * Configure the model factory.
-     *
-     * @return array
      */
     public function definition(): array
     {
         return [
             'item_id' => null,
 
-            'supplier_id' => null,
-            'supplier_name' => null,
+            'company_id' => null,
+            'company_name' => null,
             'created_by_id' => null,
             'created_by_name' => null,
 
@@ -37,59 +35,43 @@ class ItemPriceFactory extends Factory
 
     /**
      * Link to a specific item.
-     *
-     * @param Item|int $item
-     *
-     * @return ItemPriceFactory
      */
     public function forItem(Item|int $item): static
     {
         return $this->state(fn () => [
-            'item_id' => $item instanceof Item ? $item->id : $item
+            'item_id' => $item instanceof Item ? $item->id : $item,
         ]);
     }
 
     /**
-     * Link to a specific supplier (or remove it).
-     *
-     * @param Supplier|int|null $supplier
-     *
-     * @return ItemPriceFactory
+     * Link to a specific company (or remove it).
      */
-    public function fromSupplier(Supplier|int|null $supplier = null): static
+    public function fromCompany(Company|int|null $company = null): static
     {
-        if (is_null($supplier)) {
+        if (is_null($company)) {
             return $this->state(fn () => [
-                'supplier_id'   => null,
-                'supplier_name' => null,
+                'company_id' => null,
+                'company_name' => null,
             ]);
         }
 
         return $this->state(fn () => [
-            'supplier_id'   => $supplier instanceof Supplier ? $supplier->id : $supplier,
+            'company_id' => $company instanceof Company ? $company->id : $company,
         ]);
     }
 
     /**
      * Link to a specific user.
-     *
-     * @param User|int $user
-     *
-     * @return ItemPriceFactory
      */
     public function createdBy(User|int $user): static
     {
         return $this->state(fn () => [
-            'created_by_id'   => $user instanceof User ? $user->id : $user
+            'created_by_id' => $user instanceof User ? $user->id : $user,
         ]);
     }
 
     /**
      * Defines a specific currency (EUR by default).
-     *
-     * @param string $currency
-     *
-     * @return ItemPriceFactory
      */
     public function withCurrency(string $currency = 'EUR'): static
     {
@@ -98,10 +80,6 @@ class ItemPriceFactory extends Factory
 
     /**
      * Force the effective date.
-     *
-     * @param string $date
-     *
-     * @return ItemPriceFactory
      */
     public function effectiveOn(string $date): static
     {
@@ -111,10 +89,8 @@ class ItemPriceFactory extends Factory
     /**
      * Force the price.
      *
-     * @param float $price The base price to set.
-     * @param bool $variation Whether to apply a random variation to the price (negative or positive)
-     *
-     * @return ItemPriceFactory
+     * @param  float  $price  The base price to set.
+     * @param  bool  $variation  Whether to apply a random variation to the price (negative or positive)
      */
     public function withPrice(float $price, bool $variation = false): static
     {
@@ -127,16 +103,12 @@ class ItemPriceFactory extends Factory
         }
 
         return $this->state(fn () => [
-            'price' => $price
+            'price' => $price,
         ]);
     }
 
     /**
      * Add some notes.
-     *
-     * @param string $notes
-     *
-     * @return ItemPriceFactory
      */
     public function withNotes(string $notes): static
     {

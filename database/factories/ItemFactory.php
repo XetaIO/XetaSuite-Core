@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\Site;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class ItemFactory extends Factory
@@ -23,9 +23,9 @@ class ItemFactory extends Factory
             'site_id' => null,
             'created_by_id' => null,
             'created_by_name' => null,
-            'supplier_id' => null,
-            'supplier_name' => null,
-            'supplier_reference' => $this->faker->optional()->word(),
+            'company_id' => null,
+            'company_name' => null,
+            'company_reference' => $this->faker->optional()->word(),
             'edited_by_id' => null,
 
             'name' => $this->faker->unique()->name(),
@@ -50,9 +50,6 @@ class ItemFactory extends Factory
 
     /**
      * Forces the use of an existing site (or site ID).
-     *
-     *
-     * @return ItemFactory
      */
     public function forSite(Site|int $site): static
     {
@@ -62,23 +59,17 @@ class ItemFactory extends Factory
     }
 
     /**
-     * Forces the use of an existing supplier (or supplier ID).
-     *
-     *
-     * @return ItemFactory
+     * Forces the use of an existing company (or company ID).
      */
-    public function fromSupplier(Supplier|int $supplier): static
+    public function fromCompany(Company|int $company): static
     {
         return $this->state(fn () => [
-            'supplier_id' => $supplier instanceof Supplier ? $supplier->id : $supplier,
+            'company_id' => $company instanceof Company ? $company->id : $company,
         ]);
     }
 
     /**
      * Defines a creator (User).
-     *
-     *
-     * @return ItemFactory
      */
     public function createdBy(User|int $user): static
     {
@@ -89,9 +80,6 @@ class ItemFactory extends Factory
 
     /**
      * Defines an editor (User).
-     *
-     *
-     * @return ItemFactory
      */
     public function editedBy(User|int $user): static
     {

@@ -16,15 +16,17 @@ class ItemMovementsSeeder extends Seeder
      */
     public function run(): void
     {
-        $items = Item::with('supplier')->get();
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+        $items = Item::with('company')->get();
+
+        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
+        $user = User::firstWhere('email', "admin@{$emailDomain}");
 
         foreach ($items as $item) {
             // Create Entries Item Movements
             ItemMovement::factory()
                 ->entry()
                 ->forItem($item)
-                ->fromSupplier($item->supplier->id)
+                ->fromCompany($item->company->id)
                 ->withQuantity(random_int(10, 50), (float) $item->current_price)
                 ->createdBy($user)
                 ->count(random_int(1, 2))

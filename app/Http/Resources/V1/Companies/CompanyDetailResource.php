@@ -20,14 +20,25 @@ class CompanyDetailResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
 
+            // Types
+            'types' => $this->types,
+            'is_item_provider' => $this->isItemProvider(),
+            'is_maintenance_provider' => $this->isMaintenanceProvider(),
+
+            // Contact info
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'address' => $this->address,
+
             // Creator
             'created_by_id' => $this->created_by_id,
             'created_by_name' => $this->created_by_name,
 
             'creator' => $this->whenLoaded('creator', fn () => new UserResource($this->creator)),
 
-            // Maintenances count
-            'maintenance_count' => $this->maintenances_count ?? $this->maintenances()->count(),
+            // Counts
+            'item_count' => $this->items_count ?? $this->item_count ?? 0,
+            'maintenance_count' => $this->maintenances_count ?? $this->maintenance_count ?? 0,
 
             // Timestamps
             'created_at' => $this->created_at?->toISOString(),

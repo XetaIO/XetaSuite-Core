@@ -21,10 +21,10 @@ class ItemMovementResource extends JsonResource
             'unit_price' => $this->unit_price ? (float) $this->unit_price : null,
             'total_price' => $this->total_price ? (float) $this->total_price : null,
 
-            // Supplier info
-            'supplier_id' => $this->supplier_id,
-            'supplier_name' => $this->supplier_name,
-            'supplier_invoice_number' => $this->supplier_invoice_number,
+            // Company info
+            'company_id' => $this->company_id,
+            'company_name' => $this->company_name,
+            'company_invoice_number' => $this->company_invoice_number,
             'invoice_date' => $this->invoice_date?->toDateString(),
 
             // Creator info

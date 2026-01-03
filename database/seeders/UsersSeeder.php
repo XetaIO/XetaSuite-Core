@@ -14,22 +14,24 @@ class UsersSeeder extends Seeder
     {
         $isDemoMode = config('app.demo_mode', false);
         $emailDomain = $isDemoMode ? 'xetasuite.demo' : 'xetasuite.test';
+        $headquarters = Site::where('is_headquarters', true)->first();
 
         // Admin - has access to all sites
         $admin = User::factory()->admin()->create([
             'username' => 'admin',
             'first_name' => 'Admin',
             'last_name' => 'Demo',
+            'current_site_id' => $headquarters->id,
             'email' => "admin@{$emailDomain}",
         ]);
         $admin->sites()->sync(Site::pluck('id')->toArray());
 
         // Manager - has access to headquarters
-        $headquarters = Site::where('is_headquarters', true)->first();
         $manager = User::factory()->create([
             'username' => 'manager',
             'first_name' => 'Manager',
             'last_name' => 'Demo',
+            'current_site_id' => $headquarters->id,
             'email' => "manager@{$emailDomain}",
         ]);
         $manager->sites()->sync([$headquarters->id]);
@@ -40,6 +42,7 @@ class UsersSeeder extends Seeder
             'username' => 'user',
             'first_name' => 'User',
             'last_name' => 'Demo',
+            'current_site_id' => $regularSite?->id ?? $headquarters->id,
             'email' => "user@{$emailDomain}",
         ]);
         $user->sites()->sync([$regularSite?->id ?? $headquarters->id]);
@@ -54,6 +57,8 @@ class UsersSeeder extends Seeder
                     ->pluck('id')
                     ->toArray();
                 $user->sites()->sync($siteIds);
+                $user->current_site_id = $siteIds[0] ?? null;
+                $user->save();
             });
         }
     }

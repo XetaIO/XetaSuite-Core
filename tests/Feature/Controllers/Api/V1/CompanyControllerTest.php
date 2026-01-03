@@ -214,6 +214,7 @@ describe('store', function () {
             ->postJson('/api/v1/companies', [
                 'name' => 'New Company',
                 'description' => 'Company description',
+                'types' => ['maintenance_provider'],
             ]);
 
         $response->assertCreated()
@@ -234,6 +235,7 @@ describe('store', function () {
         $response = $this->actingAs($user)
             ->postJson('/api/v1/companies', [
                 'name' => 'Company Without Description',
+                'types' => ['item_provider'],
             ]);
 
         $response->assertCreated()

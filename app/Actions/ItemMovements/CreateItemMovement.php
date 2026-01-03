@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 use XetaSuite\Actions\ItemPrices\CreateItemPrice;
 use XetaSuite\Jobs\Item\CheckItemCriticalStock;
 use XetaSuite\Jobs\Item\CheckItemWarningStock;
+use XetaSuite\Models\Company;
 use XetaSuite\Models\Item;
 use XetaSuite\Models\ItemMovement;
-use XetaSuite\Models\Supplier;
 use XetaSuite\Models\User;
 
 class CreateItemMovement
@@ -45,7 +45,7 @@ class CreateItemMovement
         return DB::transaction(function () use ($item, $user, $data) {
             $unitPrice = isset($data['unit_price']) ? (float) $data['unit_price'] : 0.00;
             $quantity = (int) $data['quantity'];
-            $supplier = isset($data['supplier_id']) ? Supplier::find($data['supplier_id']) : null;
+            $company = isset($data['company_id']) ? Company::find($data['company_id']) : null;
 
             $movement = ItemMovement::create([
                 'item_id' => $item->id,
@@ -53,8 +53,8 @@ class CreateItemMovement
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'total_price' => $quantity * $unitPrice,
-                'supplier_id' => $supplier?->id,
-                'supplier_invoice_number' => $data['supplier_invoice_number'] ?? null,
+                'company_id' => $company?->id,
+                'company_invoice_number' => $data['company_invoice_number'] ?? null,
                 'invoice_date' => isset($data['invoice_date']) ? new Carbon($data['invoice_date']) : null,
                 'created_by_id' => $user->id,
                 'notes' => $data['notes'] ?? null,
@@ -66,7 +66,7 @@ class CreateItemMovement
 
             // If the price has changed, create a new price history
             if (! $item->current_price || $item->current_price != $unitPrice) {
-                $data['supplier'] = $supplier;
+                $data['company'] = $company;
                 $data['current_price'] = $unitPrice;
 
                 app(CreateItemPrice::class)->handle($item, $user, $data);

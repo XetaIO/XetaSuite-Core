@@ -17,7 +17,9 @@ class IncidentsSeeder extends Seeder
     public function run(): void
     {
         $maintenances = Maintenance::with('material')->get();
-        $user = User::firstWhere('email', 'admin@xetasuite.test');
+
+        $emailDomain = config('app.demo_mode', false) ? 'xetasuite.demo' : 'xetasuite.test';
+        $user = User::firstWhere('email', "admin@{$emailDomain}");
 
         foreach ($maintenances as $maintenance) {
             Incident::factory()
