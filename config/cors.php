@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('SPA_URL', 'https://xetasuite.test'), 'http://localhost:5173'],
+    'allowed_origins' => array_filter([
+        env('SPA_URL'),
+        env('APP_ENV') === 'local' ? 'http://localhost:5173' : null,
+        env('APP_ENV') === 'local' ? 'https://xetasuite.test' : null,
+    ]),
 
     'allowed_origins_patterns' => [],
 

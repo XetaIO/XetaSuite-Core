@@ -66,7 +66,7 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Customize password reset URL to point to React SPA
         ResetPassword::createUrlUsing(function ($user, string $token) {
-            return config('app.frontend_url').'/reset-password?token='.$token.'&email='.urlencode($user->email);
+            return config('app.spa_url').'/reset-password?token='.$token.'&email='.urlencode($user->email);
         });
 
         RateLimiter::for('login', function (Request $request) {

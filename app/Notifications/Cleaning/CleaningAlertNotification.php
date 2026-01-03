@@ -62,7 +62,7 @@ class CleaningAlertNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
 
-        $materialUrl = config('app.frontend_url', config('app.url')).'/materials/'.$this->material->id;
+        $materialUrl = config('app.spa_url', config('app.url')).'/materials/'.$this->material->id;
 
         return (new MailMessage())
             ->subject(__('cleanings.notifications.cleaning_alert_subject', ['name' => config('app.name')]))

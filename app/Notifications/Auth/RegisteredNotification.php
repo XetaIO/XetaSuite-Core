@@ -66,7 +66,7 @@ class RegisteredNotification extends Notification
         $queryString = $parsedUrl['query'] ?? '';
 
         // Build frontend URL with the signed parameters
-        $frontendUrl = Config::get('app.frontend_url', 'http://localhost:5173');
+        $frontendUrl = Config::get('app.spa_url', 'http://localhost:5173');
 
         return $frontendUrl.'/setup-password/'.$notifiable->getKey().'/'.sha1($notifiable->getEmailForSetup()).'?'.$queryString;
     }

@@ -219,7 +219,7 @@ composer run dev
 ```env
 # Application
 APP_URL=https://xetasuite.test
-FRONTEND_URL=http://localhost:5173
+SPA_URL=http://localhost:5173
 
 # Database
 DB_CONNECTION=pgsql

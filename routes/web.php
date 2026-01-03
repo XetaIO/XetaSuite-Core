@@ -8,7 +8,10 @@ use XetaSuite\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use XetaSuite\Http\Controllers\Api\V1\Auth\SetupPasswordController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'name' => config('app.name'),
+        'version' => '1.0.0',
+    ]);
 });
 
 Route::prefix('api/v1')->middleware(['web'])->group(function () {

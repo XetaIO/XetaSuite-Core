@@ -173,7 +173,7 @@ class MaterialController extends Controller
         $size = (int) request('size', 200);
         $size = max(100, min(400, $size)); // Limit between 100 and 400
 
-        $url = config('app.frontend_url').'?source=qr&material='.$material->id;
+        $url = config('app.spa_url').'?source=qr&material='.$material->id;
 
         $qrCode = new QrCode(
             data: $url,

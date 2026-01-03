@@ -38,7 +38,7 @@ class ItemCriticalStockNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $itemUrl = config('app.frontend_url', config('app.url')).'/items/'.$this->item->id;
+        $itemUrl = config('app.spa_url', config('app.url')).'/items/'.$this->item->id;
 
         return (new MailMessage())
             ->subject(__('items.notifications.critical_stock_subject', ['name' => $this->item->name]))
