@@ -13,6 +13,26 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+
+        // Register middleware aliases
+        $middleware->alias([
+            'recaptcha' => \XetaSuite\Http\Middleware\VerifyRecaptcha::class,
+        ]);
+
+        // Middlewares for web routes
+        $middleware->web(append: [
+            \XetaSuite\Http\Middleware\SetLocale::class,
+            \XetaSuite\Http\Middleware\SetCurrentSite::class,
+            \XetaSuite\Http\Middleware\SetCurrentPermissionsAndRoles::class,
+        ]);
+
+        // Middlewares for API routes (stateful SPA via Sanctum)
+        $middleware->api(append: [
+            \XetaSuite\Http\Middleware\SetLocale::class,
+            \XetaSuite\Http\Middleware\SetCurrentSite::class,
+            \XetaSuite\Http\Middleware\SetCurrentPermissionsAndRoles::class,
+            \XetaSuite\Http\Middleware\DemoModeRestriction::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

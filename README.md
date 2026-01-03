@@ -1,59 +1,313 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src=".github/logos/logo.svg#gh-light-mode-only" width="400" alt="XetaSuite Logo">
+  <img src=".github/logos/logo-dark.svg#gh-dark-mode-only" width="400" alt="XetaSuite Logo">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>Backend API for XetaSuite - Multi-Tenant Facility Management ERP</strong>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 8.2+"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel 12"></a>
+  <a href="#"><img src="https://img.shields.io/badge/PostgreSQL-16+-336791?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL"></a>
+  <a href="#"><img src="https://img.shields.io/github/actions/workflow/status/XetaIO/XetaSuite-Core/tests.yml?style=flat-square" alt="Tests"></a>
+  <a href="#"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License MIT"></a>
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📋 About XetaSuite
 
-## Learning Laravel
+**XetaSuite** is a **multi-tenant ERP (Enterprise Resource Planning)** designed for **comprehensive facility, equipment, and inventory management**. This professional solution enables businesses to efficiently manage their sites, zones, materials, stock, and interventions (maintenance, cleaning, incidents).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 🎯 Who is XetaSuite for?
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+XetaSuite is ideal for:
 
-## Laravel Sponsors
+| Industry | Use Cases |
+|----------|-----------|
+| 🏢 **Facility Management** | Building management, workspaces, meeting rooms |
+| 🏭 **Manufacturing & Production** | Equipment tracking, preventive maintenance, spare parts management |
+| 🏥 **Healthcare & Hospitals** | Medical equipment inventory, equipment traceability, cleaning schedules |
+| 🏫 **Education** | School furniture management, IT equipment tracking |
+| 🏨 **Hospitality & Catering** | Linen management, kitchen equipment, room maintenance |
+| 🏬 **Retail & Commerce** | Multi-store management, product inventory, incident tracking |
+| 🏗️ **Construction** | Construction equipment management, tool tracking |
+| 🚚 **Logistics & Warehousing** | Storage zone management, stock movement tracking |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## ✨ Key Features
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🏢 Multi-Site Management (Multi-Tenancy)
 
-## Contributing
+- **Multiple sites**: Manage several locations from a single interface
+- **Headquarters site**: Centralized administration with global access
+- **Per-site permissions**: Each user has specific roles/permissions per site
+- **Dynamic site switching**: Switch between sites without logging out
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🗺️ Hierarchical Zone Organization
 
-## Code of Conduct
+- **Nested zones**: Unlimited tree structure (Building → Floor → Room)
+- **Hierarchical visualization**: Intuitive tree navigation
+- **Property inheritance**: Configuration propagated to child zones
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 🔧 Equipment & Material Management
 
-## Security Vulnerabilities
+- **Complete records**: Reference, brand, model, serial number, acquisition date
+- **Zone assignment**: Precise location for each piece of equipment
+- **QR Codes**: Automatic generation for quick identification
+- **Full history**: Traceability of all interventions on each material
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 📦 Stock & Inventory Management
 
-## License
+- **Items catalog**: Complete catalog with references, descriptions, units
+- **Stock movements**: Entries, exits, transfers with full traceability
+- **QR Codes**: Automatic generation for quick identification
+- **Price history**: Track purchase cost evolution
+- **Stock alerts**: Configurable thresholds for reordering
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 🏢 Company Management
+
+- **Unified company model**: Companies can be item providers, maintenance contractors, or both
+- **Type-based filtering**: Filter companies by their role (ITEM_PROVIDER, MAINTENANCE_PROVIDER)
+- **Headquarters management**: Centralized database managed from HQ site
+- **Full traceability**: Track all items and maintenances linked to each company
+
+### 🛠️ Maintenance & Interventions
+
+- **Scheduling**: Preventive maintenance with configurable recurrence
+- **Intervention tracking**: Statuses (scheduled, in progress, completed, cancelled)
+- **External contractors**: Maintenance company management
+- **Costs & budgets**: Track expenses per intervention
+
+### 🧹 Cleaning Management
+
+- **Cleaning schedules**: Configurable frequencies per zone
+- **Service tracking**: Validation and history of cleaning sessions
+- **Quality control**: Notes and comments on services
+
+### ⚠️ Incident Management
+
+- **Simplified reporting**: Quick reporting with location
+- **Priority levels**: Critical, high, medium, low
+- **Resolution workflow**: Statuses and team assignment
+- **Statistics**: Dashboards and indicators
+
+### 👥 User & Access Management
+
+- **Secure authentication**: Laravel Sanctum (SPA) + Fortify
+- **Customizable roles**: Admin, Manager, Operator, etc.
+- **Granular permissions**: Fine-grained access control per feature
+- **Per-site permissions**: Users can have different roles depending on the site
+
+### 🌐 Internationalization
+
+- **Multi-language**: French and English included
+- **User preferences**: Language saved per profile
+- **Extensible**: Easy addition of new languages
+
+### 🔔 Notifications
+
+- **Real-time notifications**: Alerts and important events
+- **Notification center**: Searchable history
+- **Read/unread marking**: Individual and bulk management
+
+### 🔍 Global Search
+
+- **Unified search**: Search across all resources from a single endpoint
+- **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, sites
+- **Permission-aware**: Results filtered based on user's permissions
+- **Site-scoped**: Regular users see only their site's data, HQ users see all
+- **Configurable limits**: Control results per type with `per_type` parameter
+
+---
+
+## 🏗️ Technical Architecture
+
+### Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Framework** | Laravel | 12.x |
+| **Language** | PHP | 8.2+ |
+| **Database** | PostgreSQL | 16, 17, 18 |
+| **Authentication** | Laravel Sanctum + Fortify | 4.x / 1.x |
+| **Permissions** | spatie/laravel-permission | 6.x |
+| **Testing** | Pest PHP | 3.x / 4.x |
+| **QR Codes** | endroid/qr-code | 6.x |
+| **Activity Log** | spatie/laravel-activitylog | 4.x |
+
+### Code Architecture
+
+```
+app/
+├── Actions/{Domain}/          # Single-responsibility action classes
+├── Enums/{Domain}/            # PHP enums with labels
+├── Http/
+│   ├── Controllers/Api/V1/    # Versioned API controllers
+│   ├── Requests/V1/           # Form Requests with validation
+│   ├── Resources/V1/          # JSON transformers
+│   └── Middleware/            # Custom middleware
+├── Models/                    # Eloquent models
+├── Observers/                 # Lifecycle hooks
+├── Policies/                  # Resource authorization
+└── Services/                  # Complex business logic
+```
+
+### Data Model
+
+```
+Site (tenant)
+├── Zone (hierarchical, self-referential)
+│   ├── Material (equipment)
+│   │   ├── Cleanings
+│   │   ├── Incidents
+│   │   └── Maintenances
+├── Items (stock)
+│   ├── ItemMovements
+│   └── ItemPrices
+└── Users (with per-site roles)
+
+Headquarters (HQ Site)
+└── Companies (unified: item providers + maintenance contractors)
+    ├── types: [ITEM_PROVIDER, MAINTENANCE_PROVIDER]
+    ├── → Items (as supplier)
+    └── → Maintenances (as contractor)
+```
+
+---
+
+## 🚀 Installation
+
+### Prerequisites
+
+- PHP 8.2 or higher
+- Composer 2.x
+- PostgreSQL 16 or higher
+- Node.js 18+ (for assets)
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/XetaIO/XetaSuite-core.git
+cd XetaSuite-core
+
+# Install dependencies
+composer install
+
+# Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# Configure database in .env
+# DB_CONNECTION=pgsql
+# DB_DATABASE=xetasuite
+# ...
+
+# Run migrations and seeders
+php artisan migrate --seed
+
+# Start development server
+composer run dev
+```
+
+### Important Environment Variables
+
+```env
+# Application
+APP_URL=https://xetasuite.test
+SPA_URL=http://localhost:5173
+
+# Database
+DB_CONNECTION=pgsql
+DB_DATABASE=xetasuite
+
+# Sanctum (SPA)
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,xetasuite.test
+
+# Session
+SESSION_DRIVER=database
+SESSION_DOMAIN=.xetasuite.test
+
+# Demo mode (optional)
+DEMO_MODE=false
+```
+
+---
+
+## 🧪 Testing
+
+XetaSuite uses **Pest PHP** for testing with comprehensive coverage:
+
+```bash
+# Run all tests
+php artisan test
+
+# Run tests with filter
+php artisan test --filter=CompanyController
+
+# Run tests by directory
+php artisan test tests/Feature/Observers/
+```
+
+---
+
+## 📖 API Documentation
+
+The API follows REST conventions with versioning (`/api/v1/`). Main endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/auth/login` | Authentication |
+| `GET /api/v1/user` | Current user |
+| `PATCH /api/v1/user/site` | Switch site |
+| `GET /api/v1/sites` | List sites |
+| `GET /api/v1/zones` | Current site zones |
+| `GET /api/v1/materials` | Materials |
+| `GET /api/v1/items` | Items/Stock |
+| `GET /api/v1/maintenances` | Maintenances |
+| `GET /api/v1/incidents` | Incidents |
+| `GET /api/v1/cleanings` | Cleanings |
+| `GET /api/v1/companies` | Companies (item providers + contractors, HQ only) |
+
+---
+
+## 🎭 Demo Mode
+
+XetaSuite can be deployed in demonstration mode:
+
+```env
+DEMO_MODE=true
+```
+
+In demo mode:
+- Destructive actions are blocked (deleting sites, users, etc.)
+- Database is reset every 6 hours
+- Test accounts available: `admin@xetasuite.demo`, `manager@xetasuite.demo`, `user@xetasuite.demo`
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please review the contribution guide before submitting a Pull Request.
+
+```bash
+# Format code before committing
+vendor/bin/pint --dirty
+```
+
+---
+
+## 📄 License
+
+XetaSuite is open-source software licensed under the [MIT](LICENSE) license.
+
+---
+
+## 🔗 Links
+
+- **React Frontend**: [XetaSuite-React](https://github.com/XetaIO/XetaSuite-React)
+- **Issues**: [GitHub Issues](https://github.com/XetaIO/XetaSuite-core/issues)

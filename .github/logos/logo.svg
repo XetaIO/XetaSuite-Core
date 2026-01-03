@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 68">
+  <!-- Icon: Hexagonal X representing connectivity/multi-tenancy -->
+  <g transform="translate(3, 2) scale(0.8)">
+    <!-- Outer hexagon -->
+    <polygon points="40,5 70,22 70,58 40,75 10,58 10,22" fill="none" stroke="#465fff" stroke-width="3"/>
+    <!-- Inner X -->
+    <path d="M25 25 L55 55 M55 25 L25 55" stroke="#465fff" stroke-width="6" stroke-linecap="round"/>
+    <!-- Connection dots -->
+    <circle cx="40" cy="5" r="4" fill="#465fff"/>
+    <circle cx="70" cy="22" r="4" fill="#465fff"/>
+    <circle cx="70" cy="58" r="4" fill="#465fff"/>
+    <circle cx="40" cy="75" r="4" fill="#465fff"/>
+    <circle cx="10" cy="58" r="4" fill="#465fff"/>
+    <circle cx="10" cy="22" r="4" fill="#465fff"/>
+  </g>
+
+  <!-- Text: XetaSuite -->
+  <text x="70" y="32" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="32" font-weight="600" fill="#111827" dominant-baseline="central">
+    <tspan fill="#465fff">Xeta</tspan><tspan fill="#374151">Suite</tspan>
+  </text>
+</svg>

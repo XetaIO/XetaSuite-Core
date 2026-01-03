@@ -10,11 +10,20 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "endroid/qr-code": "^6.0",
+        "laravel/fortify": "^1.31.3",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "laravolt/avatar": "^6.3.1",
+        "spatie/laravel-activitylog": "^4.10.2",
+        "spatie/laravel-backup": "^9.3.6",
+        "spatie/laravel-permission": "^6.23.0",
+        "xetaio/xetaravel-counts": "^2.0",
+        "xetaio/xetaravel-iptraceable": "^12.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.0.0",
         "fakerphp/faker": "^1.23",
         "laravel/boost": "^1.8",
         "laravel/pail": "^1.2.2",
@@ -22,12 +31,15 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "^4.1",
-        "pestphp/pest-plugin-laravel": "^4.0"
+        "pestphp/pest": "^3.0|^4.1",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0"
     },
     "autoload": {
+        "files": [
+            "app/helpers.php"
+        ],
         "psr-4": {
-            "App\\": "app/",
+            "XetaSuite\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
@@ -60,7 +72,7 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan boost:update --ansi"
+            "@php artisan boost:update --ansi || true"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
