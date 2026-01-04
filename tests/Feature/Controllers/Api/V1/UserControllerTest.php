@@ -15,7 +15,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -51,8 +51,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns paginated list of users for authorized user', function () {
+describe('index', function (): void {
+    it('returns paginated list of users for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         User::factory()->count(25)->withSite($this->headquarters)->create();
@@ -71,7 +71,7 @@ describe('index', function () {
             ->assertJsonCount(20, 'data'); // Default pagination
     });
 
-    it('can filter users by site_id', function () {
+    it('can filter users by site_id', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         User::factory()->count(5)->withSite($this->headquarters)->create();
@@ -84,7 +84,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('can search users by name or email', function () {
+    it('can search users by name or email', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         User::factory()->withSite($this->headquarters)->create(['first_name' => 'Zephyrin', 'last_name' => 'Doe']);
@@ -99,7 +99,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.first_name', 'Zephyrin');
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
@@ -109,7 +109,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/users');
 
         $response->assertUnauthorized();
@@ -120,8 +120,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns user details for authorized user', function () {
+describe('show', function (): void {
+    it('returns user details for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetUser = User::factory()->withSite($this->headquarters)->create([
@@ -152,7 +152,7 @@ describe('show', function () {
             ->assertJsonPath('data.last_name', 'User');
     });
 
-    it('returns 404 for non-existent user', function () {
+    it('returns 404 for non-existent user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -166,8 +166,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('creates a new user for authorized user', function () {
+describe('store', function (): void {
+    it('creates a new user for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -191,7 +191,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates user with sites and roles', function () {
+    it('creates user with sites and roles', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -223,7 +223,7 @@ describe('store', function () {
         expect($newUser->hasRole('operator'))->toBeTrue();
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -233,7 +233,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['username', 'email', 'first_name', 'last_name']);
     });
 
-    it('validates unique username and email', function () {
+    it('validates unique username and email', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         User::factory()->create(['username' => 'existing', 'email' => 'existing@example.com']);
@@ -250,7 +250,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['username', 'email']);
     });
 
-    it('denies access for user without create permission', function () {
+    it('denies access for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'viewer', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('user.viewAny');
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutCreate);
@@ -271,8 +271,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates user for authorized user', function () {
+describe('update', function (): void {
+    it('updates user for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
 
@@ -287,7 +287,7 @@ describe('update', function () {
             ->assertJsonPath('data.last_name', 'Name');
     });
 
-    it('updates user sites and roles', function () {
+    it('updates user sites and roles', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
 
@@ -308,7 +308,7 @@ describe('update', function () {
         expect($targetUser->sites->first()->id)->toBe($this->regularSite->id);
     });
 
-    it('validates unique username and email on update', function () {
+    it('validates unique username and email on update', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $existingUser = User::factory()->create(['username' => 'taken', 'email' => 'taken@example.com']);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
@@ -323,7 +323,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['username', 'email']);
     });
 
-    it('allows user to keep their own username and email', function () {
+    it('allows user to keep their own username and email', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create([
             'username' => 'myusername',
@@ -346,8 +346,8 @@ describe('update', function () {
 // DELETE TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('soft deletes user for authorized user', function () {
+describe('destroy', function (): void {
+    it('soft deletes user for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
 
@@ -360,7 +360,7 @@ describe('destroy', function () {
         $this->assertSoftDeleted('users', ['id' => $targetUser->id]);
     });
 
-    it('records who deleted the user', function () {
+    it('records who deleted the user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
 
@@ -371,7 +371,7 @@ describe('destroy', function () {
         expect($targetUser->deleted_by_id)->toBe($user->id);
     });
 
-    it('returns 404 for non-existent user', function () {
+    it('returns 404 for non-existent user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -385,8 +385,8 @@ describe('destroy', function () {
 // AVAILABLE OPTIONS TESTS
 // ============================================================================
 
-describe('available options', function () {
-    it('returns available sites for user assignment', function () {
+describe('available options', function (): void {
+    it('returns available sites for user assignment', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -400,7 +400,7 @@ describe('available options', function () {
             ]);
     });
 
-    it('returns available roles', function () {
+    it('returns available roles', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -414,7 +414,7 @@ describe('available options', function () {
             ]);
     });
 
-    it('returns available permissions for user with assignDirectPermission', function () {
+    it('returns available permissions for user with assignDirectPermission', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -428,7 +428,7 @@ describe('available options', function () {
             ]);
     });
 
-    it('denies permissions list for user without assignDirectPermission', function () {
+    it('denies permissions list for user without assignDirectPermission', function (): void {
         $roleWithoutAssign = Role::create(['name' => 'basic', 'guard_name' => 'web']);
         $roleWithoutAssign->givePermissionTo(['user.viewAny', 'user.view']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutAssign);
@@ -444,8 +444,8 @@ describe('available options', function () {
 // USER ACTIVITIES TESTS
 // ============================================================================
 
-describe('user activities', function () {
-    it('returns user cleanings', function () {
+describe('user activities', function (): void {
+    it('returns user cleanings', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
         $zone = Zone::factory()->forSite($this->headquarters)->create();
@@ -466,7 +466,7 @@ describe('user activities', function () {
             ->assertJsonCount(5, 'data');
     });
 
-    it('returns user maintenances', function () {
+    it('returns user maintenances', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
         $zone = Zone::factory()->forSite($this->headquarters)->create();
@@ -487,7 +487,7 @@ describe('user activities', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns user incidents', function () {
+    it('returns user incidents', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->withSite($this->headquarters)->create();
         $zone = Zone::factory()->forSite($this->headquarters)->create();
@@ -508,7 +508,7 @@ describe('user activities', function () {
             ->assertJsonCount(4, 'data');
     });
 
-    it('returns roles per site for a user', function () {
+    it('returns roles per site for a user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
         $targetUser = User::factory()->create();
         $targetUser->sites()->attach([$this->headquarters->id, $this->regularSite->id]);

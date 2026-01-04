@@ -12,7 +12,7 @@ use XetaSuite\Models\Company;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -57,8 +57,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns movements for an item', function () {
+describe('index', function (): void {
+    it('returns movements for an item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -88,7 +88,7 @@ describe('index', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -132,7 +132,7 @@ describe('index', function () {
             ]);
     });
 
-    it('can filter movements by type', function () {
+    it('can filter movements by type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -170,7 +170,7 @@ describe('index', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('cannot view movements from another site item', function () {
+    it('cannot view movements from another site item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -181,7 +181,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-permission', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -193,7 +193,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $item = Item::factory()->forSite($this->regularSite)->create();
 
         $response = $this->getJson("/api/v1/items/{$item->id}/movements");
@@ -206,8 +206,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns movement details with proper structure', function () {
+describe('show', function (): void {
+    it('returns movement details with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -247,7 +247,7 @@ describe('show', function () {
             ]);
     });
 
-    it('cannot view movement from another site item', function () {
+    it('cannot view movement from another site item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -263,7 +263,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-permission', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -281,8 +281,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('can create entry movement with required fields', function () {
+describe('store', function (): void {
+    it('can create entry movement with required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -318,7 +318,7 @@ describe('store', function () {
         expect($item->item_entry_count)->toBe(1);
     });
 
-    it('can create entry movement with company', function () {
+    it('can create entry movement with company', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -342,7 +342,7 @@ describe('store', function () {
             ->assertJsonPath('data.company_invoice_number', 'INV-2024-001');
     });
 
-    it('can create exit movement', function () {
+    it('can create exit movement', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -371,7 +371,7 @@ describe('store', function () {
         expect($item->item_exit_count)->toBe(1);
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -386,7 +386,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['type', 'quantity']);
     });
 
-    it('validates type is entry or exit', function () {
+    it('validates type is entry or exit', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -406,7 +406,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['type']);
     });
 
-    it('cannot create movement for item from another site', function () {
+    it('cannot create movement for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -422,7 +422,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.update permission', function () {
+    it('requires item.update permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->viewOnlyRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create();
@@ -438,7 +438,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $item = Item::factory()->forSite($this->regularSite)->create();
 
         $response = $this->postJson("/api/v1/items/{$item->id}/movements", [
@@ -456,8 +456,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('can update movement quantity', function () {
+describe('update', function (): void {
+    it('can update movement quantity', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -491,7 +491,7 @@ describe('update', function () {
         expect($item->item_entry_total)->toBe($initialTotal + 5);
     });
 
-    it('can update movement company', function () {
+    it('can update movement company', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -519,7 +519,7 @@ describe('update', function () {
             ->assertJsonPath('data.company_id', $this->company2->id);
     });
 
-    it('cannot update movement from another site item', function () {
+    it('cannot update movement from another site item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -539,7 +539,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.update permission', function () {
+    it('requires item.update permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->viewOnlyRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create();
@@ -564,8 +564,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('can delete movement and update item totals', function () {
+describe('destroy', function (): void {
+    it('can delete movement and update item totals', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create item with initial totals at 0 - the movement creation will set them
@@ -604,7 +604,7 @@ describe('destroy', function () {
         expect($item->item_entry_count)->toBe(0);
     });
 
-    it('can delete exit movement and update totals', function () {
+    it('can delete exit movement and update totals', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create item with initial totals at 0 - the movement creation will set them
@@ -640,7 +640,7 @@ describe('destroy', function () {
         expect($item->item_exit_count)->toBe(0);
     });
 
-    it('cannot delete movement from another site item', function () {
+    it('cannot delete movement from another site item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -656,7 +656,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.update permission', function () {
+    it('requires item.update permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->viewOnlyRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create();
@@ -677,8 +677,8 @@ describe('destroy', function () {
 // AVAILABLE COMPANIES TESTS
 // ============================================================================
 
-describe('availableCompanies', function () {
-    it('returns list of item provider companies', function () {
+describe('availableCompanies', function (): void {
+    it('returns list of item provider companies', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -700,7 +700,7 @@ describe('availableCompanies', function () {
         expect(count($response->json('companies')))->toBeGreaterThanOrEqual(2);
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-permission', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -715,8 +715,8 @@ describe('availableCompanies', function () {
 // ALL MOVEMENTS TESTS
 // ============================================================================
 
-describe('all', function () {
-    it('returns all movements for items on user current site', function () {
+describe('all', function (): void {
+    it('returns all movements for items on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create items on user's site
@@ -764,7 +764,7 @@ describe('all', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('returns proper structure with item information', function () {
+    it('returns proper structure with item information', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -817,7 +817,7 @@ describe('all', function () {
         expect($response->json('data.0.item.reference'))->toBe('REF-123');
     });
 
-    it('can filter by type', function () {
+    it('can filter by type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -855,7 +855,7 @@ describe('all', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('can search by item name', function () {
+    it('can search by item name', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item1 = Item::factory()
@@ -889,7 +889,7 @@ describe('all', function () {
             ->assertJsonCount(1, 'data');
     });
 
-    it('can search by company name', function () {
+    it('can search by company name', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -920,7 +920,7 @@ describe('all', function () {
             ->assertJsonCount(1, 'data');
     });
 
-    it('can sort by different fields', function () {
+    it('can sort by different fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -966,7 +966,7 @@ describe('all', function () {
         expect($quantities)->toBe([20, 10, 5]);
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-permission', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -976,13 +976,13 @@ describe('all', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/item-movements');
 
         $response->assertUnauthorized();
     });
 
-    it('returns empty list when no movements exist', function () {
+    it('returns empty list when no movements exist', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)

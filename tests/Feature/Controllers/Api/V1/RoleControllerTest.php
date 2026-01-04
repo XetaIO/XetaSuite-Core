@@ -10,7 +10,7 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -48,8 +48,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns paginated list of roles for authorized HQ user', function () {
+describe('index', function (): void {
+    it('returns paginated list of roles for authorized HQ user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create additional roles
@@ -70,7 +70,7 @@ describe('index', function () {
             ]);
     });
 
-    it('can search roles by name', function () {
+    it('can search roles by name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Role::create(['name' => 'administrator', 'guard_name' => 'web']);
@@ -84,7 +84,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.name', 'administrator');
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-manager', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.viewAny');
 
@@ -96,7 +96,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
@@ -106,7 +106,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/roles');
 
         $response->assertUnauthorized();
@@ -117,8 +117,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns role details with permissions for authorized HQ user', function () {
+describe('show', function (): void {
+    it('returns role details with permissions for authorized HQ user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'test-role', 'guard_name' => 'web']);
@@ -144,7 +144,7 @@ describe('show', function () {
             ->assertJsonCount(2, 'data.permissions');
     });
 
-    it('returns 404 for non-existent role', function () {
+    it('returns 404 for non-existent role', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -153,7 +153,7 @@ describe('show', function () {
         $response->assertNotFound();
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-viewer', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.view');
 
@@ -172,8 +172,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('creates a new role for authorized HQ user', function () {
+describe('store', function (): void {
+    it('creates a new role for authorized HQ user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -190,7 +190,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates role with permissions', function () {
+    it('creates role with permissions', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $permissions = Permission::whereIn('name', ['user.viewAny', 'user.view'])->pluck('id')->toArray();
@@ -209,7 +209,7 @@ describe('store', function () {
         expect($createdRole->permissions()->count())->toBe(2);
     });
 
-    it('validates unique role name', function () {
+    it('validates unique role name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Role::create(['name' => 'existing-role', 'guard_name' => 'web']);
@@ -223,7 +223,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates required name', function () {
+    it('validates required name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -233,7 +233,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-creator', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.create');
 
@@ -247,7 +247,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without create permission', function () {
+    it('denies access for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'viewer-only', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('role.viewAny');
 
@@ -266,8 +266,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates role name for authorized HQ user', function () {
+describe('update', function (): void {
+    it('updates role name for authorized HQ user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'old-name', 'guard_name' => 'web']);
@@ -286,7 +286,7 @@ describe('update', function () {
         ]);
     });
 
-    it('updates role permissions', function () {
+    it('updates role permissions', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'test-role', 'guard_name' => 'web']);
@@ -308,7 +308,7 @@ describe('update', function () {
         expect($targetRole->hasPermissionTo('user.viewAny'))->toBeFalse();
     });
 
-    it('validates unique name on update', function () {
+    it('validates unique name on update', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Role::create(['name' => 'existing-role', 'guard_name' => 'web']);
@@ -323,7 +323,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('allows keeping same name on update', function () {
+    it('allows keeping same name on update', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'my-role', 'guard_name' => 'web']);
@@ -337,7 +337,7 @@ describe('update', function () {
             ->assertJsonPath('data.name', 'my-role');
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-updater', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.update');
 
@@ -358,8 +358,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('deletes role without users for authorized HQ user', function () {
+describe('destroy', function (): void {
+    it('deletes role without users for authorized HQ user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'to-delete', 'guard_name' => 'web']);
@@ -374,7 +374,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('prevents deletion of role with assigned users', function () {
+    it('prevents deletion of role with assigned users', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'role-with-users', 'guard_name' => 'web']);
@@ -394,7 +394,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-deleter', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.delete');
 
@@ -408,7 +408,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without delete permission', function () {
+    it('denies access for user without delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'viewer-only', 'guard_name' => 'web']);
         $roleWithoutDelete->givePermissionTo(['role.viewAny', 'role.view']);
 
@@ -427,8 +427,8 @@ describe('destroy', function () {
 // AVAILABLE PERMISSIONS TESTS
 // ============================================================================
 
-describe('availablePermissions', function () {
-    it('returns limited list of permissions by default', function () {
+describe('availablePermissions', function (): void {
+    it('returns limited list of permissions by default', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -442,7 +442,7 @@ describe('availablePermissions', function () {
             ]);
     });
 
-    it('can search permissions by name', function () {
+    it('can search permissions by name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -457,7 +457,7 @@ describe('availablePermissions', function () {
         }
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-viewer', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.viewAny');
 
@@ -474,8 +474,8 @@ describe('availablePermissions', function () {
 // USERS TESTS
 // ============================================================================
 
-describe('users', function () {
-    it('returns users assigned to a role', function () {
+describe('users', function (): void {
+    it('returns users assigned to a role', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $targetRole = Role::create(['name' => 'test-role', 'guard_name' => 'web']);
@@ -494,7 +494,7 @@ describe('users', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('denies access for non-HQ user', function () {
+    it('denies access for non-HQ user', function (): void {
         $roleWithPermissions = Role::create(['name' => 'site-role-viewer', 'guard_name' => 'web']);
         $roleWithPermissions->givePermissionTo('role.view');
 

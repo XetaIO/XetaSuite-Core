@@ -7,8 +7,8 @@ declare(strict_types=1);
  * This endpoint does NOT require authentication.
  */
 
-describe('AppConfigController', function () {
-    it('returns app configuration without authentication', function () {
+describe('AppConfigController', function (): void {
+    it('returns app configuration without authentication', function (): void {
         $response = $this->getJson('/api/v1/app/config');
 
         $response->assertSuccessful()
@@ -18,7 +18,7 @@ describe('AppConfigController', function () {
             ]);
     });
 
-    it('returns demo_mode as boolean', function () {
+    it('returns demo_mode as boolean', function (): void {
         $response = $this->getJson('/api/v1/app/config');
 
         $response->assertSuccessful();
@@ -27,7 +27,7 @@ describe('AppConfigController', function () {
         expect($data['demo_mode'])->toBeBool();
     });
 
-    it('returns app_name from configuration', function () {
+    it('returns app_name from configuration', function (): void {
         $response = $this->getJson('/api/v1/app/config');
 
         $response->assertSuccessful()

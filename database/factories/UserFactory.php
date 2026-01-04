@@ -60,7 +60,7 @@ class UserFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->afterCreating(function (User $user) {
+        return $this->afterCreating(function (User $user): void {
             if (method_exists($user, 'assignRole')) {
                 $user->assignRolesToSites('admin', Site::all()->pluck('id')->toArray());
             }
@@ -79,7 +79,7 @@ class UserFactory extends Factory
 
         return $this->state(fn () => [
             'current_site_id' => $siteId,
-        ])->afterCreating(function (User $user) use ($siteId) {
+        ])->afterCreating(function (User $user) use ($siteId): void {
             $user->sites()->syncWithoutDetaching([$siteId]);
         });
     }
@@ -106,7 +106,7 @@ class UserFactory extends Factory
      */
     public function withCleanings(int $count = 5): static
     {
-        return $this->afterCreating(function (User $user) use ($count) {
+        return $this->afterCreating(function (User $user) use ($count): void {
             $user->cleanings()->createMany(
                 Cleaning::factory()->count($count)->make()->toArray()
             );
@@ -121,7 +121,7 @@ class UserFactory extends Factory
      */
     public function withIncidents(int $count = 3): static
     {
-        return $this->afterCreating(function (User $user) use ($count) {
+        return $this->afterCreating(function (User $user) use ($count): void {
             $user->incidents()->createMany(
                 Incident::factory()->count($count)->make()->toArray()
             );
@@ -136,7 +136,7 @@ class UserFactory extends Factory
      */
     public function withMaintenances(int $count = 3): static
     {
-        return $this->afterCreating(function (User $user) use ($count) {
+        return $this->afterCreating(function (User $user) use ($count): void {
             $user->maintenances()->createMany(
                 Maintenance::factory()->count($count)->make()->toArray()
             );
@@ -151,7 +151,7 @@ class UserFactory extends Factory
      */
     public function withMaintenanceOperators(int $count = 3): static
     {
-        return $this->afterCreating(function (User $user) use ($count) {
+        return $this->afterCreating(function (User $user) use ($count): void {
             $maintenances = Maintenance::factory()->count($count)->create();
             $user->maintenancesOperators()->attach($maintenances->pluck('id')->toArray());
         });
@@ -165,7 +165,7 @@ class UserFactory extends Factory
      */
     public function withSites(int $count = 2): static
     {
-        return $this->afterCreating(function (User $user) use ($count) {
+        return $this->afterCreating(function (User $user) use ($count): void {
             $sites = Site::factory()->count($count)->create();
             $user->sites()->attach($sites->pluck('id')->toArray());
         });

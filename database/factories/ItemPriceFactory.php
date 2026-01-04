@@ -99,7 +99,7 @@ class ItemPriceFactory extends Factory
                 'positive' => $price * random_int(10, 50) / 100,
                 'negative' => $price * random_int(-50, -10) / 100,
             ];
-            $price = $price + $priceChoices[array_rand($priceChoices, 1)];
+            $price += $priceChoices[array_rand($priceChoices, 1)];
         }
 
         return $this->state(fn () => [

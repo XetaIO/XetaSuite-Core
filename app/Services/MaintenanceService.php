@@ -106,13 +106,13 @@ class MaintenanceService
     {
         return Incident::query()
             ->forCurrentSite()
-            ->where(function (Builder $query) use ($maintenanceId) {
+            ->where(function (Builder $query) use ($maintenanceId): void {
                 $query->whereNull('maintenance_id');
                 if ($maintenanceId) {
                     $query->orWhere('maintenance_id', $maintenanceId);
                 }
             })
-            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
+            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s): void {
                 $q->where('id', 'like', "%{$s}%")
                     ->orWhere('description', 'ILIKE', "%{$s}%");
             }))
@@ -128,7 +128,7 @@ class MaintenanceService
     {
         return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('site_id', session('current_site_id')))
-            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
+            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s): void {
                 $q->where('first_name', 'ILIKE', "%{$s}%")
                     ->orWhere('last_name', 'ILIKE', "%{$s}%")
                     ->orWhere('email', 'ILIKE', "%{$s}%");
@@ -161,7 +161,7 @@ class MaintenanceService
         return Item::query()
             ->forCurrentSite()
             ->whereRaw('(item_entry_total - item_exit_total) > 0')
-            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
+            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s): void {
                 $q->where('name', 'ILIKE', "%{$s}%")
                     ->orWhere('reference', 'ILIKE', "%{$s}%");
             }))
@@ -222,7 +222,7 @@ class MaintenanceService
      */
     private function applySearch(Builder $query, string $search): Builder
     {
-        return $query->where(function (Builder $q) use ($search) {
+        return $query->where(function (Builder $q) use ($search): void {
             $q->where('description', 'ILIKE', "%{$search}%")
                 ->orWhere('reason', 'ILIKE', "%{$search}%")
                 ->orWhereHas('material', fn (Builder $mq) => $mq->where('name', 'ILIKE', "%{$search}%"));

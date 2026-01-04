@@ -50,8 +50,8 @@ class StoreItemRequest extends FormRequest
             'material_ids' => 'nullable|array',
             'material_ids.*' => [
                 'integer',
-                Rule::exists('materials', 'id')->where(function ($query) use ($siteId) {
-                    $query->whereIn('zone_id', function ($subQuery) use ($siteId) {
+                Rule::exists('materials', 'id')->where(function ($query) use ($siteId): void {
+                    $query->whereIn('zone_id', function ($subQuery) use ($siteId): void {
                         $subQuery->select('id')
                             ->from('zones')
                             ->where('site_id', $siteId);
@@ -61,8 +61,8 @@ class StoreItemRequest extends FormRequest
             'recipient_ids' => 'nullable|array',
             'recipient_ids.*' => [
                 'integer',
-                Rule::exists('users', 'id')->where(function ($query) use ($siteId) {
-                    $query->whereIn('id', function ($subQuery) use ($siteId) {
+                Rule::exists('users', 'id')->where(function ($query) use ($siteId): void {
+                    $query->whereIn('id', function ($subQuery) use ($siteId): void {
                         $subQuery->select('user_id')
                             ->from('site_user')
                             ->where('site_id', $siteId);

@@ -12,7 +12,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
     $this->zone = Zone::factory()->forSite($this->site)->withAllowMaterial()->create();
     $this->material = Material::factory()
@@ -21,7 +21,7 @@ beforeEach(function () {
         ->create(['name' => 'Machine A']);
 });
 
-it('saves material_name in cleanings when material is deleted', function () {
+it('saves material_name in cleanings when material is deleted', function (): void {
     $cleaning = Cleaning::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($cleaning->material_name)->toBeNull();
@@ -33,7 +33,7 @@ it('saves material_name in cleanings when material is deleted', function () {
     expect($cleaning->material_name)->toBe('Machine A');
 });
 
-it('saves material_name in incidents when material is deleted', function () {
+it('saves material_name in incidents when material is deleted', function (): void {
     $incident = Incident::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($incident->material_name)->toBeNull();
@@ -45,7 +45,7 @@ it('saves material_name in incidents when material is deleted', function () {
     expect($incident->material_name)->toBe('Machine A');
 });
 
-it('saves material_name in maintenances when material is deleted', function () {
+it('saves material_name in maintenances when material is deleted', function (): void {
     $maintenance = Maintenance::factory()->forSite($this->site)->forMaterial($this->material)->create();
 
     expect($maintenance->material_name)->toBeNull();

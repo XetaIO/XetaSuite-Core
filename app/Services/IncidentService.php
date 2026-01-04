@@ -62,7 +62,7 @@ class IncidentService
             ->with('material:id,name')
             ->forCurrentSite()
             ->when($materialId, fn (Builder $query, int $id) => $query->where('material_id', $id))
-            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s) {
+            ->when($search, fn (Builder $query, string $s) => $query->where(function (Builder $q) use ($s): void {
                 $q->where('id', 'like', "%{$s}%")
                     ->orWhere('description', 'ilike', "%{$s}%")
                     ->orWhereHas('material', fn (Builder $mq) => $mq->where('name', 'ilike', "%{$s}%"));
@@ -104,7 +104,7 @@ class IncidentService
     {
         $searchTerm = '%' . mb_strtolower($search) . '%';
 
-        return $query->where(function (Builder $q) use ($searchTerm) {
+        return $query->where(function (Builder $q) use ($searchTerm): void {
             $q->whereRaw('LOWER(description) LIKE ?', [$searchTerm])
                 ->orWhereRaw('LOWER(material_name) LIKE ?', [$searchTerm])
                 ->orWhereRaw('LOWER(reported_by_name) LIKE ?', [$searchTerm]);

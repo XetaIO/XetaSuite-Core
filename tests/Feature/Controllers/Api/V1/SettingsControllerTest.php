@@ -10,7 +10,7 @@ use XetaSuite\Models\Site;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -54,8 +54,8 @@ beforeEach(function () {
 // PUBLIC ENDPOINT TESTS
 // ============================================================================
 
-describe('public', function () {
-    it('returns settings as key-value pairs', function () {
+describe('public', function (): void {
+    it('returns settings as key-value pairs', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -69,7 +69,7 @@ describe('public', function () {
             ->assertJsonPath('data.login_enabled', true);
     });
 
-    it('only returns global settings (null model_type and model_id)', function () {
+    it('only returns global settings (null model_type and model_id)', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create a user-scoped setting
@@ -90,8 +90,8 @@ describe('public', function () {
 // INDEX (MANAGE) TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns all settings with full details for authorized user on headquarters', function () {
+describe('index', function (): void {
+    it('returns all settings with full details for authorized user on headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -105,7 +105,7 @@ describe('index', function () {
             ]);
     });
 
-    it('returns settings ordered by key', function () {
+    it('returns settings ordered by key', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -116,7 +116,7 @@ describe('index', function () {
         expect($keys)->toBe(['currency', 'login_enabled']);
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
@@ -126,7 +126,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/settings/manage');
 
         $response->assertUnauthorized();
@@ -137,8 +137,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns setting details for authorized user', function () {
+describe('show', function (): void {
+    it('returns setting details for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -152,7 +152,7 @@ describe('show', function () {
             ->assertJsonPath('data.value', 'EUR');
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutView);
 
@@ -162,7 +162,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('returns 404 for non-existent setting', function () {
+    it('returns 404 for non-existent setting', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -176,8 +176,8 @@ describe('show', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates currency setting from headquarters', function () {
+describe('update', function (): void {
+    it('updates currency setting from headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -195,7 +195,7 @@ describe('update', function () {
         ]);
     });
 
-    it('updates login_enabled setting from headquarters', function () {
+    it('updates login_enabled setting from headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -207,7 +207,7 @@ describe('update', function () {
             ->assertJsonPath('data.value', false);
     });
 
-    it('denies update from regular site', function () {
+    it('denies update from regular site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -218,7 +218,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('denies update for user without update permission', function () {
+    it('denies update for user without update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'viewer', 'guard_name' => 'web']);
         $roleWithoutUpdate->givePermissionTo(['setting.viewAny', 'setting.view']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutUpdate);
@@ -231,7 +231,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('validates currency setting must be 3 characters', function () {
+    it('validates currency setting must be 3 characters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -243,7 +243,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['value']);
     });
 
-    it('validates login_enabled must be boolean', function () {
+    it('validates login_enabled must be boolean', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -255,7 +255,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['value']);
     });
 
-    it('clears cache after update', function () {
+    it('clears cache after update', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // First, access the setting to cache it

@@ -17,7 +17,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -61,8 +61,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns only materials for zones on user current site', function () {
+describe('index', function (): void {
+    it('returns only materials for zones on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->count(3)->forZone($this->zoneWithMaterials)->create();
@@ -75,7 +75,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->count(5)->forZone($this->zoneWithMaterials)->create();
@@ -99,7 +99,7 @@ describe('index', function () {
             ]);
     });
 
-    it('returns materials ordered by name', function () {
+    it('returns materials ordered by name', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->forZone($this->zoneWithMaterials)->create(['name' => 'Zebra Material']);
@@ -114,7 +114,7 @@ describe('index', function () {
         expect($data[1]['name'])->toBe('Zebra Material');
     });
 
-    it('filters materials by zone_id', function () {
+    it('filters materials by zone_id', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone2 = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => true]);
@@ -132,7 +132,7 @@ describe('index', function () {
         expect($names)->not->toContain('Zone 2 Material');
     });
 
-    it('filters materials by search term', function () {
+    it('filters materials by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->forZone($this->zoneWithMaterials)->create(['name' => 'Printer HP']);
@@ -147,7 +147,7 @@ describe('index', function () {
         expect($names)->not->toContain('Coffee Machine');
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited-material', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -157,7 +157,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/materials');
 
         $response->assertUnauthorized();
@@ -168,8 +168,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns material details for material on user current site', function () {
+describe('show', function (): void {
+    it('returns material details for material on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()
@@ -195,7 +195,7 @@ describe('show', function () {
             ->assertJsonPath('data.name', $material->name);
     });
 
-    it('includes recipients when cleaning alert is enabled', function () {
+    it('includes recipients when cleaning alert is enabled', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $recipient = User::factory()->create();
@@ -215,7 +215,7 @@ describe('show', function () {
             ->assertJsonPath('data.recipients.0.id', $recipient->id);
     });
 
-    it('denies access for material on different site', function () {
+    it('denies access for material on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $material = Material::factory()->forZone($this->otherSiteZone)->create();
 
@@ -225,7 +225,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'no-material-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutView);
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -236,7 +236,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('returns 404 for non-existent material', function () {
+    it('returns 404 for non-existent material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -250,8 +250,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('creates a new material in zone on user current site', function () {
+describe('store', function (): void {
+    it('creates a new material in zone on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -274,7 +274,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates a material with cleaning alert enabled', function () {
+    it('creates a material with cleaning alert enabled', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $recipient = User::factory()->create();
@@ -303,7 +303,7 @@ describe('store', function () {
         expect($material->recipients->first()->id)->toBe($recipient->id);
     });
 
-    it('validates zone belongs to user current site', function () {
+    it('validates zone belongs to user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -316,7 +316,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['zone_id']);
     });
 
-    it('validates zone allows materials', function () {
+    it('validates zone allows materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zoneNoMaterials = Zone::factory()->forSite($this->regularSite)->create([
@@ -333,7 +333,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['zone_id']);
     });
 
-    it('validates recipients belong to current site', function () {
+    it('validates recipients belong to current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteUser = User::factory()->create();
@@ -351,7 +351,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['recipients.0']);
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -361,7 +361,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['zone_id', 'name']);
     });
 
-    it('denies access for user without create permission', function () {
+    it('denies access for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'no-material-create', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('material.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutCreate);
@@ -380,8 +380,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates a material on user current site', function () {
+describe('update', function (): void {
+    it('updates a material on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -402,7 +402,7 @@ describe('update', function () {
         ]);
     });
 
-    it('updates material zone to another zone on same site', function () {
+    it('updates material zone to another zone on same site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone2 = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => true]);
@@ -417,7 +417,7 @@ describe('update', function () {
             ->assertJsonPath('data.zone_id', $zone2->id);
     });
 
-    it('enables cleaning alert and adds recipients', function () {
+    it('enables cleaning alert and adds recipients', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $recipient = User::factory()->create();
@@ -442,7 +442,7 @@ describe('update', function () {
         expect($material->recipients)->toHaveCount(1);
     });
 
-    it('disables cleaning alert and clears related fields', function () {
+    it('disables cleaning alert and clears related fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $recipient = User::factory()->create();
@@ -471,7 +471,7 @@ describe('update', function () {
         expect($material->cleaning_alert_frequency_repeatedly)->toBe(0);
     });
 
-    it('validates zone belongs to user current site on update', function () {
+    it('validates zone belongs to user current site on update', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -485,7 +485,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['zone_id']);
     });
 
-    it('denies access for material on different site', function () {
+    it('denies access for material on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $material = Material::factory()->forZone($this->otherSiteZone)->create();
 
@@ -497,7 +497,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without update permission', function () {
+    it('denies access for user without update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'no-material-update', 'guard_name' => 'web']);
         $roleWithoutUpdate->givePermissionTo('material.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutUpdate);
@@ -517,8 +517,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('deletes a material on user current site', function () {
+describe('destroy', function (): void {
+    it('deletes a material on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -532,7 +532,7 @@ describe('destroy', function () {
         $this->assertDatabaseMissing('materials', ['id' => $materialId]);
     });
 
-    it('preserves material_name in related cleanings on delete', function () {
+    it('preserves material_name in related cleanings on delete', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create([
@@ -551,7 +551,7 @@ describe('destroy', function () {
         expect($cleaning->material_id)->toBeNull();
     });
 
-    it('preserves material_name in related incidents on delete', function () {
+    it('preserves material_name in related incidents on delete', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create([
@@ -570,7 +570,7 @@ describe('destroy', function () {
         expect($incident->material_id)->toBeNull();
     });
 
-    it('preserves material_name in related maintenances on delete', function () {
+    it('preserves material_name in related maintenances on delete', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create([
@@ -589,7 +589,7 @@ describe('destroy', function () {
         expect($maintenance->material_id)->toBeNull();
     });
 
-    it('detaches items from material on delete', function () {
+    it('detaches items from material on delete', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -605,7 +605,7 @@ describe('destroy', function () {
         expect($item->materials)->toHaveCount(0);
     });
 
-    it('denies access for material on different site', function () {
+    it('denies access for material on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $material = Material::factory()->forZone($this->otherSiteZone)->create();
 
@@ -615,7 +615,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without delete permission', function () {
+    it('denies access for user without delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'no-material-delete', 'guard_name' => 'web']);
         $roleWithoutDelete->givePermissionTo('material.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutDelete);
@@ -633,8 +633,8 @@ describe('destroy', function () {
 // AVAILABLE ZONES TESTS
 // ============================================================================
 
-describe('availableZones', function () {
-    it('returns only zones that allow materials on user current site', function () {
+describe('availableZones', function (): void {
+    it('returns only zones that allow materials on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zoneNoMaterials = Zone::factory()->forSite($this->regularSite)->create([
@@ -654,7 +654,7 @@ describe('availableZones', function () {
         expect($zoneIds)->not->toContain($this->otherSiteZone->id);
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/materials/available-zones');
 
         $response->assertUnauthorized();
@@ -665,8 +665,8 @@ describe('availableZones', function () {
 // AVAILABLE RECIPIENTS TESTS
 // ============================================================================
 
-describe('availableRecipients', function () {
-    it('returns only users with access to current site', function () {
+describe('availableRecipients', function (): void {
+    it('returns only users with access to current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $siteUser = User::factory()->create(['first_name' => 'Site', 'last_name' => 'User']);
@@ -687,7 +687,7 @@ describe('availableRecipients', function () {
         expect($userIds)->not->toContain($otherUser->id);
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/materials/available-recipients');
 
         $response->assertUnauthorized();
@@ -698,8 +698,8 @@ describe('availableRecipients', function () {
 // STATS TESTS
 // ============================================================================
 
-describe('stats', function () {
-    it('returns monthly statistics for a material', function () {
+describe('stats', function (): void {
+    it('returns monthly statistics for a material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -726,7 +726,7 @@ describe('stats', function () {
         expect($response->json('data.item_movements'))->toHaveCount(12);
     });
 
-    it('returns correct counts for material with data', function () {
+    it('returns correct counts for material with data', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()
@@ -770,7 +770,7 @@ describe('stats', function () {
         expect($cleanings[11])->toBe(3);
     });
 
-    it('denies access for material on different site', function () {
+    it('denies access for material on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -781,7 +781,7 @@ describe('stats', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $noPermRole = Role::create(['name' => 'no-perm', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $noPermRole);
 
@@ -793,7 +793,7 @@ describe('stats', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/stats");
@@ -806,8 +806,8 @@ describe('stats', function () {
 // QR CODE TESTS
 // ============================================================================
 
-describe('qrCode', function () {
-    it('generates QR code for material', function () {
+describe('qrCode', function (): void {
+    it('generates QR code for material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -826,7 +826,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 200);
     });
 
-    it('respects size parameter', function () {
+    it('respects size parameter', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -838,7 +838,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 300);
     });
 
-    it('limits size between 100 and 400', function () {
+    it('limits size between 100 and 400', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -856,7 +856,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 400);
     });
 
-    it('cannot generate QR code for material from another site', function () {
+    it('cannot generate QR code for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -867,7 +867,7 @@ describe('qrCode', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without generateQrcode permission', function () {
+    it('denies access for user without generateQrcode permission', function (): void {
         $noPermRole = Role::create(['name' => 'no-qr-perm', 'guard_name' => 'web']);
         $noPermRole->givePermissionTo('material.view');
         $user = createUserOnRegularSite($this->regularSite, $noPermRole);
@@ -880,7 +880,7 @@ describe('qrCode', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/qr-code");
@@ -893,8 +893,8 @@ describe('qrCode', function () {
 // INCIDENTS ENDPOINT TESTS
 // ============================================================================
 
-describe('incidents', function () {
-    it('returns paginated incidents for a material', function () {
+describe('incidents', function (): void {
+    it('returns paginated incidents for a material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -914,7 +914,7 @@ describe('incidents', function () {
             ]);
     });
 
-    it('filters incidents by search term', function () {
+    it('filters incidents by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -929,7 +929,7 @@ describe('incidents', function () {
         expect($response->json('data.0.description'))->toBe('Broken door');
     });
 
-    it('cannot view incidents for material from another site', function () {
+    it('cannot view incidents for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -940,7 +940,7 @@ describe('incidents', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/incidents");
@@ -953,8 +953,8 @@ describe('incidents', function () {
 // MAINTENANCES ENDPOINT TESTS
 // ============================================================================
 
-describe('maintenances', function () {
-    it('returns paginated maintenances for a material', function () {
+describe('maintenances', function (): void {
+    it('returns paginated maintenances for a material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -974,7 +974,7 @@ describe('maintenances', function () {
             ]);
     });
 
-    it('filters maintenances by search term', function () {
+    it('filters maintenances by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -989,7 +989,7 @@ describe('maintenances', function () {
         expect($response->json('data.0.reason'))->toBe('Annual checkup');
     });
 
-    it('cannot view maintenances for material from another site', function () {
+    it('cannot view maintenances for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -1000,7 +1000,7 @@ describe('maintenances', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/maintenances");
@@ -1013,8 +1013,8 @@ describe('maintenances', function () {
 // CLEANINGS ENDPOINT TESTS
 // ============================================================================
 
-describe('cleanings', function () {
-    it('returns paginated cleanings for a material', function () {
+describe('cleanings', function (): void {
+    it('returns paginated cleanings for a material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -1034,7 +1034,7 @@ describe('cleanings', function () {
             ]);
     });
 
-    it('filters cleanings by search term', function () {
+    it('filters cleanings by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -1049,7 +1049,7 @@ describe('cleanings', function () {
         expect($response->json('data.0.description'))->toBe('Deep cleaning');
     });
 
-    it('cannot view cleanings for material from another site', function () {
+    it('cannot view cleanings for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -1060,7 +1060,7 @@ describe('cleanings', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/cleanings");
@@ -1073,8 +1073,8 @@ describe('cleanings', function () {
 // ITEMS ENDPOINT TESTS
 // ============================================================================
 
-describe('items', function () {
-    it('returns paginated items for a material', function () {
+describe('items', function (): void {
+    it('returns paginated items for a material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -1095,7 +1095,7 @@ describe('items', function () {
             ]);
     });
 
-    it('filters items by search term', function () {
+    it('filters items by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
@@ -1111,7 +1111,7 @@ describe('items', function () {
         expect($response->json('data.0.name'))->toBe('Filter Oil');
     });
 
-    it('cannot view items for material from another site', function () {
+    it('cannot view items for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaterial = Material::factory()->forZone($this->otherSiteZone)->create();
@@ -1122,7 +1122,7 @@ describe('items', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $material = Material::factory()->forZone($this->zoneWithMaterials)->create();
 
         $response = $this->getJson("/api/v1/materials/{$material->id}/items");

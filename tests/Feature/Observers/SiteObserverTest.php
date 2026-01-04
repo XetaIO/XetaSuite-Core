@@ -8,11 +8,11 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
 });
 
-it('prevents site deletion when it has zones', function () {
+it('prevents site deletion when it has zones', function (): void {
     Zone::factory()->forSite($this->site)->create();
     $this->site->refresh();
 
@@ -24,7 +24,7 @@ it('prevents site deletion when it has zones', function () {
     expect(Site::find($this->site->id))->not->toBeNull();
 });
 
-it('allows site deletion when it has no zones', function () {
+it('allows site deletion when it has no zones', function (): void {
 
     expect($this->site->zone_count)->toBe(0);
 

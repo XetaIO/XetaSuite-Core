@@ -14,13 +14,13 @@ class SettingFactory extends Factory
     public function definition(): array
     {
         return [
-            'key' => fake()->unique()->slug,
-            'value' => fake()->text,
+            'key' => fake()->unique()->slug(),
+            'value' => fake()->text(),
             'model_type' => null,
             'model_id' => null,
-            'text' => fake()->sentence,
-            'label' => fake()->word,
-            'label_info' => fake()->sentence,
+            'text' => fake()->sentence(),
+            'label' => fake()->word(),
+            'label_info' => fake()->sentence(),
             'updated_by_id' => null,
             'created_at' => now(),
             'updated_at' => now(),

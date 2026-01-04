@@ -65,7 +65,7 @@ class ItemMovementFactory extends Factory
     public function entry(): static
     {
         return $this->state(fn () => ['type' => 'entry'])
-            ->afterMaking(function (ItemMovement $movement) {
+            ->afterMaking(function (ItemMovement $movement): void {
                 $movement->movable_type = null;
                 $movement->movable_id = null;
             });
@@ -77,7 +77,7 @@ class ItemMovementFactory extends Factory
     public function exit(): static
     {
         return $this->state(fn () => ['type' => 'exit'])
-            ->afterMaking(function (ItemMovement $movement) {
+            ->afterMaking(function (ItemMovement $movement): void {
                 $movement->company_id = null;
                 $movement->company_name = null;
                 $movement->company_invoice_number = null;

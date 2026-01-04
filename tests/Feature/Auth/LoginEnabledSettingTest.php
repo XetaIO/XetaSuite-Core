@@ -11,8 +11,8 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-describe('Login when login_enabled setting', function () {
-    it('allows login when login_enabled is true', function () {
+describe('Login when login_enabled setting', function (): void {
+    it('allows login when login_enabled is true', function (): void {
         // Create login_enabled setting with true
         Setting::factory()->create([
             'key' => 'login_enabled',
@@ -33,7 +33,7 @@ describe('Login when login_enabled setting', function () {
         $response->assertOk();
     });
 
-    it('denies login when login_enabled is false', function () {
+    it('denies login when login_enabled is false', function (): void {
         // Create login_enabled setting with false
         Setting::factory()->create([
             'key' => 'login_enabled',
@@ -56,7 +56,7 @@ describe('Login when login_enabled setting', function () {
             ->assertJsonPath('errors.email.0', __('auth.login_disabled'));
     });
 
-    it('allows login when login_enabled setting does not exist (default behavior)', function () {
+    it('allows login when login_enabled setting does not exist (default behavior)', function (): void {
         // No login_enabled setting exists - should default to allowing login
         $user = User::factory()->create([
             'password' => bcrypt('password123'),
@@ -70,7 +70,7 @@ describe('Login when login_enabled setting', function () {
         $response->assertOk();
     });
 
-    it('still validates credentials when login is enabled', function () {
+    it('still validates credentials when login is enabled', function (): void {
         Setting::factory()->create([
             'key' => 'login_enabled',
             'value' => true,
@@ -91,7 +91,7 @@ describe('Login when login_enabled setting', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('allows login with bypass.login permission when login_enabled is false', function () {
+    it('allows login with bypass.login permission when login_enabled is false', function (): void {
         // Create login_enabled setting with false
         Setting::factory()->create([
             'key' => 'login_enabled',
@@ -119,7 +119,7 @@ describe('Login when login_enabled setting', function () {
         $response->assertOk();
     });
 
-    it('denies login without bypass.login permission when login_enabled is false', function () {
+    it('denies login without bypass.login permission when login_enabled is false', function (): void {
         // Create login_enabled setting with false
         Setting::factory()->create([
             'key' => 'login_enabled',

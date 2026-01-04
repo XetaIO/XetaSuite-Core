@@ -38,7 +38,8 @@ class Session extends Model
      *
      * @return Builder
      */
-    public function scopeExpires(Builder $query): Builder
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function expires(Builder $query): Builder
     {
         $timeout = 5; // Timeout in minutes
         $expire = time() - (60 * $timeout);

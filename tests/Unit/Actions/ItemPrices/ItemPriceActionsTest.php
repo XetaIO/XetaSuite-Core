@@ -16,8 +16,8 @@ uses(RefreshDatabase::class);
 // CREATE ITEM PRICE TESTS
 // ============================================================================
 
-describe('CreateItemPrice', function () {
-    it('creates a price entry successfully', function () {
+describe('CreateItemPrice', function (): void {
+    it('creates a price entry successfully', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 0]);
@@ -35,7 +35,7 @@ describe('CreateItemPrice', function () {
             ->and($price->created_by_name)->toBe($user->full_name);
     });
 
-    it('creates a price entry with company', function () {
+    it('creates a price entry with company', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $company = Company::factory()->asItemProvider()->create();
@@ -50,7 +50,7 @@ describe('CreateItemPrice', function () {
         expect($price->company_id)->toBe($company->id);
     });
 
-    it('creates a price entry with notes', function () {
+    it('creates a price entry with notes', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -65,7 +65,7 @@ describe('CreateItemPrice', function () {
         expect($price->notes)->toBe('Price increase due to inflation');
     });
 
-    it('creates a price entry with effective date', function () {
+    it('creates a price entry with effective date', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -81,7 +81,7 @@ describe('CreateItemPrice', function () {
         expect($price->effective_date->toDateString())->toBe($effectiveDate->toDateString());
     });
 
-    it('updates item current price after creating price entry', function () {
+    it('updates item current price after creating price entry', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 10.00]);
@@ -96,7 +96,7 @@ describe('CreateItemPrice', function () {
         expect((float) $item->current_price)->toBe(99.99);
     });
 
-    it('updates item company after creating price entry with company', function () {
+    it('updates item company after creating price entry with company', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $company = Company::factory()->asItemProvider()->create();
@@ -112,7 +112,7 @@ describe('CreateItemPrice', function () {
         expect($item->company_id)->toBe($company->id);
     });
 
-    it('uses current date as effective date when not specified', function () {
+    it('uses current date as effective date when not specified', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -126,7 +126,7 @@ describe('CreateItemPrice', function () {
         expect($price->effective_date->toDateString())->toBe(now()->toDateString());
     });
 
-    it('creates multiple price entries for same item', function () {
+    it('creates multiple price entries for same item', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 0]);

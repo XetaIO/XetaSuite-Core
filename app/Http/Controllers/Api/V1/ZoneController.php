@@ -72,7 +72,7 @@ class ZoneController extends Controller
 
         // Load children with counts if this is a parent zone
         if (! $zone->allow_material) {
-            $zone->load(['children' => function ($query) {
+            $zone->load(['children' => function ($query): void {
                 $query->withCount(['children', 'materials']);
             }]);
         } else {

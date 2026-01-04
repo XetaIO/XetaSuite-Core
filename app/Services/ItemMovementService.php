@@ -74,7 +74,7 @@ class ItemMovementService
      */
     private function applyMovementSearch(Builder $query, string $search): Builder
     {
-        return $query->where(function (Builder $q) use ($search) {
+        return $query->where(function (Builder $q) use ($search): void {
             $q->whereHas('item', fn (Builder $itemQ) => $itemQ
                 ->where('name', 'ILIKE', "%{$search}%")
                 ->orWhere('reference', 'ILIKE', "%{$search}%"))

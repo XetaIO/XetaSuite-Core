@@ -16,8 +16,8 @@ uses(RefreshDatabase::class);
 // CREATE ZONE TESTS
 // ============================================================================
 
-describe('CreateZone', function () {
-    it('creates a zone successfully', function () {
+describe('CreateZone', function (): void {
+    it('creates a zone successfully', function (): void {
         $site = Site::factory()->create();
         $action = app(CreateZone::class);
 
@@ -33,7 +33,7 @@ describe('CreateZone', function () {
             ->and($zone->allow_material)->toBeFalse();
     });
 
-    it('creates a zone with parent', function () {
+    it('creates a zone with parent', function (): void {
         $site = Site::factory()->create();
         $parentZone = Zone::factory()->forSite($site)->create();
         $action = app(CreateZone::class);
@@ -48,7 +48,7 @@ describe('CreateZone', function () {
             ->and($zone->parent->id)->toBe($parentZone->id);
     });
 
-    it('creates a zone with allow_material enabled', function () {
+    it('creates a zone with allow_material enabled', function (): void {
         $site = Site::factory()->create();
         $action = app(CreateZone::class);
 
@@ -61,7 +61,7 @@ describe('CreateZone', function () {
         expect($zone->allow_material)->toBeTrue();
     });
 
-    it('creates nested zones (multi-level hierarchy)', function () {
+    it('creates nested zones (multi-level hierarchy)', function (): void {
         $site = Site::factory()->create();
         $action = app(CreateZone::class);
 
@@ -79,8 +79,8 @@ describe('CreateZone', function () {
 // UPDATE ZONE TESTS
 // ============================================================================
 
-describe('UpdateZone', function () {
-    it('updates zone name', function () {
+describe('UpdateZone', function (): void {
+    it('updates zone name', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->create(['name' => 'Old Name']);
         $action = app(UpdateZone::class);
@@ -92,7 +92,7 @@ describe('UpdateZone', function () {
         expect($updatedZone->name)->toBe('New Name');
     });
 
-    it('updates zone parent', function () {
+    it('updates zone parent', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->create();
         $newParent = Zone::factory()->forSite($site)->create();
@@ -105,7 +105,7 @@ describe('UpdateZone', function () {
         expect($updatedZone->parent_id)->toBe($newParent->id);
     });
 
-    it('updates zone allow_material', function () {
+    it('updates zone allow_material', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->create(['allow_material' => false]);
         $action = app(UpdateZone::class);
@@ -117,7 +117,7 @@ describe('UpdateZone', function () {
         expect($updatedZone->allow_material)->toBeTrue();
     });
 
-    it('can remove parent from zone', function () {
+    it('can remove parent from zone', function (): void {
         $site = Site::factory()->create();
         $parent = Zone::factory()->forSite($site)->create();
         $zone = Zone::factory()->forSite($site)->withParent($parent)->create();
@@ -130,7 +130,7 @@ describe('UpdateZone', function () {
         expect($updatedZone->parent_id)->toBeNull();
     });
 
-    it('returns fresh model after update', function () {
+    it('returns fresh model after update', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->create(['name' => 'Original']);
         $action = app(UpdateZone::class);
@@ -146,8 +146,8 @@ describe('UpdateZone', function () {
 // DELETE ZONE TESTS
 // ============================================================================
 
-describe('DeleteZone', function () {
-    it('deletes an empty zone successfully', function () {
+describe('DeleteZone', function (): void {
+    it('deletes an empty zone successfully', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->create();
         $action = app(DeleteZone::class);
@@ -158,7 +158,7 @@ describe('DeleteZone', function () {
             ->and(Zone::find($zone->id))->toBeNull();
     });
 
-    it('cannot delete zone with children', function () {
+    it('cannot delete zone with children', function (): void {
         $site = Site::factory()->create();
         $parent = Zone::factory()->forSite($site)->create();
         Zone::factory()->forSite($site)->withParent($parent)->create();
@@ -171,7 +171,7 @@ describe('DeleteZone', function () {
             ->and(Zone::find($parent->id))->not->toBeNull();
     });
 
-    it('cannot delete zone with materials', function () {
+    it('cannot delete zone with materials', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         Material::factory()->forZone($zone)->create();
@@ -184,7 +184,7 @@ describe('DeleteZone', function () {
             ->and(Zone::find($zone->id))->not->toBeNull();
     });
 
-    it('can delete zone after children are removed', function () {
+    it('can delete zone after children are removed', function (): void {
         $site = Site::factory()->create();
         $parent = Zone::factory()->forSite($site)->create();
         $child = Zone::factory()->forSite($site)->withParent($parent)->create();

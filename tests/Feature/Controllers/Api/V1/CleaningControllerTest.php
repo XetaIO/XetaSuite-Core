@@ -13,7 +13,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -64,8 +64,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns only cleanings for user current site', function () {
+describe('index', function (): void {
+    it('returns only cleanings for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Cleaning::factory()->count(3)->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create();
@@ -78,7 +78,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Cleaning::factory()->count(5)->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create();
@@ -109,7 +109,7 @@ describe('index', function () {
             ]);
     });
 
-    it('can filter cleanings by type', function () {
+    it('can filter cleanings by type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Cleaning::factory()->count(3)->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)
@@ -124,7 +124,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('can filter cleanings by material', function () {
+    it('can filter cleanings by material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $anotherMaterial = Material::factory()->forZone($this->zone)->create();
@@ -139,7 +139,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('can search cleanings by description', function () {
+    it('can search cleanings by description', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Cleaning::factory()->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create([
@@ -157,7 +157,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.description', 'Deep cleaning of the machine');
     });
 
-    it('requires cleaning.viewAny permission', function () {
+    it('requires cleaning.viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited-cleaning', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -167,7 +167,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/cleanings');
 
         $response->assertUnauthorized();
@@ -178,8 +178,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns cleaning details with proper structure', function () {
+describe('show', function (): void {
+    it('returns cleaning details with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $cleaning = Cleaning::factory()->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create();
@@ -209,7 +209,7 @@ describe('show', function () {
             ]);
     });
 
-    it('cannot view cleaning from another site', function () {
+    it('cannot view cleaning from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteCleaning = Cleaning::factory()->forSite($this->otherSite)->forMaterial($this->otherSiteMaterial)->create();
@@ -220,7 +220,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('requires cleaning.viewAny permission', function () {
+    it('requires cleaning.viewAny permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'no-view-cleaning', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutView);
 
@@ -237,8 +237,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('can create cleaning with required fields', function () {
+describe('store', function (): void {
+    it('can create cleaning with required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -261,7 +261,7 @@ describe('store', function () {
         ]);
     });
 
-    it('cannot create cleaning for material from another site', function () {
+    it('cannot create cleaning for material from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -275,7 +275,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['material_id']);
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -285,7 +285,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['material_id', 'description', 'type']);
     });
 
-    it('requires cleaning.create permission', function () {
+    it('requires cleaning.create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'no-create-cleaning', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('cleaning.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutCreate);
@@ -305,8 +305,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('can update cleaning description', function () {
+describe('update', function (): void {
+    it('can update cleaning description', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $cleaning = Cleaning::factory()->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create([
@@ -329,7 +329,7 @@ describe('update', function () {
         ]);
     });
 
-    it('can update cleaning type', function () {
+    it('can update cleaning type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $cleaning = Cleaning::factory()->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)
@@ -344,7 +344,7 @@ describe('update', function () {
             ->assertJsonPath('data.type', 'weekly');
     });
 
-    it('cannot update cleaning from another site', function () {
+    it('cannot update cleaning from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteCleaning = Cleaning::factory()->forSite($this->otherSite)->forMaterial($this->otherSiteMaterial)->create();
@@ -357,7 +357,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('requires cleaning.update permission', function () {
+    it('requires cleaning.update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'no-update-cleaning', 'guard_name' => 'web']);
         $roleWithoutUpdate->givePermissionTo('cleaning.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutUpdate);
@@ -377,8 +377,8 @@ describe('update', function () {
 // DELETE TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('can delete a cleaning', function () {
+describe('destroy', function (): void {
+    it('can delete a cleaning', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $cleaning = Cleaning::factory()->forSite($this->regularSite)->forMaterial($this->material)->createdBy($user)->create();
@@ -391,7 +391,7 @@ describe('destroy', function () {
         $this->assertDatabaseMissing('cleanings', ['id' => $cleaning->id]);
     });
 
-    it('cannot delete cleaning from another site', function () {
+    it('cannot delete cleaning from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteCleaning = Cleaning::factory()->forSite($this->otherSite)->forMaterial($this->otherSiteMaterial)->create();
@@ -404,7 +404,7 @@ describe('destroy', function () {
         $this->assertDatabaseHas('cleanings', ['id' => $otherSiteCleaning->id]);
     });
 
-    it('requires cleaning.delete permission', function () {
+    it('requires cleaning.delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'no-delete-cleaning', 'guard_name' => 'web']);
         $roleWithoutDelete->givePermissionTo('cleaning.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutDelete);
@@ -422,8 +422,8 @@ describe('destroy', function () {
 // AVAILABLE MATERIALS TESTS
 // ============================================================================
 
-describe('available-materials', function () {
-    it('returns materials for current site only', function () {
+describe('available-materials', function (): void {
+    it('returns materials for current site only', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->count(3)->forZone($this->zone)->create();
@@ -446,8 +446,8 @@ describe('available-materials', function () {
 // TYPE OPTIONS TESTS
 // ============================================================================
 
-describe('type-options', function () {
-    it('returns all cleaning type options', function () {
+describe('type-options', function (): void {
+    it('returns all cleaning type options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)

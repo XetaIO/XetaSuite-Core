@@ -16,7 +16,7 @@ class DeleteMaintenance
      */
     public function handle(Maintenance $maintenance): void
     {
-        DB::transaction(function () use ($maintenance) {
+        DB::transaction(function () use ($maintenance): void {
             // Unlink incidents before deletion
             $maintenance->incidents()->update(['maintenance_id' => null]);
 

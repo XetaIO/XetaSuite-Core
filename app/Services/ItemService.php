@@ -106,7 +106,7 @@ class ItemService
 
         return User::query()
             ->whereHas('sites', fn (Builder $query) => $query->where('sites.id', $currentSiteId))
-            ->when($search, fn (Builder $query) => $query->where(function (Builder $q) use ($search) {
+            ->when($search, fn (Builder $query) => $query->where(function (Builder $q) use ($search): void {
                 $q->where('first_name', 'ILIKE', "%{$search}%")
                     ->orWhere('last_name', 'ILIKE', "%{$search}%")
                     ->orWhere('email', 'ILIKE', "%{$search}%");
@@ -249,7 +249,7 @@ class ItemService
                 ->whereRaw('item_entry_total - item_exit_total > number_critical_minimum')
                 ->whereRaw('item_entry_total - item_exit_total <= number_warning_minimum'),
             'ok' => $query->whereRaw('item_entry_total - item_exit_total > 0')
-                ->where(function (Builder $q) {
+                ->where(function (Builder $q): void {
                     $q->where('number_warning_enabled', false)
                         ->orWhereRaw('item_entry_total - item_exit_total > number_warning_minimum');
                 }),

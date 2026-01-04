@@ -15,7 +15,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->headquarters = Site::factory()->headquarters()->create();
     $this->regularSite = Site::factory()->create(['name' => 'Regular Site']);
 
@@ -84,17 +84,17 @@ beforeEach(function () {
     $this->hqMultiRole->givePermissionTo(['company.view', 'site.view']);
 });
 
-describe('GlobalSearchController', function () {
+describe('GlobalSearchController', function (): void {
 
-    describe('search endpoint', function () {
+    describe('search endpoint', function (): void {
 
-        it('requires authentication', function () {
+        it('requires authentication', function (): void {
             $response = $this->getJson('/api/v1/search?q=test');
 
             $response->assertUnauthorized();
         });
 
-        it('requires minimum 2 characters', function () {
+        it('requires minimum 2 characters', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->materialRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=a');
@@ -102,7 +102,7 @@ describe('GlobalSearchController', function () {
             $response->assertUnprocessable();
         });
 
-        it('returns empty results for short queries', function () {
+        it('returns empty results for short queries', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->materialRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=ab');
@@ -111,7 +111,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonStructure(['results', 'total', 'query']);
         });
 
-        it('searches materials when user has permission', function () {
+        it('searches materials when user has permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->materialRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Beta');
@@ -121,7 +121,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.materials.items.0.title', 'Material Beta');
         });
 
-        it('does not return materials when user lacks permission', function () {
+        it('does not return materials when user lacks permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->zoneRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Beta');
@@ -130,7 +130,7 @@ describe('GlobalSearchController', function () {
             expect($response->json('results'))->not->toHaveKey('materials');
         });
 
-        it('searches zones when user has permission', function () {
+        it('searches zones when user has permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->zoneRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Alpha');
@@ -140,7 +140,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.zones.items.0.title', 'Test Zone Alpha');
         });
 
-        it('searches items when user has permission', function () {
+        it('searches items when user has permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->itemRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Gamma');
@@ -150,7 +150,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.items.items.0.title', 'Item Gamma');
         });
 
-        it('searches incidents when user has permission', function () {
+        it('searches incidents when user has permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->incidentRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Delta');
@@ -159,7 +159,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.incidents.count', 1);
         });
 
-        it('searches maintenances when user has permission', function () {
+        it('searches maintenances when user has permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->maintenanceRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Epsilon');
@@ -168,7 +168,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.maintenances.count', 1);
         });
 
-        it('returns companies for regular site users with permission', function () {
+        it('returns companies for regular site users with permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->companyRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Eta');
@@ -178,7 +178,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.companies.items.0.title', 'Company Eta');
         });
 
-        it('does not return companies when user lacks permission', function () {
+        it('does not return companies when user lacks permission', function (): void {
             $user = createUserOnRegularSite($this->regularSite, $this->materialRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Eta');
@@ -187,7 +187,7 @@ describe('GlobalSearchController', function () {
             expect($response->json('results'))->not->toHaveKey('companies');
         });
 
-        it('does not return sites for regular site users', function () {
+        it('does not return sites for regular site users', function (): void {
             $siteRoleRegular = Role::create(['name' => 'site-viewer-regular', 'site_id' => $this->regularSite->id]);
             $siteRoleRegular->givePermissionTo('site.view');
             $user = createUserOnRegularSite($this->regularSite, $siteRoleRegular);
@@ -198,7 +198,7 @@ describe('GlobalSearchController', function () {
             expect($response->json('results'))->not->toHaveKey('sites');
         });
 
-        it('returns sites for HQ users with permission', function () {
+        it('returns sites for HQ users with permission', function (): void {
             $user = createUserOnHeadquarters($this->headquarters, $this->hqSiteRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Regular');
@@ -208,7 +208,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.sites.items.0.title', 'Regular Site');
         });
 
-        it('scopes results to current site for regular users', function () {
+        it('scopes results to current site for regular users', function (): void {
             // Create another site with a material
             $otherSite = Site::factory()->create();
             $otherZone = Zone::factory()->for($otherSite)->create();
@@ -223,7 +223,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.materials.items.0.title', 'Material Beta');
         });
 
-        it('returns results from all sites for HQ users', function () {
+        it('returns results from all sites for HQ users', function (): void {
             $user = createUserOnHeadquarters($this->headquarters, $this->hqMaterialRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search?q=Beta');
@@ -232,7 +232,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.materials.count', 1);
         });
 
-        it('respects per_type limit', function () {
+        it('respects per_type limit', function (): void {
             // Create multiple materials
             for ($i = 0; $i < 10; $i++) {
                 Material::factory()->for($this->regularSite)->for($this->zone)->create(['name' => "Search Material {$i}"]);
@@ -247,7 +247,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('results.materials.has_more', true);
         });
 
-        it('searches across multiple types simultaneously', function () {
+        it('searches across multiple types simultaneously', function (): void {
             // Create searchable items with common term
             Material::factory()->for($this->regularSite)->for($this->zone)->create(['name' => 'Common Search Term']);
             Zone::factory()->for($this->regularSite)->create(['name' => 'Common Search Zone']);
@@ -265,15 +265,15 @@ describe('GlobalSearchController', function () {
 
     });
 
-    describe('types endpoint', function () {
+    describe('types endpoint', function (): void {
 
-        it('requires authentication', function () {
+        it('requires authentication', function (): void {
             $response = $this->getJson('/api/v1/search/types');
 
             $response->assertUnauthorized();
         });
 
-        it('returns only permitted types for regular site user', function () {
+        it('returns only permitted types for regular site user', function (): void {
             $roleWithTwo = Role::create(['name' => 'two-perms', 'site_id' => $this->regularSite->id]);
             $roleWithTwo->givePermissionTo(['material.view', 'zone.view']);
             $user = createUserOnRegularSite($this->regularSite, $roleWithTwo);
@@ -284,7 +284,7 @@ describe('GlobalSearchController', function () {
                 ->assertJsonPath('types', ['materials', 'zones']);
         });
 
-        it('excludes HQ-only types for regular site users', function () {
+        it('excludes HQ-only types for regular site users', function (): void {
             $roleWithMixed = Role::create(['name' => 'mixed-perms', 'site_id' => $this->regularSite->id]);
             $roleWithMixed->givePermissionTo(['material.view', 'company.view', 'site.view']);
             $user = createUserOnRegularSite($this->regularSite, $roleWithMixed);
@@ -299,7 +299,7 @@ describe('GlobalSearchController', function () {
                 ->toContain('companies');
         });
 
-        it('includes HQ-only types for HQ users with permissions', function () {
+        it('includes HQ-only types for HQ users with permissions', function (): void {
             $user = createUserOnHeadquarters($this->headquarters, $this->hqMultiRole);
 
             $response = $this->actingAs($user)->getJson('/api/v1/search/types');

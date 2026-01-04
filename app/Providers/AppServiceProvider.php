@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register the Settings class
-        $this->app->singleton(Settings::class, function (Application $app) {
+        $this->app->singleton(function (Application $app): \XetaSuite\Settings\Settings {
             return new Settings($app['cache.store']);
         });
     }

@@ -15,8 +15,8 @@ uses(RefreshDatabase::class);
 // CREATE SITE TESTS
 // ============================================================================
 
-describe('CreateSite', function () {
-    it('creates a regular site successfully', function () {
+describe('CreateSite', function (): void {
+    it('creates a regular site successfully', function (): void {
         $action = app(CreateSite::class);
 
         $result = $action->handle([
@@ -31,7 +31,7 @@ describe('CreateSite', function () {
             ->and($result['site']->is_headquarters)->toBeFalse();
     });
 
-    it('creates a headquarters site when none exists', function () {
+    it('creates a headquarters site when none exists', function (): void {
         $action = app(CreateSite::class);
 
         $result = $action->handle([
@@ -43,7 +43,7 @@ describe('CreateSite', function () {
             ->and($result['site']->is_headquarters)->toBeTrue();
     });
 
-    it('prevents creating a second headquarters', function () {
+    it('prevents creating a second headquarters', function (): void {
         Site::factory()->create(['is_headquarters' => true]);
 
         $action = app(CreateSite::class);
@@ -57,7 +57,7 @@ describe('CreateSite', function () {
             ->and($result['message'])->toBe(__('sites.headquarters_already_exists'));
     });
 
-    it('sets all provided fields', function () {
+    it('sets all provided fields', function (): void {
         $action = app(CreateSite::class);
 
         $result = $action->handle([
@@ -86,8 +86,8 @@ describe('CreateSite', function () {
 // UPDATE SITE TESTS
 // ============================================================================
 
-describe('UpdateSite', function () {
-    it('updates site successfully', function () {
+describe('UpdateSite', function (): void {
+    it('updates site successfully', function (): void {
         $site = Site::factory()->create(['name' => 'Old Name']);
 
         $action = app(UpdateSite::class);
@@ -102,7 +102,7 @@ describe('UpdateSite', function () {
             ->and($result['site']->city)->toBe('Lyon');
     });
 
-    it('prevents setting headquarters when one already exists', function () {
+    it('prevents setting headquarters when one already exists', function (): void {
         Site::factory()->create(['is_headquarters' => true]);
         $site = Site::factory()->create(['is_headquarters' => false]);
 
@@ -116,7 +116,7 @@ describe('UpdateSite', function () {
             ->and($result['message'])->toBe(__('sites.headquarters_already_exists'));
     });
 
-    it('prevents removing headquarters status', function () {
+    it('prevents removing headquarters status', function (): void {
         $hq = Site::factory()->create(['is_headquarters' => true]);
 
         $action = app(UpdateSite::class);
@@ -129,7 +129,7 @@ describe('UpdateSite', function () {
             ->and($result['message'])->toBe(__('sites.cannot_remove_headquarters_status'));
     });
 
-    it('allows updating headquarters name without changing status', function () {
+    it('allows updating headquarters name without changing status', function (): void {
         $hq = Site::factory()->create(['is_headquarters' => true, 'name' => 'Old HQ']);
 
         $action = app(UpdateSite::class);
@@ -143,7 +143,7 @@ describe('UpdateSite', function () {
             ->and($result['site']->is_headquarters)->toBeTrue();
     });
 
-    it('allows updating headquarters when is_headquarters stays true', function () {
+    it('allows updating headquarters when is_headquarters stays true', function (): void {
         $hq = Site::factory()->create(['is_headquarters' => true]);
 
         $action = app(UpdateSite::class);
@@ -162,8 +162,8 @@ describe('UpdateSite', function () {
 // DELETE SITE TESTS
 // ============================================================================
 
-describe('DeleteSite', function () {
-    it('deletes a regular site without zones', function () {
+describe('DeleteSite', function (): void {
+    it('deletes a regular site without zones', function (): void {
         $site = Site::factory()->create(['is_headquarters' => false]);
 
         $action = app(DeleteSite::class);
@@ -176,7 +176,7 @@ describe('DeleteSite', function () {
         $this->assertDatabaseMissing('sites', ['id' => $site->id]);
     });
 
-    it('prevents deleting headquarters site', function () {
+    it('prevents deleting headquarters site', function (): void {
         $hq = Site::factory()->create(['is_headquarters' => true]);
 
         $action = app(DeleteSite::class);
@@ -189,7 +189,7 @@ describe('DeleteSite', function () {
         $this->assertDatabaseHas('sites', ['id' => $hq->id]);
     });
 
-    it('prevents deleting site with zones', function () {
+    it('prevents deleting site with zones', function (): void {
         $site = Site::factory()->create(['is_headquarters' => false]);
         Zone::factory()->forSite($site)->create();
 

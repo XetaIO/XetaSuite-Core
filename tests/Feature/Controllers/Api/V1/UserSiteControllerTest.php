@@ -8,15 +8,15 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create sites
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
     $this->regularSite = Site::factory()->create(['is_headquarters' => false]);
     $this->anotherSite = Site::factory()->create(['is_headquarters' => false]);
 });
 
-describe('update current site', function () {
-    it('updates the current site for authenticated user', function () {
+describe('update current site', function (): void {
+    it('updates the current site for authenticated user', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->headquarters->id]);
         $user->sites()->attach([$this->headquarters->id, $this->regularSite->id]);
 
@@ -32,7 +32,7 @@ describe('update current site', function () {
         ]);
     });
 
-    it('updates session with new site info', function () {
+    it('updates session with new site info', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->regularSite->id]);
         $user->sites()->attach([$this->headquarters->id, $this->regularSite->id]);
 
@@ -46,7 +46,7 @@ describe('update current site', function () {
             ->and(session('is_on_headquarters'))->toBeTrue();
     });
 
-    it('requires site_id field', function () {
+    it('requires site_id field', function (): void {
         $user = User::factory()->create();
         $user->sites()->attach([$this->headquarters->id]);
 
@@ -57,7 +57,7 @@ describe('update current site', function () {
             ->assertJsonValidationErrors(['site_id']);
     });
 
-    it('validates site_id is an integer', function () {
+    it('validates site_id is an integer', function (): void {
         $user = User::factory()->create();
         $user->sites()->attach([$this->headquarters->id]);
 
@@ -68,7 +68,7 @@ describe('update current site', function () {
             ->assertJsonValidationErrors(['site_id']);
     });
 
-    it('validates site exists', function () {
+    it('validates site exists', function (): void {
         $user = User::factory()->create();
         $user->sites()->attach([$this->headquarters->id]);
 
@@ -79,7 +79,7 @@ describe('update current site', function () {
             ->assertJsonValidationErrors(['site_id']);
     });
 
-    it('prevents switching to site user does not belong to', function () {
+    it('prevents switching to site user does not belong to', function (): void {
         $user = User::factory()->create();
         $user->sites()->attach([$this->headquarters->id]); // Only attached to headquarters
 
@@ -90,7 +90,7 @@ describe('update current site', function () {
             ->assertJsonValidationErrors(['site_id']);
     });
 
-    it('returns updated user data', function () {
+    it('returns updated user data', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->headquarters->id]);
         $user->sites()->attach([$this->headquarters->id, $this->regularSite->id]);
 
@@ -116,7 +116,7 @@ describe('update current site', function () {
             ]);
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->patchJson('/api/v1/user/site', ['site_id' => $this->headquarters->id]);
 
         $response->assertUnauthorized();

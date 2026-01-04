@@ -10,7 +10,7 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
     $this->user = User::factory()->create();
     $this->item = Item::factory()
@@ -19,7 +19,7 @@ beforeEach(function () {
         ->create();
 });
 
-it('increments item_entry_total when entry movement is created', function () {
+it('increments item_entry_total when entry movement is created', function (): void {
     expect($this->item->item_entry_total)->toBe(0);
 
     ItemMovement::factory()
@@ -33,7 +33,7 @@ it('increments item_entry_total when entry movement is created', function () {
     expect($this->item->item_entry_total)->toBe(10);
 });
 
-it('increments item_exit_total when exit movement is created', function () {
+it('increments item_exit_total when exit movement is created', function (): void {
     expect($this->item->item_exit_total)->toBe(0);
 
     ItemMovement::factory()
@@ -47,7 +47,7 @@ it('increments item_exit_total when exit movement is created', function () {
     expect($this->item->item_exit_total)->toBe(5);
 });
 
-it('decrements item_entry_total when entry movement is deleted', function () {
+it('decrements item_entry_total when entry movement is deleted', function (): void {
     // Create an entry movement first
     $movement = ItemMovement::factory()
         ->forItem($this->item)
@@ -65,7 +65,7 @@ it('decrements item_entry_total when entry movement is deleted', function () {
     expect($this->item->item_entry_total)->toBe(0);
 });
 
-it('decrements item_exit_total when exit movement is deleted', function () {
+it('decrements item_exit_total when exit movement is deleted', function (): void {
     // Create an exit movement first
     $movement = ItemMovement::factory()
         ->forItem($this->item)
@@ -83,7 +83,7 @@ it('decrements item_exit_total when exit movement is deleted', function () {
     expect($this->item->item_exit_total)->toBe(0);
 });
 
-it('handles multiple movements correctly', function () {
+it('handles multiple movements correctly', function (): void {
     ItemMovement::factory()
         ->forItem($this->item)
         ->entry()

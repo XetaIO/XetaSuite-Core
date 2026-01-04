@@ -12,7 +12,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
     $this->zone = Zone::factory()->forSite($this->site)->create();
     $this->user = User::factory()->create();
@@ -22,7 +22,7 @@ beforeEach(function () {
         ->create();
 });
 
-it('prevents deletion if item has movements', function () {
+it('prevents deletion if item has movements', function (): void {
     ItemMovement::factory()
         ->forItem($this->item)
         ->entry()
@@ -35,14 +35,14 @@ it('prevents deletion if item has movements', function () {
     expect(Item::find($this->item->id))->not->toBeNull();
 });
 
-it('allows deletion if item has no movements', function () {
+it('allows deletion if item has no movements', function (): void {
     $result = $this->item->delete();
 
     expect($result)->toBeTrue();
     expect(Item::find($this->item->id))->toBeNull();
 });
 
-it('detaches materials when item is deleted', function () {
+it('detaches materials when item is deleted', function (): void {
     $material = Material::factory()
         ->forSite($this->site)
         ->forZone($this->zone)
@@ -58,7 +58,7 @@ it('detaches materials when item is deleted', function () {
     expect($material->items()->count())->toBe(0);
 });
 
-it('detaches recipients when item is deleted', function () {
+it('detaches recipients when item is deleted', function (): void {
     $recipient = User::factory()->create();
     $this->item->recipients()->attach($recipient);
 
@@ -74,7 +74,7 @@ it('detaches recipients when item is deleted', function () {
     ]);
 });
 
-it('cascades deletion to prices via database constraint', function () {
+it('cascades deletion to prices via database constraint', function (): void {
     $this->item->prices()->create([
         'price' => 100.00,
         'effective_date' => now(),

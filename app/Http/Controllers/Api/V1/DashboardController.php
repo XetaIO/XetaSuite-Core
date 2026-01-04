@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $isHq = isOnHeadquarters();
 
         // Build base queries depending on HQ or regular site
-        $siteFilter = function ($query) use ($isHq, $user) {
+        $siteFilter = function ($query) use ($isHq, $user): void {
             if (! $isHq) {
                 $query->where('site_id', $user->current_site_id);
             }
@@ -131,14 +131,14 @@ class DashboardController extends Controller
         $lowStockItems = Item::query()
             ->tap($siteFilter)
             ->selectRaw('*, (item_entry_total - item_exit_total) as calculated_stock')
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 // Items below critical threshold (if enabled)
-                $query->where(function ($q) {
+                $query->where(function ($q): void {
                     $q->where('number_critical_enabled', true)
                     ->whereRaw('(item_entry_total - item_exit_total) < number_critical_minimum');
                 })
                 // OR Items below warning threshold (if enabled)
-                ->orWhere(function ($q) {
+                ->orWhere(function ($q): void {
                     $q->where('number_warning_enabled', true)
                       ->whereRaw('(item_entry_total - item_exit_total) < number_warning_minimum');
                 })
@@ -302,7 +302,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $isHq = isOnHeadquarters();
 
-        $siteFilter = function ($query) use ($isHq, $user) {
+        $siteFilter = function ($query) use ($isHq, $user): void {
             if (! $isHq) {
                 $query->where('site_id', $user->current_site_id);
             }

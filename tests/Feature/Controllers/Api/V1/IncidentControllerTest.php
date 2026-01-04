@@ -15,7 +15,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -66,8 +66,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns only incidents for user current site', function () {
+describe('index', function (): void {
+    it('returns only incidents for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()->count(3)->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create();
@@ -80,7 +80,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()->count(5)->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create();
@@ -115,7 +115,7 @@ describe('index', function () {
             ]);
     });
 
-    it('can filter incidents by status', function () {
+    it('can filter incidents by status', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()->count(3)->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)
@@ -130,7 +130,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('can filter incidents by severity', function () {
+    it('can filter incidents by severity', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()->count(2)->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)
@@ -145,7 +145,7 @@ describe('index', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('can filter incidents by material', function () {
+    it('can filter incidents by material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $anotherMaterial = Material::factory()->forZone($this->zone)->create();
@@ -160,7 +160,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('can search incidents by description', function () {
+    it('can search incidents by description', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create([
@@ -178,7 +178,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.description', 'The machine is broken');
     });
 
-    it('requires incident.viewAny permission', function () {
+    it('requires incident.viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited-incident', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -188,7 +188,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/incidents');
 
         $response->assertUnauthorized();
@@ -199,8 +199,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns incident details with proper structure', function () {
+describe('show', function (): void {
+    it('returns incident details with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create();
@@ -237,7 +237,7 @@ describe('show', function () {
             ]);
     });
 
-    it('cannot view incident from another site', function () {
+    it('cannot view incident from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteIncident = Incident::factory()->forSite($this->otherSiteMaterial->site_id)->forMaterial($this->otherSiteMaterial)->create();
@@ -248,7 +248,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('requires incident.viewAny permission', function () {
+    it('requires incident.viewAny permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'no-view-incident', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutView);
 
@@ -265,8 +265,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('can create incident with required fields', function () {
+describe('store', function (): void {
+    it('can create incident with required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -287,7 +287,7 @@ describe('store', function () {
         ]);
     });
 
-    it('can create incident with all fields', function () {
+    it('can create incident with all fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -303,7 +303,7 @@ describe('store', function () {
             ->assertJsonPath('data.status', 'open');
     });
 
-    it('can create incident with maintenance', function () {
+    it('can create incident with maintenance', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()->forSite($this->material->site_id)->forMaterial($this->material)->create();
@@ -319,7 +319,7 @@ describe('store', function () {
             ->assertJsonPath('data.maintenance_id', $maintenance->id);
     });
 
-    it('can create resolved incident', function () {
+    it('can create resolved incident', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -334,7 +334,7 @@ describe('store', function () {
             ->assertJsonPath('data.status', 'resolved');
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -344,7 +344,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['material_id', 'description']);
     });
 
-    it('validates material belongs to user site', function () {
+    it('validates material belongs to user site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -357,7 +357,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['material_id']);
     });
 
-    it('validates maintenance belongs to user site', function () {
+    it('validates maintenance belongs to user site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaintenance = Maintenance::factory()->forSite($this->otherSiteMaterial->site_id)->forMaterial($this->otherSiteMaterial)->create();
@@ -373,7 +373,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['maintenance_id']);
     });
 
-    it('requires incident.create permission', function () {
+    it('requires incident.create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'no-create-incident', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutCreate);
 
@@ -386,7 +386,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->postJson('/api/v1/incidents', [
             'material_id' => $this->material->id,
             'description' => 'Test incident',
@@ -400,8 +400,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('can update incident description', function () {
+describe('update', function (): void {
+    it('can update incident description', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create([
@@ -418,7 +418,7 @@ describe('update', function () {
             ->assertJsonPath('data.edited_by_id', $user->id);
     });
 
-    it('can update incident severity', function () {
+    it('can update incident severity', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)
@@ -433,7 +433,7 @@ describe('update', function () {
             ->assertJsonPath('data.severity', 'critical');
     });
 
-    it('can update incident status', function () {
+    it('can update incident status', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)
@@ -448,7 +448,7 @@ describe('update', function () {
             ->assertJsonPath('data.status', 'in_progress');
     });
 
-    it('can resolve incident by setting resolved_at', function () {
+    it('can resolve incident by setting resolved_at', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)
@@ -465,7 +465,7 @@ describe('update', function () {
             ->assertJsonPath('data.status', 'resolved');
     });
 
-    it('cannot update incident from another site', function () {
+    it('cannot update incident from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteIncident = Incident::factory()->forSite($this->otherSiteMaterial->site_id)->forMaterial($this->otherSiteMaterial)->create();
@@ -478,7 +478,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('requires incident.update permission', function () {
+    it('requires incident.update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'no-update-incident', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutUpdate);
 
@@ -497,8 +497,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('can delete incident', function () {
+describe('destroy', function (): void {
+    it('can delete incident', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident = Incident::factory()->forSite($this->material->site_id)->forMaterial($this->material)->reportedBy($user)->create();
@@ -513,7 +513,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('cannot delete incident from another site', function () {
+    it('cannot delete incident from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteIncident = Incident::factory()->forSite($this->otherSiteMaterial->site_id)->forMaterial($this->otherSiteMaterial)->create();
@@ -524,7 +524,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('requires incident.delete permission', function () {
+    it('requires incident.delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'no-delete-incident', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutDelete);
 
@@ -541,8 +541,8 @@ describe('destroy', function () {
 // AVAILABLE MATERIALS TESTS
 // ============================================================================
 
-describe('availableMaterials', function () {
-    it('returns list of materials for current site', function () {
+describe('availableMaterials', function (): void {
+    it('returns list of materials for current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->count(2)->forSite($this->zone->site_id)->forZone($this->zone)->create();
@@ -561,7 +561,7 @@ describe('availableMaterials', function () {
             ]);
     });
 
-    it('requires incident.viewAny permission', function () {
+    it('requires incident.viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'no-materials-list', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -576,8 +576,8 @@ describe('availableMaterials', function () {
 // AVAILABLE MAINTENANCES TESTS
 // ============================================================================
 
-describe('availableMaintenances', function () {
-    it('returns list of maintenances for current site', function () {
+describe('availableMaintenances', function (): void {
+    it('returns list of maintenances for current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Maintenance::factory()->count(2)->forSite($this->material->site_id)->forMaterial($this->material)->create();
@@ -595,7 +595,7 @@ describe('availableMaintenances', function () {
             ]);
     });
 
-    it('can filter maintenances by material_id', function () {
+    it('can filter maintenances by material_id', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $anotherMaterial = Material::factory()->forZone($this->zone)->create();
@@ -610,7 +610,7 @@ describe('availableMaintenances', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('requires incident.viewAny permission', function () {
+    it('requires incident.viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'no-maintenances-list', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -625,8 +625,8 @@ describe('availableMaintenances', function () {
 // OPTIONS TESTS
 // ============================================================================
 
-describe('options', function () {
-    it('returns severity options', function () {
+describe('options', function (): void {
+    it('returns severity options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -641,7 +641,7 @@ describe('options', function () {
             ]);
     });
 
-    it('returns status options', function () {
+    it('returns status options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)

@@ -178,7 +178,7 @@ class MaterialService
     {
         return $material->incidents()
             ->with(['reporter', 'maintenance'])
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where('description', 'ILIKE', "%{$search}%");
             })
             ->orderByDesc('created_at')
@@ -194,8 +194,8 @@ class MaterialService
     {
         return $material->maintenances()
             ->with(['creator', 'operators', 'companies', 'material'])
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
-                $query->where(function (Builder $q) use ($search) {
+            ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
+                $query->where(function (Builder $q) use ($search): void {
                     $q->where('description', 'ILIKE', "%{$search}%")
                         ->orWhere('reason', 'ILIKE', "%{$search}%");
                 });
@@ -213,7 +213,7 @@ class MaterialService
     {
         return $material->cleanings()
             ->with(['site', 'creator', 'material'])
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where('description', 'ILIKE', "%{$search}%")
                     ->orWhere('id', 'ILIKE', "%{$search}%");
             })
@@ -230,8 +230,8 @@ class MaterialService
     {
         return $material->items()
             ->with(['company'])
-            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
-                $query->where(function (Builder $q) use ($search) {
+            ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
+                $query->where(function (Builder $q) use ($search): void {
                     $q->where('items.name', 'ILIKE', "%{$search}%")
                         ->orWhere('items.reference', 'ILIKE', "%{$search}%");
                 });

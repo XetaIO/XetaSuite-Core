@@ -37,7 +37,7 @@ trait HasSearchAndSort
             return $query;
         }
 
-        return $query->where(function (Builder $q) use ($search, $columns, $relations) {
+        return $query->where(function (Builder $q) use ($search, $columns, $relations): void {
             // Search in direct columns
             foreach ($columns as $i => $column) {
                 $method = $i === 0 ? 'where' : 'orWhere';

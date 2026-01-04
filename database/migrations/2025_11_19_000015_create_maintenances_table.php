@@ -16,7 +16,7 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('maintenances', function (Blueprint $table) {
+        Schema::create('maintenances', function (Blueprint $table): void {
             $table->id();
 
             $table->foreignIdFor(Site::class)
@@ -58,7 +58,7 @@ return new class () extends Migration {
             $table->timestamps();
         });
 
-        Schema::table('incidents', function (Blueprint $table) {
+        Schema::table('incidents', function (Blueprint $table): void {
             $table->foreignIdFor(Maintenance::class)
                 ->after('material_name')
                 ->nullable()

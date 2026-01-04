@@ -13,7 +13,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -42,8 +42,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns paginated list of companies for authorized user on headquarters', function () {
+describe('index', function (): void {
+    it('returns paginated list of companies for authorized user on headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Company::factory()->count(25)->create();
@@ -62,7 +62,7 @@ describe('index', function () {
             ->assertJsonCount(20, 'data'); // Default pagination
     });
 
-    it('returns companies ordered by name by default', function () {
+    it('returns companies ordered by name by default', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Company::factory()->create(['name' => 'Zebra Corp']);
@@ -77,7 +77,7 @@ describe('index', function () {
         expect($names)->toBe(['Alpha Inc', 'Beta Ltd', 'Zebra Corp']);
     });
 
-    it('can search companies by name', function () {
+    it('can search companies by name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Company::factory()->create(['name' => 'Alpha Corp']);
@@ -91,7 +91,7 @@ describe('index', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('can search companies by description', function () {
+    it('can search companies by description', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Company::factory()->create(['name' => 'Company A', 'description' => 'Maintenance services']);
@@ -105,7 +105,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.name', 'Company A');
     });
 
-    it('includes maintenance_count in response', function () {
+    it('includes maintenance_count in response', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create();
@@ -125,7 +125,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.maintenance_count', 3);
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
@@ -135,7 +135,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/companies');
 
         $response->assertUnauthorized();
@@ -146,8 +146,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns company details for authorized user', function () {
+describe('show', function (): void {
+    it('returns company details for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->createdBy($user)->create([
@@ -166,7 +166,7 @@ describe('show', function () {
             ->assertJsonPath('data.description', 'Test description');
     });
 
-    it('includes creator information when loaded', function () {
+    it('includes creator information when loaded', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->createdBy($user)->create();
@@ -179,7 +179,7 @@ describe('show', function () {
             ->assertJsonPath('data.created_by_name', $user->full_name);
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'no-view', 'guard_name' => 'web']);
         $roleWithoutView->givePermissionTo('company.viewAny');
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutView);
@@ -192,7 +192,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('returns 404 for non-existent company', function () {
+    it('returns 404 for non-existent company', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -206,8 +206,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('can create a company with valid data', function () {
+describe('store', function (): void {
+    it('can create a company with valid data', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -229,7 +229,7 @@ describe('store', function () {
         ]);
     });
 
-    it('can create a company without description', function () {
+    it('can create a company without description', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -243,7 +243,7 @@ describe('store', function () {
             ->assertJsonPath('data.description', null);
     });
 
-    it('validates name is required', function () {
+    it('validates name is required', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -255,7 +255,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates name max length', function () {
+    it('validates name max length', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -267,7 +267,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates description max length', function () {
+    it('validates description max length', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -280,7 +280,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['description']);
     });
 
-    it('denies creation for user not on headquarters', function () {
+    it('denies creation for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -291,7 +291,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('denies creation for user without create permission', function () {
+    it('denies creation for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'no-create', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('company.viewAny');
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutCreate);
@@ -309,8 +309,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('can update company name', function () {
+describe('update', function (): void {
+    it('can update company name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create(['name' => 'Old Name']);
@@ -329,7 +329,7 @@ describe('update', function () {
         ]);
     });
 
-    it('can update company description', function () {
+    it('can update company description', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create(['description' => 'Old description']);
@@ -343,7 +343,7 @@ describe('update', function () {
             ->assertJsonPath('data.description', 'New description');
     });
 
-    it('can set description to null', function () {
+    it('can set description to null', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create(['description' => 'Some description']);
@@ -357,7 +357,7 @@ describe('update', function () {
             ->assertJsonPath('data.description', null);
     });
 
-    it('denies update for user not on headquarters', function () {
+    it('denies update for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $company = Company::factory()->create();
@@ -370,7 +370,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('denies update for user without update permission', function () {
+    it('denies update for user without update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'no-update', 'guard_name' => 'web']);
         $roleWithoutUpdate->givePermissionTo('company.viewAny');
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutUpdate);
@@ -390,8 +390,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('can delete a company without maintenances', function () {
+describe('destroy', function (): void {
+    it('can delete a company without maintenances', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create();
@@ -406,7 +406,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('cannot delete a company with maintenances', function () {
+    it('cannot delete a company with maintenances', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $company = Company::factory()->create();
@@ -428,7 +428,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('denies delete for user not on headquarters', function () {
+    it('denies delete for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $company = Company::factory()->create();
@@ -439,7 +439,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('denies delete for user without delete permission', function () {
+    it('denies delete for user without delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'no-delete', 'guard_name' => 'web']);
         $roleWithoutDelete->givePermissionTo('company.viewAny');
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutDelete);

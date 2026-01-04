@@ -12,7 +12,7 @@ use XetaSuite\Models\User;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('item_prices', function (Blueprint $table) {
+        Schema::create('item_prices', function (Blueprint $table): void {
             $table->id();
 
             $table->foreignIdFor(Item::class)

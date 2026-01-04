@@ -6,15 +6,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use XetaSuite\Models\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->user = User::factory()->create([
         'password' => null,
         'password_setup_at' => null,
     ]);
 });
 
-describe('Password Setup Verification', function () {
-    it('returns valid for a correct signed url', function () {
+describe('Password Setup Verification', function (): void {
+    it('returns valid for a correct signed url', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -41,7 +41,7 @@ describe('Password Setup Verification', function () {
             ]);
     });
 
-    it('returns 404 for non-existent user', function () {
+    it('returns 404 for non-existent user', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -60,7 +60,7 @@ describe('Password Setup Verification', function () {
             ->assertJson(['valid' => false]);
     });
 
-    it('returns 403 for invalid hash', function () {
+    it('returns 403 for invalid hash', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -79,7 +79,7 @@ describe('Password Setup Verification', function () {
             ->assertJson(['valid' => false]);
     });
 
-    it('returns 403 for expired link', function () {
+    it('returns 403 for expired link', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->subMinutes(60), // Expired
@@ -98,7 +98,7 @@ describe('Password Setup Verification', function () {
             ->assertJson(['valid' => false]);
     });
 
-    it('returns 403 if password already setup', function () {
+    it('returns 403 if password already setup', function (): void {
         $this->user->forceFill(['password_setup_at' => now()])->save();
 
         $signedUrl = URL::temporarySignedRoute(
@@ -120,8 +120,8 @@ describe('Password Setup Verification', function () {
     });
 });
 
-describe('Password Setup Store', function () {
-    it('sets up password with valid data', function () {
+describe('Password Setup Store', function (): void {
+    it('sets up password with valid data', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -150,7 +150,7 @@ describe('Password Setup Store', function () {
         expect($this->user->password_setup_at)->not->toBeNull();
     });
 
-    it('fails with password mismatch', function () {
+    it('fails with password mismatch', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -175,7 +175,7 @@ describe('Password Setup Store', function () {
             ->assertJsonValidationErrors(['password']);
     });
 
-    it('fails with short password', function () {
+    it('fails with short password', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),
@@ -200,7 +200,7 @@ describe('Password Setup Store', function () {
             ->assertJsonValidationErrors(['password']);
     });
 
-    it('cannot setup password twice', function () {
+    it('cannot setup password twice', function (): void {
         $signedUrl = URL::temporarySignedRoute(
             'auth.password.setup',
             Carbon::now()->addMinutes(60),

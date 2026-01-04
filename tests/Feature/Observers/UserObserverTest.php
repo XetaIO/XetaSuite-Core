@@ -14,7 +14,7 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-it('saves created_by_name in items when user is force deleted', function () {
+it('saves created_by_name in items when user is force deleted', function (): void {
     $site = Site::factory()->create();
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $item = Item::factory()->for($site)->create(['created_by_id' => $user->id]);
@@ -28,7 +28,7 @@ it('saves created_by_name in items when user is force deleted', function () {
     expect($item->created_by_name)->toBe('John Doe');
 });
 
-it('saves created_by_name in cleanings when user is force deleted', function () {
+it('saves created_by_name in cleanings when user is force deleted', function (): void {
     $site = Site::factory()->create();
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $cleaning = Cleaning::factory()->for($site)->create(['created_by_id' => $user->id]);
@@ -42,7 +42,7 @@ it('saves created_by_name in cleanings when user is force deleted', function () 
     expect($cleaning->created_by_name)->toBe('John Doe');
 });
 
-it('saves created_by_name in maintenances when user is force deleted', function () {
+it('saves created_by_name in maintenances when user is force deleted', function (): void {
     $site = Site::factory()->create();
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $maintenance = Maintenance::factory()->for($site)->create(['created_by_id' => $user->id]);
@@ -56,7 +56,7 @@ it('saves created_by_name in maintenances when user is force deleted', function 
     expect($maintenance->created_by_name)->toBe('John Doe');
 });
 
-it('saves reported_by_name in incidents when user is force deleted', function () {
+it('saves reported_by_name in incidents when user is force deleted', function (): void {
     $site = Site::factory()->create();
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $incident = Incident::factory()->for($site)->create(['reported_by_id' => $user->id]);
@@ -70,7 +70,7 @@ it('saves reported_by_name in incidents when user is force deleted', function ()
     expect($incident->reported_by_name)->toBe('John Doe');
 });
 
-it('saves created_by_name in companies when user is force deleted', function () {
+it('saves created_by_name in companies when user is force deleted', function (): void {
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $company = Company::factory()->create(['created_by_id' => $user->id]);
 
@@ -83,7 +83,7 @@ it('saves created_by_name in companies when user is force deleted', function () 
     expect($company->created_by_name)->toBe('John Doe');
 });
 
-it('invalidates avatar cache when first_name changes', function () {
+it('invalidates avatar cache when first_name changes', function (): void {
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $cacheKey = $user->getAvatarCacheKey();
 
@@ -98,7 +98,7 @@ it('invalidates avatar cache when first_name changes', function () {
     expect(Cache::has($cacheKey))->toBeFalse();
 });
 
-it('invalidates avatar cache when last_name changes', function () {
+it('invalidates avatar cache when last_name changes', function (): void {
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $cacheKey = $user->getAvatarCacheKey();
 
@@ -113,7 +113,7 @@ it('invalidates avatar cache when last_name changes', function () {
     expect(Cache::has($cacheKey))->toBeFalse();
 });
 
-it('does not invalidate avatar cache when unrelated field changes', function () {
+it('does not invalidate avatar cache when unrelated field changes', function (): void {
     $user = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
     $cacheKey = $user->getAvatarCacheKey();
 

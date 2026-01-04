@@ -18,7 +18,7 @@ use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->headquarters = Site::factory()->headquarters()->create();
     $this->regularSite = Site::factory()->create(['name' => 'Site A']);
     $this->otherSite = Site::factory()->create(['name' => 'Site B']);
@@ -27,8 +27,8 @@ beforeEach(function () {
     $this->role = Role::create(['name' => 'dashboard-viewer', 'guard_name' => 'web']);
 });
 
-describe('stats endpoint', function () {
-    it('returns dashboard stats for HQ user with aggregated data from all sites', function () {
+describe('stats endpoint', function (): void {
+    it('returns dashboard stats for HQ user with aggregated data from all sites', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create data on multiple sites
@@ -104,7 +104,7 @@ describe('stats endpoint', function () {
             ->assertJsonPath('incidents_summary.in_progress', 2);
     });
 
-    it('returns dashboard stats for regular site user with site-specific data only', function () {
+    it('returns dashboard stats for regular site user with site-specific data only', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create data on current site
@@ -154,7 +154,7 @@ describe('stats endpoint', function () {
             ->assertJsonPath('incidents_summary.total', 2);
     });
 
-    it('returns low stock items for current site', function () {
+    it('returns low stock items for current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Item with low stock (current_stock = item_entry_total - item_exit_total = 10)
@@ -198,7 +198,7 @@ describe('stats endpoint', function () {
             ->assertJsonPath('low_stock_items.0.min_stock', 50);
     });
 
-    it('returns upcoming maintenances for current site', function () {
+    it('returns upcoming maintenances for current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Upcoming maintenance (should appear)
@@ -232,14 +232,14 @@ describe('stats endpoint', function () {
             ->assertJsonPath('upcoming_maintenances.0.title', 'Future Maintenance');
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $this->getJson('/api/v1/dashboard/stats')
             ->assertUnauthorized();
     });
 });
 
-describe('charts endpoint', function () {
-    it('returns chart data for HQ user with aggregated data', function () {
+describe('charts endpoint', function (): void {
+    it('returns chart data for HQ user with aggregated data', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         actingAs($user)
@@ -253,7 +253,7 @@ describe('charts endpoint', function () {
             ->assertJsonCount(6, 'incidents_evolution');
     });
 
-    it('returns chart data for regular site user', function () {
+    it('returns chart data for regular site user', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         actingAs($user)
@@ -265,7 +265,7 @@ describe('charts endpoint', function () {
             ]);
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $this->getJson('/api/v1/dashboard/charts')
             ->assertUnauthorized();
     });

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Notification;
 use XetaSuite\Models\User;
 use XetaSuite\Notifications\Auth\RegisteredNotification;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Disable reCAPTCHA for most tests - we test reCAPTCHA validation separately
     config([
         'services.recaptcha.secret_key' => 'test-secret-key',
@@ -15,8 +15,8 @@ beforeEach(function () {
     ]);
 });
 
-describe('Resend Setup Password', function () {
-    it('returns success for valid email with pending password setup', function () {
+describe('Resend Setup Password', function (): void {
+    it('returns success for valid email with pending password setup', function (): void {
         Notification::fake();
 
         $user = User::factory()->create([
@@ -35,7 +35,7 @@ describe('Resend Setup Password', function () {
         Notification::assertSentTo($user, RegisteredNotification::class);
     });
 
-    it('returns success but does not send notification for non-existent email', function () {
+    it('returns success but does not send notification for non-existent email', function (): void {
         Notification::fake();
 
         $response = $this->postJson('/api/v1/auth/setup-password-resend', [
@@ -50,7 +50,7 @@ describe('Resend Setup Password', function () {
         Notification::assertNothingSent();
     });
 
-    it('returns success but does not send notification for user with password already setup', function () {
+    it('returns success but does not send notification for user with password already setup', function (): void {
         // Create user with password already setup (default factory state)
         $user = User::factory()->create();
 
@@ -72,7 +72,7 @@ describe('Resend Setup Password', function () {
         Notification::assertNothingSent();
     });
 
-    it('validates email is required', function () {
+    it('validates email is required', function (): void {
         $response = $this->postJson('/api/v1/auth/setup-password-resend', [
             'recaptcha_token' => 'valid-token',
         ]);
@@ -81,7 +81,7 @@ describe('Resend Setup Password', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('validates email format', function () {
+    it('validates email format', function (): void {
         $response = $this->postJson('/api/v1/auth/setup-password-resend', [
             'email' => 'invalid-email',
             'recaptcha_token' => 'valid-token',
@@ -91,7 +91,7 @@ describe('Resend Setup Password', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('rejects missing recaptcha token', function () {
+    it('rejects missing recaptcha token', function (): void {
         config(['services.recaptcha.enabled' => true]);
 
         $response = $this->postJson('/api/v1/auth/setup-password-resend', [
@@ -102,7 +102,7 @@ describe('Resend Setup Password', function () {
             ->assertJsonPath('errors.recaptcha_token.0', __('validation.recaptcha.required'));
     });
 
-    it('rejects invalid recaptcha token', function () {
+    it('rejects invalid recaptcha token', function (): void {
         config(['services.recaptcha.enabled' => true]);
         mockFailedRecaptcha();
 

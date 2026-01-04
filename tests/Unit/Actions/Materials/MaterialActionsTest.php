@@ -19,8 +19,8 @@ uses(RefreshDatabase::class);
 // CREATE MATERIAL TESTS
 // ============================================================================
 
-describe('CreateMaterial', function () {
-    it('creates a material successfully', function () {
+describe('CreateMaterial', function (): void {
+    it('creates a material successfully', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -39,7 +39,7 @@ describe('CreateMaterial', function () {
             ->and($material->created_by_name)->toBe($user->full_name);
     });
 
-    it('creates a material with description', function () {
+    it('creates a material with description', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -54,7 +54,7 @@ describe('CreateMaterial', function () {
         expect($material->description)->toBe('This is a detailed description');
     });
 
-    it('creates a material with cleaning alert enabled', function () {
+    it('creates a material with cleaning alert enabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -75,7 +75,7 @@ describe('CreateMaterial', function () {
             ->and($material->cleaning_alert_frequency_type)->toBe(CleaningFrequency::WEEKLY);
     });
 
-    it('creates a material with recipients when cleaning alert is enabled', function () {
+    it('creates a material with recipients when cleaning alert is enabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -93,7 +93,7 @@ describe('CreateMaterial', function () {
         expect($material->recipients)->toHaveCount(2);
     });
 
-    it('does not attach recipients when cleaning alert is disabled', function () {
+    it('does not attach recipients when cleaning alert is disabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -110,7 +110,7 @@ describe('CreateMaterial', function () {
         expect($material->recipients)->toHaveCount(0);
     });
 
-    it('loads zone and creator relations after creation', function () {
+    it('loads zone and creator relations after creation', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $user = User::factory()->create();
@@ -131,8 +131,8 @@ describe('CreateMaterial', function () {
 // UPDATE MATERIAL TESTS
 // ============================================================================
 
-describe('UpdateMaterial', function () {
-    it('updates material name', function () {
+describe('UpdateMaterial', function (): void {
+    it('updates material name', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material = Material::factory()->forZone($zone)->create(['name' => 'Old Name']);
@@ -145,7 +145,7 @@ describe('UpdateMaterial', function () {
         expect($updatedMaterial->name)->toBe('New Name');
     });
 
-    it('updates material zone', function () {
+    it('updates material zone', function (): void {
         $site = Site::factory()->create();
         $oldZone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $newZone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
@@ -159,7 +159,7 @@ describe('UpdateMaterial', function () {
         expect($updatedMaterial->zone_id)->toBe($newZone->id);
     });
 
-    it('updates description to null', function () {
+    it('updates description to null', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material = Material::factory()->forZone($zone)->create(['description' => 'Old description']);
@@ -172,7 +172,7 @@ describe('UpdateMaterial', function () {
         expect($updatedMaterial->description)->toBeNull();
     });
 
-    it('resets cleaning fields when cleaning_alert is disabled', function () {
+    it('resets cleaning fields when cleaning_alert is disabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $recipient = User::factory()->create();
@@ -196,7 +196,7 @@ describe('UpdateMaterial', function () {
             ->and($updatedMaterial->recipients)->toHaveCount(0);
     });
 
-    it('syncs recipients when cleaning alert is enabled', function () {
+    it('syncs recipients when cleaning alert is enabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $oldRecipient = User::factory()->create();
@@ -213,7 +213,7 @@ describe('UpdateMaterial', function () {
             ->and($updatedMaterial->recipients->first()->id)->toBe($newRecipient->id);
     });
 
-    it('detaches recipients when cleaning alert becomes disabled', function () {
+    it('detaches recipients when cleaning alert becomes disabled', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $recipient = User::factory()->create();
@@ -229,7 +229,7 @@ describe('UpdateMaterial', function () {
         expect($updatedMaterial->recipients)->toHaveCount(0);
     });
 
-    it('returns fresh model with relations after update', function () {
+    it('returns fresh model with relations after update', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material = Material::factory()->forZone($zone)->create();
@@ -247,8 +247,8 @@ describe('UpdateMaterial', function () {
 // DELETE MATERIAL TESTS
 // ============================================================================
 
-describe('DeleteMaterial', function () {
-    it('deletes a material successfully', function () {
+describe('DeleteMaterial', function (): void {
+    it('deletes a material successfully', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material = Material::factory()->forZone($zone)->create();
@@ -260,7 +260,7 @@ describe('DeleteMaterial', function () {
             ->and(Material::find($material->id))->toBeNull();
     });
 
-    it('deletes material with recipients (detaches via observer)', function () {
+    it('deletes material with recipients (detaches via observer)', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $recipient = User::factory()->create();
@@ -274,7 +274,7 @@ describe('DeleteMaterial', function () {
             ->and(Material::find($material->id))->toBeNull();
     });
 
-    it('deletes material with items attached (observer detaches)', function () {
+    it('deletes material with items attached (observer detaches)', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material = Material::factory()->forZone($zone)->create();

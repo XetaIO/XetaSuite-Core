@@ -32,7 +32,7 @@ class RoleService
 
         // Apply search filter
         if ($search = $filters['search'] ?? null) {
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('first_name', 'ILIKE', "%{$search}%")
                     ->orWhere('last_name', 'ILIKE', "%{$search}%")
                     ->orWhere('email', 'ILIKE', "%{$search}%");

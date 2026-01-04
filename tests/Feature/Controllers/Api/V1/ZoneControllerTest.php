@@ -11,7 +11,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -43,8 +43,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns only zones for the user current site', function () {
+describe('index', function (): void {
+    it('returns only zones for the user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Zone::factory()->count(3)->forSite($this->regularSite)->create();
@@ -57,7 +57,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Zone::factory()->count(5)->forSite($this->regularSite)->create();
@@ -75,7 +75,7 @@ describe('index', function () {
             ]);
     });
 
-    it('returns zones ordered by name', function () {
+    it('returns zones ordered by name', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Zone::factory()->forSite($this->regularSite)->create(['name' => 'Zebra Zone']);
@@ -90,7 +90,7 @@ describe('index', function () {
         expect($data[1]['name'])->toBe('Zebra Zone');
     });
 
-    it('includes children_count and material_count in response', function () {
+    it('includes children_count and material_count in response', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -104,7 +104,7 @@ describe('index', function () {
         expect($parentData['children_count'])->toBe(3);
     });
 
-    it('filters zones by search term', function () {
+    it('filters zones by search term', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Zone::factory()->forSite($this->regularSite)->create(['name' => 'Main Building']);
@@ -119,7 +119,7 @@ describe('index', function () {
         expect($names)->not->toContain('Storage Area');
     });
 
-    it('ignores site_id filter and always uses current user site', function () {
+    it('ignores site_id filter and always uses current user site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Zone::factory()->forSite($this->regularSite)->create(['name' => 'My Zone']);
@@ -135,7 +135,7 @@ describe('index', function () {
         expect($names)->not->toContain('Other Zone');
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited-zone', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutViewAny);
 
@@ -145,7 +145,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/zones');
 
         $response->assertUnauthorized();
@@ -156,8 +156,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns zone details for zone on user current site', function () {
+describe('show', function (): void {
+    it('returns zone details for zone on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -173,7 +173,7 @@ describe('show', function () {
             ->assertJsonPath('data.name', $zone->name);
     });
 
-    it('includes children for parent zones', function () {
+    it('includes children for parent zones', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -190,7 +190,7 @@ describe('show', function () {
             ->assertJsonPath('data.children.0.name', 'Child Zone');
     });
 
-    it('includes materials for zones that allow materials', function () {
+    it('includes materials for zones that allow materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => true]);
@@ -204,7 +204,7 @@ describe('show', function () {
             ->assertJsonPath('data.materials.0.name', 'Test Material');
     });
 
-    it('denies access for zone on different site', function () {
+    it('denies access for zone on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $zone = Zone::factory()->forSite($this->otherSite)->create();
 
@@ -214,7 +214,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'no-zone-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutView);
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -225,7 +225,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('returns 404 for non-existent zone', function () {
+    it('returns 404 for non-existent zone', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -239,8 +239,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('creates a new zone for user current site', function () {
+describe('store', function (): void {
+    it('creates a new zone for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -260,7 +260,7 @@ describe('store', function () {
         ]);
     });
 
-    it('ignores provided site_id and uses user current site', function () {
+    it('ignores provided site_id and uses user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -279,7 +279,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates a zone with parent', function () {
+    it('creates a zone with parent', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -300,7 +300,7 @@ describe('store', function () {
         ]);
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -310,7 +310,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates parent zone exists', function () {
+    it('validates parent zone exists', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -323,7 +323,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['parent_id']);
     });
 
-    it('denies access for user without create permission', function () {
+    it('denies access for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'no-zone-create', 'guard_name' => 'web']);
         $roleWithoutCreate->givePermissionTo('zone.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutCreate);
@@ -341,8 +341,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates a zone on user current site', function () {
+describe('update', function (): void {
+    it('updates a zone on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['name' => 'Old Name']);
@@ -361,7 +361,7 @@ describe('update', function () {
         ]);
     });
 
-    it('updates zone allow_material flag', function () {
+    it('updates zone allow_material flag', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -375,7 +375,7 @@ describe('update', function () {
             ->assertJsonPath('data.allow_material', true);
     });
 
-    it('updates zone parent', function () {
+    it('updates zone parent', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $newParent = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -390,7 +390,7 @@ describe('update', function () {
             ->assertJsonPath('data.parent_id', $newParent->id);
     });
 
-    it('validates parent zone belongs to same site', function () {
+    it('validates parent zone belongs to same site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherSiteParent = Zone::factory()->forSite($this->otherSite)->create(['allow_material' => false]);
@@ -405,7 +405,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['parent_id']);
     });
 
-    it('denies access for zone on different site', function () {
+    it('denies access for zone on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $zone = Zone::factory()->forSite($this->otherSite)->create();
 
@@ -417,7 +417,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without update permission', function () {
+    it('denies access for user without update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'no-zone-update', 'guard_name' => 'web']);
         $roleWithoutUpdate->givePermissionTo('zone.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutUpdate);
@@ -436,8 +436,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('deletes a zone without children or materials', function () {
+describe('destroy', function (): void {
+    it('deletes a zone without children or materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -452,7 +452,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('prevents deleting zone with children', function () {
+    it('prevents deleting zone with children', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create();
@@ -468,7 +468,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('prevents deleting zone with materials', function () {
+    it('prevents deleting zone with materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => true]);
@@ -484,7 +484,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('denies access for zone on different site', function () {
+    it('denies access for zone on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $zone = Zone::factory()->forSite($this->otherSite)->create();
 
@@ -494,7 +494,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without delete permission', function () {
+    it('denies access for user without delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'no-zone-delete', 'guard_name' => 'web']);
         $roleWithoutDelete->givePermissionTo('zone.viewAny');
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutDelete);
@@ -511,8 +511,8 @@ describe('destroy', function () {
 // CHILDREN TESTS
 // ============================================================================
 
-describe('children', function () {
-    it('returns children for a zone on user current site', function () {
+describe('children', function (): void {
+    it('returns children for a zone on user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -528,7 +528,7 @@ describe('children', function () {
         expect($names)->toContain('Child 2');
     });
 
-    it('returns empty array for zone without children', function () {
+    it('returns empty array for zone without children', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -540,7 +540,7 @@ describe('children', function () {
             ->assertJsonCount(0, 'data');
     });
 
-    it('denies access for zone on different site', function () {
+    it('denies access for zone on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $zone = Zone::factory()->forSite($this->otherSite)->create();
 
@@ -555,8 +555,8 @@ describe('children', function () {
 // MATERIALS TESTS
 // ============================================================================
 
-describe('materials', function () {
-    it('returns materials for a zone that allows materials', function () {
+describe('materials', function (): void {
+    it('returns materials for a zone that allows materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => true]);
@@ -570,7 +570,7 @@ describe('materials', function () {
             ->assertJsonPath('data.0.name', 'Test Material');
     });
 
-    it('returns error for zone that does not allow materials', function () {
+    it('returns error for zone that does not allow materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false]);
@@ -581,7 +581,7 @@ describe('materials', function () {
         $response->assertUnprocessable();
     });
 
-    it('denies access for zone on different site', function () {
+    it('denies access for zone on different site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $zone = Zone::factory()->forSite($this->otherSite)->create(['allow_material' => true]);
 
@@ -596,8 +596,8 @@ describe('materials', function () {
 // AVAILABLE PARENTS TESTS
 // ============================================================================
 
-describe('availableParents', function () {
-    it('returns available parent zones for user current site', function () {
+describe('availableParents', function (): void {
+    it('returns available parent zones for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $parentZone = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false, 'name' => 'Parent Zone']);
@@ -614,7 +614,7 @@ describe('availableParents', function () {
         expect($names)->not->toContain('Other Site Zone');
     });
 
-    it('excludes a zone and its descendants when exclude_zone_id is provided', function () {
+    it('excludes a zone and its descendants when exclude_zone_id is provided', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone1 = Zone::factory()->forSite($this->regularSite)->create(['allow_material' => false, 'name' => 'Zone 1']);
@@ -636,8 +636,8 @@ describe('availableParents', function () {
 // TREE TESTS
 // ============================================================================
 
-describe('tree', function () {
-    it('returns hierarchical zone tree for user current site', function () {
+describe('tree', function (): void {
+    it('returns hierarchical zone tree for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create hierarchical zones
@@ -684,7 +684,7 @@ describe('tree', function () {
         expect($response->json('meta.total_zones'))->toBe(3);
     });
 
-    it('returns nested children recursively', function () {
+    it('returns nested children recursively', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $rootZone = Zone::factory()->forSite($this->regularSite)->create(['name' => 'Root']);
@@ -710,7 +710,7 @@ describe('tree', function () {
         expect($data[0]['children'][0]['children'][0]['name'])->toBe('Grandchild');
     });
 
-    it('allows HQ users to view zones for any site', function () {
+    it('allows HQ users to view zones for any site', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create zones on regular site
@@ -725,7 +725,7 @@ describe('tree', function () {
         expect($response->json('meta.site_id'))->toBe($this->regularSite->id);
     });
 
-    it('ignores site_id parameter for non-HQ users', function () {
+    it('ignores site_id parameter for non-HQ users', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create zones on both sites
@@ -743,7 +743,7 @@ describe('tree', function () {
         expect($names)->not->toContain('Other Site Zone');
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-zone-access', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -752,7 +752,7 @@ describe('tree', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/zones/tree');
 
         $response->assertUnauthorized();

@@ -12,7 +12,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -65,8 +65,8 @@ beforeEach(function () {
 // MATERIAL SCAN TESTS
 // ============================================================================
 
-describe('material scan', function () {
-    it('returns material information when user has permission and site access', function () {
+describe('material scan', function (): void {
+    it('returns material information when user has permission and site access', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $material = Material::factory()->forZone($this->zone)->create([
@@ -96,7 +96,7 @@ describe('material scan', function () {
             ->assertJsonPath('data.zone.id', $this->zone->id);
     });
 
-    it('returns available actions based on user permissions', function () {
+    it('returns available actions based on user permissions', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $material = Material::factory()->forZone($this->zone)->create();
@@ -108,7 +108,7 @@ describe('material scan', function () {
             ->assertJsonPath('data.available_actions', ['cleaning', 'maintenance', 'incident']);
     });
 
-    it('returns no actions when user has only scan permission', function () {
+    it('returns no actions when user has only scan permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->scanRole);
 
         $material = Material::factory()->forZone($this->zone)->create();
@@ -120,7 +120,7 @@ describe('material scan', function () {
             ->assertJsonPath('data.available_actions', []);
     });
 
-    it('returns 403 when user has no site access', function () {
+    it('returns 403 when user has no site access', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         // Material on other site
@@ -133,7 +133,7 @@ describe('material scan', function () {
             ->assertJsonPath('error', 'no_site_access');
     });
 
-    it('returns 403 when user lacks scan permission', function () {
+    it('returns 403 when user lacks scan permission', function (): void {
         // Create role without scan permission
         $noScanRole = Role::create(['name' => 'no-scan', 'guard_name' => 'web']);
         $noScanRole->givePermissionTo(['cleaning.create']);
@@ -148,7 +148,7 @@ describe('material scan', function () {
         $response->assertForbidden();
     });
 
-    it('returns 401 when user is not authenticated', function () {
+    it('returns 401 when user is not authenticated', function (): void {
         $material = Material::factory()->forZone($this->zone)->create();
 
         $response = $this->getJson("/api/v1/qr-scan/material/{$material->id}");
@@ -156,7 +156,7 @@ describe('material scan', function () {
         $response->assertUnauthorized();
     });
 
-    it('returns 404 when material does not exist', function () {
+    it('returns 404 when material does not exist', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $response = $this->actingAs($user)
@@ -170,8 +170,8 @@ describe('material scan', function () {
 // ITEM SCAN TESTS
 // ============================================================================
 
-describe('item scan', function () {
-    it('returns item information when user has permission and site access', function () {
+describe('item scan', function (): void {
+    it('returns item information when user has permission and site access', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create([
@@ -203,7 +203,7 @@ describe('item scan', function () {
             ->assertJsonPath('data.site.id', $this->regularSite->id);
     });
 
-    it('returns available actions based on user permissions', function () {
+    it('returns available actions based on user permissions', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create();
@@ -215,7 +215,7 @@ describe('item scan', function () {
             ->assertJsonPath('data.available_actions', ['entry', 'exit']);
     });
 
-    it('returns no actions when user has only scan permission', function () {
+    it('returns no actions when user has only scan permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->scanRole);
 
         $item = Item::factory()->forSite($this->regularSite)->create();
@@ -227,7 +227,7 @@ describe('item scan', function () {
             ->assertJsonPath('data.available_actions', []);
     });
 
-    it('returns 403 when user has no site access', function () {
+    it('returns 403 when user has no site access', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         // Item on other site
@@ -240,7 +240,7 @@ describe('item scan', function () {
             ->assertJsonPath('error', 'no_site_access');
     });
 
-    it('returns 403 when user lacks scan permission', function () {
+    it('returns 403 when user lacks scan permission', function (): void {
         // Create role without scan permission
         $noScanRole = Role::create(['name' => 'no-item-scan', 'guard_name' => 'web']);
         $noScanRole->givePermissionTo(['item-movement.create']);
@@ -255,7 +255,7 @@ describe('item scan', function () {
         $response->assertForbidden();
     });
 
-    it('returns 401 when user is not authenticated', function () {
+    it('returns 401 when user is not authenticated', function (): void {
         $item = Item::factory()->forSite($this->regularSite)->create();
 
         $response = $this->getJson("/api/v1/qr-scan/item/{$item->id}");
@@ -263,7 +263,7 @@ describe('item scan', function () {
         $response->assertUnauthorized();
     });
 
-    it('returns 404 when item does not exist', function () {
+    it('returns 404 when item does not exist', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->fullRole);
 
         $response = $this->actingAs($user)

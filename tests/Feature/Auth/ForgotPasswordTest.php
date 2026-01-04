@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Notification;
 use XetaSuite\Models\User;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Configure reCAPTCHA settings
     config([
         'services.recaptcha.secret_key' => 'test-secret-key',
@@ -14,8 +14,8 @@ beforeEach(function () {
     ]);
 });
 
-describe('Forgot Password', function () {
-    it('sends reset link for valid email', function () {
+describe('Forgot Password', function (): void {
+    it('sends reset link for valid email', function (): void {
         mockSuccessfulRecaptcha();
         Notification::fake();
 
@@ -30,7 +30,7 @@ describe('Forgot Password', function () {
             ->assertJsonStructure(['message']);
     });
 
-    it('returns success for non-existent email to prevent enumeration', function () {
+    it('returns success for non-existent email to prevent enumeration', function (): void {
         mockSuccessfulRecaptcha();
         Notification::fake();
 
@@ -46,7 +46,7 @@ describe('Forgot Password', function () {
         Notification::assertNothingSent();
     });
 
-    it('validates email is required', function () {
+    it('validates email is required', function (): void {
         mockSuccessfulRecaptcha();
 
         $response = $this->postJson('/api/v1/auth/forgot-password', [
@@ -57,7 +57,7 @@ describe('Forgot Password', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('validates email format', function () {
+    it('validates email format', function (): void {
         mockSuccessfulRecaptcha();
 
         $response = $this->postJson('/api/v1/auth/forgot-password', [
@@ -69,7 +69,7 @@ describe('Forgot Password', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('rejects missing recaptcha token', function () {
+    it('rejects missing recaptcha token', function (): void {
         $response = $this->postJson('/api/v1/auth/forgot-password', [
             'email' => 'test@example.com',
         ]);
@@ -78,7 +78,7 @@ describe('Forgot Password', function () {
             ->assertJsonPath('errors.recaptcha_token.0', __('validation.recaptcha.required'));
     });
 
-    it('rejects invalid recaptcha token', function () {
+    it('rejects invalid recaptcha token', function (): void {
         mockFailedRecaptcha();
 
         $response = $this->postJson('/api/v1/auth/forgot-password', [

@@ -14,7 +14,7 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('material_user', function (Blueprint $table) {
+        Schema::create('material_user', function (Blueprint $table): void {
             $table->foreignIdFor(Material::class)
                 ->constrained()
                 ->cascadeOnDelete();

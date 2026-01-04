@@ -13,7 +13,7 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sites', function (Blueprint $table) {
+        Schema::create('sites', function (Blueprint $table): void {
             $table->id();
 
             $table->string('name')->unique();

@@ -13,7 +13,7 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-it('detaches companies when maintenance is deleted', function () {
+it('detaches companies when maintenance is deleted', function (): void {
     $site = Site::factory()->create();
     $maintenance = Maintenance::factory()->for($site)->create();
     $company = Company::factory()->create();
@@ -27,7 +27,7 @@ it('detaches companies when maintenance is deleted', function () {
     expect($company->fresh()->maintenances)->toHaveCount(0);
 });
 
-it('detaches operators when maintenance is deleted', function () {
+it('detaches operators when maintenance is deleted', function (): void {
     $site = Site::factory()->create();
     $user = User::factory()->create();
     $maintenance = Maintenance::factory()->for($site)->createdBy($user)->create();
@@ -47,7 +47,7 @@ it('detaches operators when maintenance is deleted', function () {
     expect($user->maintenance_count)->toBe(0);
 });
 
-it('sets maintenance_id to null on incidents when maintenance is deleted', function () {
+it('sets maintenance_id to null on incidents when maintenance is deleted', function (): void {
     $site = Site::factory()->create();
     $maintenance = Maintenance::factory()->for($site)->create();
     $incident = Incident::factory()->for($site)->for($maintenance)->create();
@@ -60,7 +60,7 @@ it('sets maintenance_id to null on incidents when maintenance is deleted', funct
     expect($incident->maintenance_id)->toBeNull();
 });
 
-it('sets movable to null on item movements when maintenance is deleted', function () {
+it('sets movable to null on item movements when maintenance is deleted', function (): void {
     $site = Site::factory()->create();
     $maintenance = Maintenance::factory()->for($site)->create();
     $item = Item::factory()->for($site)->create();

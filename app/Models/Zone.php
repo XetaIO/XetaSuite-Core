@@ -91,9 +91,10 @@ class Zone extends Model
     /**
      * Scope to load children recursively with counts.
      */
-    public function scopeWithRecursiveChildren($query): void
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function withRecursiveChildren($query): void
     {
-        $query->with(['children' => function ($q) {
+        $query->with(['children' => function ($q): void {
             $q->withRecursiveChildren();
         }])->withCount(['children', 'materials']);
     }

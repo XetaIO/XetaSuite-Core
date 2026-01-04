@@ -16,7 +16,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -68,8 +68,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns only items for user current site', function () {
+describe('index', function (): void {
+    it('returns only items for user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->count(3)->forSite($this->regularSite)->createdBy($user)->create();
@@ -82,7 +82,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns paginated list with proper structure', function () {
+    it('returns paginated list with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->count(5)->forSite($this->regularSite)->createdBy($user)->create();
@@ -112,7 +112,7 @@ describe('index', function () {
             ]);
     });
 
-    it('can search items by name', function () {
+    it('can search items by name', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->forSite($this->regularSite)->createdBy($user)->create(['name' => 'Alpha Product']);
@@ -127,7 +127,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.name', 'Beta Item');
     });
 
-    it('can search items by reference', function () {
+    it('can search items by reference', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->forSite($this->regularSite)->createdBy($user)->create(['reference' => 'REF-001']);
@@ -141,7 +141,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.reference', 'REF-001');
     });
 
-    it('can filter items by company', function () {
+    it('can filter items by company', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $company2 = Company::factory()->asItemProvider()->create();
 
@@ -157,7 +157,7 @@ describe('index', function () {
             ->assertJsonCount(2, 'data');
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -167,7 +167,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/items');
 
         $response->assertUnauthorized();
@@ -178,8 +178,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns item details with proper structure', function () {
+describe('show', function (): void {
+    it('returns item details with proper structure', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -223,7 +223,7 @@ describe('show', function () {
             ]);
     });
 
-    it('cannot view item from another site', function () {
+    it('cannot view item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -234,7 +234,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.view permission', function () {
+    it('requires item.view permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -251,8 +251,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('can create item with required fields only', function () {
+describe('store', function (): void {
+    it('can create item with required fields only', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -270,7 +270,7 @@ describe('store', function () {
         ]);
     });
 
-    it('can create item with all fields', function () {
+    it('can create item with all fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -294,7 +294,7 @@ describe('store', function () {
             ->assertJsonPath('data.number_critical_enabled', true);
     });
 
-    it('can create item with materials', function () {
+    it('can create item with materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $material1 = Material::factory()->forZone($this->zone)->create();
@@ -312,7 +312,7 @@ describe('store', function () {
             ->assertJsonCount(2, 'data.materials');
     });
 
-    it('can create item with recipients', function () {
+    it('can create item with recipients', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $recipient = User::factory()->withSite($this->regularSite)->create();
@@ -329,7 +329,7 @@ describe('store', function () {
             ->assertJsonCount(1, 'data.recipients');
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -339,7 +339,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates reference uniqueness within site', function () {
+    it('validates reference uniqueness within site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->forSite($this->regularSite)->createdBy($user)->create(['reference' => 'DUPLICATE-REF']);
@@ -355,7 +355,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['reference']);
     });
 
-    it('allows same reference on different sites', function () {
+    it('allows same reference on different sites', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()->forSite($this->otherSite)->create(['reference' => 'SHARED-REF']);
@@ -370,7 +370,7 @@ describe('store', function () {
         $response->assertStatus(201);
     });
 
-    it('requires item.create permission', function () {
+    it('requires item.create permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-create', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -389,8 +389,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('can update item basic fields', function () {
+describe('update', function (): void {
+    it('can update item basic fields', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -416,7 +416,7 @@ describe('update', function () {
         ]);
     });
 
-    it('cannot update item from another site', function () {
+    it('cannot update item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -431,7 +431,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('validates reference uniqueness on update', function () {
+    it('validates reference uniqueness on update', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item1 = Item::factory()->forSite($this->regularSite)->createdBy($user)->create(['reference' => 'REF-001']);
@@ -448,7 +448,7 @@ describe('update', function () {
             ->assertJsonValidationErrors(['reference']);
     });
 
-    it('allows keeping same reference on update', function () {
+    it('allows keeping same reference on update', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()->forSite($this->regularSite)->createdBy($user)->create(['reference' => 'MY-REF']);
@@ -463,7 +463,7 @@ describe('update', function () {
         $response->assertOk();
     });
 
-    it('requires item.update permission', function () {
+    it('requires item.update permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-update', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -484,8 +484,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('can delete item without movements', function () {
+describe('destroy', function (): void {
+    it('can delete item without movements', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -501,7 +501,7 @@ describe('destroy', function () {
         $this->assertDatabaseMissing('items', ['id' => $item->id]);
     });
 
-    it('cannot delete item with movements', function () {
+    it('cannot delete item with movements', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -519,7 +519,7 @@ describe('destroy', function () {
         $this->assertDatabaseHas('items', ['id' => $item->id]);
     });
 
-    it('cannot delete item from another site', function () {
+    it('cannot delete item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -530,7 +530,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.delete permission', function () {
+    it('requires item.delete permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-delete', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -547,8 +547,8 @@ describe('destroy', function () {
 // STATS TESTS
 // ============================================================================
 
-describe('stats', function () {
-    it('returns monthly statistics for item', function () {
+describe('stats', function (): void {
+    it('returns monthly statistics for item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -573,7 +573,7 @@ describe('stats', function () {
             ->assertJsonCount(12, 'stats');
     });
 
-    it('cannot view stats for item from another site', function () {
+    it('cannot view stats for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -589,8 +589,8 @@ describe('stats', function () {
 // MOVEMENTS TESTS
 // ============================================================================
 
-describe('movements', function () {
-    it('returns movements for item', function () {
+describe('movements', function (): void {
+    it('returns movements for item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -625,7 +625,7 @@ describe('movements', function () {
             ]);
     });
 
-    it('cannot view movements for item from another site', function () {
+    it('cannot view movements for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -641,8 +641,8 @@ describe('movements', function () {
 // PRICE HISTORY TESTS
 // ============================================================================
 
-describe('priceHistory', function () {
-    it('returns price history with statistics for item', function () {
+describe('priceHistory', function (): void {
+    it('returns price history with statistics for item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -683,7 +683,7 @@ describe('priceHistory', function () {
             ]);
     });
 
-    it('returns empty history when no price records exist', function () {
+    it('returns empty history when no price records exist', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -702,7 +702,7 @@ describe('priceHistory', function () {
         expect($response->json('data.stats.current_price'))->toBeNumeric();
     });
 
-    it('cannot view price history for item from another site', function () {
+    it('cannot view price history for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -713,7 +713,7 @@ describe('priceHistory', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.view permission', function () {
+    it('requires item.view permission', function (): void {
         // Create a role with no permissions for this site
         setPermissionsTeamId($this->regularSite->id);
         $roleWithoutPermission = Role::create([
@@ -737,8 +737,8 @@ describe('priceHistory', function () {
 // STORE MOVEMENT TESTS
 // ============================================================================
 
-describe('storeMovement', function () {
-    it('can create entry movement', function () {
+describe('storeMovement', function (): void {
+    it('can create entry movement', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -766,7 +766,7 @@ describe('storeMovement', function () {
             ->and($item->item_entry_count)->toBe(1);
     });
 
-    it('can create exit movement', function () {
+    it('can create exit movement', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         // Create fresh item for this test
@@ -798,7 +798,7 @@ describe('storeMovement', function () {
             ->and($item->item_exit_count)->toBe(1);
     });
 
-    it('validates movement type', function () {
+    it('validates movement type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -816,7 +816,7 @@ describe('storeMovement', function () {
             ->assertJsonValidationErrors(['type']);
     });
 
-    it('validates quantity is positive', function () {
+    it('validates quantity is positive', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -834,7 +834,7 @@ describe('storeMovement', function () {
             ->assertJsonValidationErrors(['quantity']);
     });
 
-    it('cannot create movement for item from another site', function () {
+    it('cannot create movement for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -853,8 +853,8 @@ describe('storeMovement', function () {
 // QR CODE TESTS
 // ============================================================================
 
-describe('qrCode', function () {
-    it('generates QR code for item', function () {
+describe('qrCode', function (): void {
+    it('generates QR code for item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -876,7 +876,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 200);
     });
 
-    it('respects size parameter', function () {
+    it('respects size parameter', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -891,7 +891,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 300);
     });
 
-    it('limits size between 100 and 400', function () {
+    it('limits size between 100 and 400', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -912,7 +912,7 @@ describe('qrCode', function () {
             ->assertJsonPath('data.size', 400);
     });
 
-    it('cannot generate QR code for item from another site', function () {
+    it('cannot generate QR code for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -928,8 +928,8 @@ describe('qrCode', function () {
 // MATERIALS ENDPOINT TESTS
 // ============================================================================
 
-describe('materials', function () {
-    it('returns paginated materials for item', function () {
+describe('materials', function (): void {
+    it('returns paginated materials for item', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -970,7 +970,7 @@ describe('materials', function () {
             ->assertJsonPath('meta.total', 7);
     });
 
-    it('can paginate through materials', function () {
+    it('can paginate through materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -996,7 +996,7 @@ describe('materials', function () {
             ->assertJsonPath('meta.current_page', 2);
     });
 
-    it('can specify per_page parameter', function () {
+    it('can specify per_page parameter', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -1022,7 +1022,7 @@ describe('materials', function () {
             ->assertJsonPath('meta.per_page', 3);
     });
 
-    it('cannot view materials for item from another site', function () {
+    it('cannot view materials for item from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherItem = Item::factory()->forSite($this->otherSite)->create();
@@ -1033,7 +1033,7 @@ describe('materials', function () {
         $response->assertForbidden();
     });
 
-    it('requires item.view permission', function () {
+    it('requires item.view permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -1050,8 +1050,8 @@ describe('materials', function () {
 // AVAILABLE ENDPOINTS TESTS
 // ============================================================================
 
-describe('availableCompanies', function () {
-    it('returns list of item provider companies', function () {
+describe('availableCompanies', function (): void {
+    it('returns list of item provider companies', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Company::factory()->asItemProvider()->count(3)->create();
@@ -1063,7 +1063,7 @@ describe('availableCompanies', function () {
             ->assertJsonCount(4, 'companies'); // 3 + 1 from beforeEach
     });
 
-    it('requires item.viewAny permission', function () {
+    it('requires item.viewAny permission', function (): void {
         $roleWithoutPermission = Role::create(['name' => 'no-item-view', 'guard_name' => 'web']);
         $user = createUserOnRegularSite($this->regularSite, $roleWithoutPermission);
 
@@ -1074,8 +1074,8 @@ describe('availableCompanies', function () {
     });
 });
 
-describe('availableMaterials', function () {
-    it('returns materials only from user current site', function () {
+describe('availableMaterials', function (): void {
+    it('returns materials only from user current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Material::factory()->count(3)->forZone($this->zone)->create();
@@ -1089,8 +1089,8 @@ describe('availableMaterials', function () {
     });
 });
 
-describe('availableRecipients', function () {
-    it('returns users with access to current site', function () {
+describe('availableRecipients', function (): void {
+    it('returns users with access to current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         User::factory()->count(2)->withSite($this->regularSite)->create();

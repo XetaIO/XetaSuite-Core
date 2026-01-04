@@ -109,17 +109,20 @@ class ItemMovement extends Model
     }
 
     // Scopes
-    public function scopeEntries($query)
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function entries($query)
     {
         return $query->where('type', 'entry');
     }
 
-    public function scopeExits($query)
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function exits($query)
     {
         return $query->where('type', 'exit');
     }
 
-    public function scopeForPeriod($query, $startDate, $endDate)
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function forPeriod($query, $startDate, $endDate)
     {
         return $query->whereBetween('movement_date', [$startDate, $endDate]);
     }

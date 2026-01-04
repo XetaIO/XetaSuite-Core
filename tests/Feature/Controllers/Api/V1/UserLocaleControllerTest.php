@@ -8,12 +8,12 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create(['is_headquarters' => true]);
 });
 
-describe('update user locale', function () {
-    it('updates the locale for authenticated user', function () {
+describe('update user locale', function (): void {
+    it('updates the locale for authenticated user', function (): void {
         $user = User::factory()->create([
             'current_site_id' => $this->site->id,
             'locale' => 'en',
@@ -32,7 +32,7 @@ describe('update user locale', function () {
         ]);
     });
 
-    it('sets the app locale for current request', function () {
+    it('sets the app locale for current request', function (): void {
         $user = User::factory()->create([
             'current_site_id' => $this->site->id,
             'locale' => 'en',
@@ -45,7 +45,7 @@ describe('update user locale', function () {
         expect(app()->getLocale())->toBe('fr');
     });
 
-    it('returns success message', function () {
+    it('returns success message', function (): void {
         $user = User::factory()->create([
             'current_site_id' => $this->site->id,
             'locale' => 'fr',
@@ -59,7 +59,7 @@ describe('update user locale', function () {
             ->assertJsonStructure(['message', 'locale']);
     });
 
-    it('requires locale field', function () {
+    it('requires locale field', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->site->id]);
         $user->sites()->attach($this->site->id);
 
@@ -70,7 +70,7 @@ describe('update user locale', function () {
             ->assertJsonValidationErrors(['locale']);
     });
 
-    it('validates locale is a string', function () {
+    it('validates locale is a string', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->site->id]);
         $user->sites()->attach($this->site->id);
 
@@ -81,7 +81,7 @@ describe('update user locale', function () {
             ->assertJsonValidationErrors(['locale']);
     });
 
-    it('validates locale is in allowed values', function () {
+    it('validates locale is in allowed values', function (): void {
         $user = User::factory()->create(['current_site_id' => $this->site->id]);
         $user->sites()->attach($this->site->id);
 
@@ -92,7 +92,7 @@ describe('update user locale', function () {
             ->assertJsonValidationErrors(['locale']);
     });
 
-    it('accepts fr locale', function () {
+    it('accepts fr locale', function (): void {
         $user = User::factory()->create([
             'current_site_id' => $this->site->id,
             'locale' => 'en',
@@ -106,7 +106,7 @@ describe('update user locale', function () {
             ->assertJsonPath('locale', 'fr');
     });
 
-    it('accepts en locale', function () {
+    it('accepts en locale', function (): void {
         $user = User::factory()->create([
             'current_site_id' => $this->site->id,
             'locale' => 'fr',
@@ -120,7 +120,7 @@ describe('update user locale', function () {
             ->assertJsonPath('locale', 'en');
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->patchJson('/api/v1/user/locale', ['locale' => 'fr']);
 
         $response->assertUnauthorized();

@@ -10,12 +10,12 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
     $this->user = User::factory()->create();
 });
 
-it('prevents deletion if zone has materials', function () {
+it('prevents deletion if zone has materials', function (): void {
     $zone = Zone::factory()->forSite($this->site)->create();
 
     Material::factory()
@@ -30,7 +30,7 @@ it('prevents deletion if zone has materials', function () {
     expect(Zone::find($zone->id))->not->toBeNull();
 });
 
-it('prevents deletion if zone has child zones', function () {
+it('prevents deletion if zone has child zones', function (): void {
     $parentZone = Zone::factory()->forSite($this->site)->create();
     $childZone = Zone::factory()
         ->forSite($this->site)
@@ -43,7 +43,7 @@ it('prevents deletion if zone has child zones', function () {
     expect(Zone::find($parentZone->id))->not->toBeNull();
 });
 
-it('allows deletion if zone has no materials and no children', function () {
+it('allows deletion if zone has no materials and no children', function (): void {
     $zone = Zone::factory()->forSite($this->site)->create();
 
     $result = $zone->delete();
@@ -52,7 +52,7 @@ it('allows deletion if zone has no materials and no children', function () {
     expect(Zone::find($zone->id))->toBeNull();
 });
 
-it('allows deletion of child zone without children or materials', function () {
+it('allows deletion of child zone without children or materials', function (): void {
     $parentZone = Zone::factory()->forSite($this->site)->create();
     $childZone = Zone::factory()
         ->forSite($this->site)

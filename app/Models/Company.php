@@ -49,7 +49,8 @@ class Company extends Model
     /**
      * Scope to filter companies that are item providers.
      */
-    public function scopeItemProviders(Builder $query): Builder
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function itemProviders(Builder $query): Builder
     {
         return $query->whereJsonContains('types', CompanyType::ITEM_PROVIDER->value);
     }
@@ -57,7 +58,8 @@ class Company extends Model
     /**
      * Scope to filter companies that are maintenance providers.
      */
-    public function scopeMaintenanceProviders(Builder $query): Builder
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function maintenanceProviders(Builder $query): Builder
     {
         return $query->whereJsonContains('types', CompanyType::MAINTENANCE_PROVIDER->value);
     }

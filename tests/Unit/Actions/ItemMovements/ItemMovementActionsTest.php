@@ -21,12 +21,12 @@ uses(RefreshDatabase::class);
 // CREATE ITEM MOVEMENT TESTS
 // ============================================================================
 
-describe('CreateItemMovement', function () {
-    beforeEach(function () {
+describe('CreateItemMovement', function (): void {
+    beforeEach(function (): void {
         Queue::fake();
     });
 
-    it('creates an entry movement successfully', function () {
+    it('creates an entry movement successfully', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -46,7 +46,7 @@ describe('CreateItemMovement', function () {
             ->and($movement->created_by_id)->toBe($user->id);
     });
 
-    it('creates an entry movement with company', function () {
+    it('creates an entry movement with company', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $company = Company::factory()->asItemProvider()->create();
@@ -67,7 +67,7 @@ describe('CreateItemMovement', function () {
             ->and($movement->invoice_date->toDateString())->toBe('2025-01-15');
     });
 
-    it('creates an entry movement with notes', function () {
+    it('creates an entry movement with notes', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -82,7 +82,7 @@ describe('CreateItemMovement', function () {
         expect($movement->notes)->toBe('Restocking for project X');
     });
 
-    it('creates an entry movement with movement date', function () {
+    it('creates an entry movement with movement date', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -97,7 +97,7 @@ describe('CreateItemMovement', function () {
         expect($movement->movement_date->toDateString())->toBe('2025-06-01');
     });
 
-    it('creates price history when price changes on entry', function () {
+    it('creates price history when price changes on entry', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 10.00]);
@@ -113,7 +113,7 @@ describe('CreateItemMovement', function () {
             ->and((float) $item->fresh()->current_price)->toBe(15.0);
     });
 
-    it('does not create price history when price unchanged on entry', function () {
+    it('does not create price history when price unchanged on entry', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 10.00]);
@@ -128,7 +128,7 @@ describe('CreateItemMovement', function () {
         expect(ItemPrice::where('item_id', $item->id)->count())->toBe(0);
     });
 
-    it('creates an exit movement successfully', function () {
+    it('creates an exit movement successfully', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -149,7 +149,7 @@ describe('CreateItemMovement', function () {
             ->and((float) $movement->total_price)->toBe(25.0);
     });
 
-    it('throws exception when exit exceeds available stock', function () {
+    it('throws exception when exit exceeds available stock', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -164,7 +164,7 @@ describe('CreateItemMovement', function () {
         ]))->toThrow(\Exception::class);
     });
 
-    it('dispatches critical stock job when threshold reached on exit', function () {
+    it('dispatches critical stock job when threshold reached on exit', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -183,7 +183,7 @@ describe('CreateItemMovement', function () {
         Queue::assertPushed(CheckItemCriticalStock::class);
     });
 
-    it('does not dispatch critical stock job when threshold not reached', function () {
+    it('does not dispatch critical stock job when threshold not reached', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -207,8 +207,8 @@ describe('CreateItemMovement', function () {
 // UPDATE ITEM MOVEMENT TESTS
 // ============================================================================
 
-describe('UpdateItemMovement', function () {
-    it('updates movement quantity', function () {
+describe('UpdateItemMovement', function (): void {
+    it('updates movement quantity', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -225,7 +225,7 @@ describe('UpdateItemMovement', function () {
             ->and((float) $updatedMovement->total_price)->toBe(80.0);
     });
 
-    it('updates movement unit price', function () {
+    it('updates movement unit price', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -240,7 +240,7 @@ describe('UpdateItemMovement', function () {
             ->and((float) $updatedMovement->total_price)->toBe(75.0);
     });
 
-    it('updates movement company', function () {
+    it('updates movement company', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -256,7 +256,7 @@ describe('UpdateItemMovement', function () {
         expect($updatedMovement->company_id)->toBe($newCompany->id);
     });
 
-    it('updates movement invoice fields', function () {
+    it('updates movement invoice fields', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -272,7 +272,7 @@ describe('UpdateItemMovement', function () {
             ->and($updatedMovement->invoice_date->toDateString())->toBe('2025-03-15');
     });
 
-    it('updates movement notes', function () {
+    it('updates movement notes', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -286,7 +286,7 @@ describe('UpdateItemMovement', function () {
         expect($updatedMovement->notes)->toBe('Updated notes');
     });
 
-    it('updates movement date', function () {
+    it('updates movement date', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -300,7 +300,7 @@ describe('UpdateItemMovement', function () {
         expect($updatedMovement->movement_date->toDateString())->toBe('2025-07-01');
     });
 
-    it('adjusts item entry total when entry quantity increases', function () {
+    it('adjusts item entry total when entry quantity increases', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -317,7 +317,7 @@ describe('UpdateItemMovement', function () {
         expect($item->item_entry_total)->toBe(18);
     });
 
-    it('adjusts item entry total when entry quantity decreases', function () {
+    it('adjusts item entry total when entry quantity decreases', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -334,7 +334,7 @@ describe('UpdateItemMovement', function () {
         expect($item->item_entry_total)->toBe(13);
     });
 
-    it('adjusts item exit total when exit quantity changes', function () {
+    it('adjusts item exit total when exit quantity changes', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create([
@@ -352,7 +352,7 @@ describe('UpdateItemMovement', function () {
         expect($item->item_exit_total)->toBe(13);
     });
 
-    it('returns fresh model after update', function () {
+    it('returns fresh model after update', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -370,8 +370,8 @@ describe('UpdateItemMovement', function () {
 // DELETE ITEM MOVEMENT TESTS
 // ============================================================================
 
-describe('DeleteItemMovement', function () {
-    it('deletes an entry movement and adjusts item totals', function () {
+describe('DeleteItemMovement', function (): void {
+    it('deletes an entry movement and adjusts item totals', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
 
@@ -401,7 +401,7 @@ describe('DeleteItemMovement', function () {
             ->and($item->item_entry_count)->toBe(2);
     });
 
-    it('deletes an exit movement and adjusts item totals', function () {
+    it('deletes an exit movement and adjusts item totals', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
 
@@ -432,7 +432,7 @@ describe('DeleteItemMovement', function () {
             ->and($item->item_exit_count)->toBe(1);
     });
 
-    it('returns success true after deletion', function () {
+    it('returns success true after deletion', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create();

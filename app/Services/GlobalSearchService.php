@@ -147,7 +147,7 @@ class GlobalSearchService
         }
 
         // Apply search across columns
-        $builder->where(function ($q) use ($query, $config) {
+        $builder->where(function ($q) use ($query, $config): void {
             foreach ($config['columns'] as $i => $column) {
                 $method = $i === 0 ? 'where' : 'orWhere';
                 $q->$method($column, 'ILIKE', "%{$query}%");

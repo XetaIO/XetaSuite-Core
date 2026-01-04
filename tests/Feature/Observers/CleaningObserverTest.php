@@ -11,7 +11,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->site = Site::factory()->create();
     $this->zone = Zone::factory()->forSite($this->site)->create();
     $this->user = User::factory()->create();
@@ -22,7 +22,7 @@ beforeEach(function () {
         ->create(['last_cleaning_at' => null]);
 });
 
-it('updates material last_cleaning_at when cleaning is created', function () {
+it('updates material last_cleaning_at when cleaning is created', function (): void {
     expect($this->material->last_cleaning_at)->toBeNull();
 
     Cleaning::factory()
@@ -37,7 +37,7 @@ it('updates material last_cleaning_at when cleaning is created', function () {
     expect($this->material->last_cleaning_at->toDateString())->toBe(now()->toDateString());
 });
 
-it('does not update other materials last_cleaning_at', function () {
+it('does not update other materials last_cleaning_at', function (): void {
     $otherMaterial = Material::factory()
         ->forSite($this->site)
         ->forZone($this->zone)

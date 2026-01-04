@@ -73,7 +73,7 @@ class StoreMaintenanceRequest extends FormRequest
      */
     public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
+        $validator->after(function ($validator): void {
             $this->validateRealizationRequirements($validator);
             $this->validateOperatorsOnSite($validator);
             $this->validateSparePartsStock($validator);

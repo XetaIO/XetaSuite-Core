@@ -17,7 +17,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->headquarters = Site::factory()->headquarters()->create();
     $this->regularSite = Site::factory()->create();
     $this->zone = Zone::factory()->forSite($this->regularSite)->create();
@@ -50,8 +50,8 @@ beforeEach(function () {
 |--------------------------------------------------------------------------
 */
 
-describe('index', function () {
-    it('lists maintenances for current site', function () {
+describe('index', function (): void {
+    it('lists maintenances for current site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Maintenance::factory()
@@ -70,7 +70,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('filters maintenances by status', function () {
+    it('filters maintenances by status', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Maintenance::factory()
@@ -94,7 +94,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.status', 'planned');
     });
 
-    it('filters maintenances by type', function () {
+    it('filters maintenances by type', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Maintenance::factory()
@@ -118,7 +118,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.type', 'corrective');
     });
 
-    it('searches maintenances by description', function () {
+    it('searches maintenances by description', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Maintenance::factory()
@@ -140,7 +140,7 @@ describe('index', function () {
             ->assertJsonPath('data.0.description', 'Repair pump motor');
     });
 
-    it('requires maintenance.viewAny permission', function () {
+    it('requires maintenance.viewAny permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->roleWithoutPermissions);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances');
@@ -155,8 +155,8 @@ describe('index', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('show', function () {
-    it('returns maintenance details', function () {
+describe('show', function (): void {
+    it('returns maintenance details', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -192,7 +192,7 @@ describe('show', function () {
             ]);
     });
 
-    it('prevents viewing maintenance from another site', function () {
+    it('prevents viewing maintenance from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaintenance = Maintenance::factory()
@@ -211,8 +211,8 @@ describe('show', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('store', function () {
-    it('creates a maintenance with minimal data', function () {
+describe('store', function (): void {
+    it('creates a maintenance with minimal data', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->postJson('/api/v1/maintenances', [
@@ -231,7 +231,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates a maintenance with material', function () {
+    it('creates a maintenance with material', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->postJson('/api/v1/maintenances', [
@@ -247,7 +247,7 @@ describe('store', function () {
             ->assertJsonPath('data.material_id', $this->material->id);
     });
 
-    it('creates a maintenance with incidents', function () {
+    it('creates a maintenance with incidents', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $incident1 = Incident::factory()
@@ -277,7 +277,7 @@ describe('store', function () {
         expect($incident2->fresh()->maintenance_id)->toBe($response->json('data.id'));
     });
 
-    it('creates a maintenance with operators for internal realization', function () {
+    it('creates a maintenance with operators for internal realization', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $operator = User::factory()->create();
         $operator->sites()->attach($this->regularSite->id);
@@ -293,7 +293,7 @@ describe('store', function () {
             ->assertJsonCount(2, 'data.operators');
     });
 
-    it('creates a maintenance with companies for external realization', function () {
+    it('creates a maintenance with companies for external realization', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $company = Company::factory()->create();
 
@@ -308,7 +308,7 @@ describe('store', function () {
             ->assertJsonCount(1, 'data.companies');
     });
 
-    it('creates a maintenance with both operators and companies', function () {
+    it('creates a maintenance with both operators and companies', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         $company = Company::factory()->create();
 
@@ -325,7 +325,7 @@ describe('store', function () {
             ->assertJsonCount(1, 'data.companies');
     });
 
-    it('creates item movements for spare parts', function () {
+    it('creates item movements for spare parts', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -360,7 +360,7 @@ describe('store', function () {
         expect($item->fresh()->current_stock)->toBe(8);
     });
 
-    it('validates operators required for internal realization', function () {
+    it('validates operators required for internal realization', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->postJson('/api/v1/maintenances', [
@@ -374,7 +374,7 @@ describe('store', function () {
             ->assertJsonValidationErrors('operator_ids');
     });
 
-    it('validates companies required for external realization', function () {
+    it('validates companies required for external realization', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->postJson('/api/v1/maintenances', [
@@ -388,7 +388,7 @@ describe('store', function () {
             ->assertJsonValidationErrors('company_ids');
     });
 
-    it('validates spare parts stock availability', function () {
+    it('validates spare parts stock availability', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -410,7 +410,7 @@ describe('store', function () {
             ->assertJsonValidationErrors('item_movements.0.quantity');
     });
 
-    it('requires maintenance.create permission', function () {
+    it('requires maintenance.create permission', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->roleWithoutPermissions);
 
         $response = $this->actingAs($user)->postJson('/api/v1/maintenances', [
@@ -428,8 +428,8 @@ describe('store', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('update', function () {
-    it('updates a maintenance', function () {
+describe('update', function (): void {
+    it('updates a maintenance', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -450,7 +450,7 @@ describe('update', function () {
             ->assertJsonPath('data.status', 'in_progress');
     });
 
-    it('updates incidents assignment', function () {
+    it('updates incidents assignment', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -476,7 +476,7 @@ describe('update', function () {
         expect($newIncident->fresh()->maintenance_id)->toBe($maintenance->id);
     });
 
-    it('prevents updating maintenance from another site', function () {
+    it('prevents updating maintenance from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaintenance = Maintenance::factory()
@@ -497,8 +497,8 @@ describe('update', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('destroy', function () {
-    it('deletes a maintenance', function () {
+describe('destroy', function (): void {
+    it('deletes a maintenance', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -512,7 +512,7 @@ describe('destroy', function () {
         $this->assertDatabaseMissing('maintenances', ['id' => $maintenance->id]);
     });
 
-    it('unlinks incidents when deleting maintenance', function () {
+    it('unlinks incidents when deleting maintenance', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -532,7 +532,7 @@ describe('destroy', function () {
         expect($incident->fresh()->maintenance_id)->toBeNull();
     });
 
-    it('deletes related item movements', function () {
+    it('deletes related item movements', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $item = Item::factory()
@@ -562,7 +562,7 @@ describe('destroy', function () {
         ]);
     });
 
-    it('prevents deleting maintenance from another site', function () {
+    it('prevents deleting maintenance from another site', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $otherMaintenance = Maintenance::factory()
@@ -581,8 +581,8 @@ describe('destroy', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('options', function () {
-    it('returns available materials', function () {
+describe('options', function (): void {
+    it('returns available materials', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances/available-materials');
@@ -591,7 +591,7 @@ describe('options', function () {
             ->assertJsonStructure(['data' => [['id', 'name']]]);
     });
 
-    it('returns available incidents', function () {
+    it('returns available incidents', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Incident::factory()
@@ -606,7 +606,7 @@ describe('options', function () {
             ->assertJsonStructure(['data' => [['id', 'description', 'severity', 'status']]]);
     });
 
-    it('returns available operators', function () {
+    it('returns available operators', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances/available-operators');
@@ -615,7 +615,7 @@ describe('options', function () {
             ->assertJsonStructure(['data' => [['id', 'full_name', 'email']]]);
     });
 
-    it('returns available companies', function () {
+    it('returns available companies', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
         Company::factory()->create();
 
@@ -625,7 +625,7 @@ describe('options', function () {
             ->assertJsonStructure(['data' => [['id', 'name']]]);
     });
 
-    it('returns available items', function () {
+    it('returns available items', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         Item::factory()
@@ -639,7 +639,7 @@ describe('options', function () {
             ->assertJsonStructure(['data' => [['id', 'name', 'reference', 'current_stock', 'current_price']]]);
     });
 
-    it('returns type options', function () {
+    it('returns type options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances/type-options');
@@ -648,7 +648,7 @@ describe('options', function () {
             ->assertJsonCount(4, 'data');
     });
 
-    it('returns status options', function () {
+    it('returns status options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances/status-options');
@@ -657,7 +657,7 @@ describe('options', function () {
             ->assertJsonCount(4, 'data');
     });
 
-    it('returns realization options', function () {
+    it('returns realization options', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)->getJson('/api/v1/maintenances/realization-options');
@@ -673,8 +673,8 @@ describe('options', function () {
 |--------------------------------------------------------------------------
 */
 
-describe('nested resources', function () {
-    it('returns paginated incidents for a maintenance', function () {
+describe('nested resources', function (): void {
+    it('returns paginated incidents for a maintenance', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()
@@ -695,7 +695,7 @@ describe('nested resources', function () {
             ->assertJsonCount(5, 'data');
     });
 
-    it('returns paginated item movements with total cost', function () {
+    it('returns paginated item movements with total cost', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $maintenance = Maintenance::factory()

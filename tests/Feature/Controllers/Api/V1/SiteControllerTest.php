@@ -11,7 +11,7 @@ use XetaSuite\Models\Zone;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create headquarters site
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
 
@@ -40,8 +40,8 @@ beforeEach(function () {
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns paginated list of sites for authorized user on headquarters', function () {
+describe('index', function (): void {
+    it('returns paginated list of sites for authorized user on headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Site::factory()->count(5)->create();
@@ -59,7 +59,7 @@ describe('index', function () {
             ]);
     });
 
-    it('returns sites ordered by headquarters first then by name', function () {
+    it('returns sites ordered by headquarters first then by name', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Site::factory()->create(['name' => 'Zebra Site', 'is_headquarters' => false]);
@@ -74,7 +74,7 @@ describe('index', function () {
         expect($data[0]['is_headquarters'])->toBeTrue();
     });
 
-    it('includes zones_count and users_count in response', function () {
+    it('includes zones_count and users_count in response', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Zone::factory()->count(3)->forSite($this->headquarters)->create();
@@ -87,7 +87,7 @@ describe('index', function () {
         expect($hqData['zone_count'])->toBe(3);
     });
 
-    it('filters sites by search term', function () {
+    it('filters sites by search term', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         Site::factory()->create(['name' => 'Paris Office', 'city' => 'Paris']);
@@ -101,7 +101,7 @@ describe('index', function () {
         expect($names)->toContain('Paris Office');
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -110,7 +110,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without viewAny permission', function () {
+    it('denies access for user without viewAny permission', function (): void {
         $roleWithoutViewAny = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutViewAny);
 
@@ -120,7 +120,7 @@ describe('index', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/sites');
 
         $response->assertUnauthorized();
@@ -131,8 +131,8 @@ describe('index', function () {
 // SHOW TESTS
 // ============================================================================
 
-describe('show', function () {
-    it('returns site details for authorized user', function () {
+describe('show', function (): void {
+    it('returns site details for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create([
@@ -158,7 +158,7 @@ describe('show', function () {
             ]);
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $site = Site::factory()->create();
@@ -169,7 +169,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutView);
 
@@ -181,7 +181,7 @@ describe('show', function () {
         $response->assertForbidden();
     });
 
-    it('returns 404 for non-existent site', function () {
+    it('returns 404 for non-existent site', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -195,8 +195,8 @@ describe('show', function () {
 // STORE TESTS
 // ============================================================================
 
-describe('store', function () {
-    it('creates a new site for authorized user', function () {
+describe('store', function (): void {
+    it('creates a new site for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -218,7 +218,7 @@ describe('store', function () {
         ]);
     });
 
-    it('creates a regular site by default', function () {
+    it('creates a regular site by default', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -230,7 +230,7 @@ describe('store', function () {
             ->assertJsonPath('data.is_headquarters', false);
     });
 
-    it('prevents creating a second headquarters', function () {
+    it('prevents creating a second headquarters', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -243,7 +243,7 @@ describe('store', function () {
             ->assertJsonPath('message', __('sites.headquarters_already_exists'));
     });
 
-    it('validates required fields', function () {
+    it('validates required fields', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -253,7 +253,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
-    it('validates email format', function () {
+    it('validates email format', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -266,7 +266,7 @@ describe('store', function () {
             ->assertJsonValidationErrors(['email']);
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -277,7 +277,7 @@ describe('store', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without create permission', function () {
+    it('denies access for user without create permission', function (): void {
         $roleWithoutCreate = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutCreate);
 
@@ -294,8 +294,8 @@ describe('store', function () {
 // UPDATE TESTS
 // ============================================================================
 
-describe('update', function () {
-    it('updates a site for authorized user', function () {
+describe('update', function (): void {
+    it('updates a site for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['name' => 'Old Name']);
@@ -316,7 +316,7 @@ describe('update', function () {
         ]);
     });
 
-    it('prevents setting headquarters when one already exists', function () {
+    it('prevents setting headquarters when one already exists', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -330,7 +330,7 @@ describe('update', function () {
             ->assertJsonPath('message', __('sites.headquarters_already_exists'));
     });
 
-    it('prevents removing headquarters status', function () {
+    it('prevents removing headquarters status', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -342,7 +342,7 @@ describe('update', function () {
             ->assertJsonPath('message', __('sites.cannot_remove_headquarters_status'));
     });
 
-    it('allows updating headquarters name without changing status', function () {
+    it('allows updating headquarters name without changing status', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -355,7 +355,7 @@ describe('update', function () {
             ->assertJsonPath('data.is_headquarters', true);
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -366,7 +366,7 @@ describe('update', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without update permission', function () {
+    it('denies access for user without update permission', function (): void {
         $roleWithoutUpdate = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutUpdate);
 
@@ -385,8 +385,8 @@ describe('update', function () {
 // DESTROY TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('deletes a site without zones for authorized user', function () {
+describe('destroy', function (): void {
+    it('deletes a site without zones for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -399,7 +399,7 @@ describe('destroy', function () {
         $this->assertDatabaseMissing('sites', ['id' => $site->id]);
     });
 
-    it('prevents deleting headquarters site', function () {
+    it('prevents deleting headquarters site', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -410,7 +410,7 @@ describe('destroy', function () {
         $this->assertDatabaseHas('sites', ['id' => $this->headquarters->id]);
     });
 
-    it('prevents deleting site with zones', function () {
+    it('prevents deleting site with zones', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -425,7 +425,7 @@ describe('destroy', function () {
         $this->assertDatabaseHas('sites', ['id' => $site->id]);
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -436,7 +436,7 @@ describe('destroy', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without delete permission', function () {
+    it('denies access for user without delete permission', function (): void {
         $roleWithoutDelete = Role::create(['name' => 'limited', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutDelete);
 
@@ -453,8 +453,8 @@ describe('destroy', function () {
 // USERS ENDPOINT TESTS
 // ============================================================================
 
-describe('users', function () {
-    it('returns users for a site for authorized user', function () {
+describe('users', function (): void {
+    it('returns users for a site for authorized user', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create users and attach them to the headquarters
@@ -474,7 +474,7 @@ describe('users', function () {
         expect(count($response->json('data')))->toBeGreaterThanOrEqual(3);
     });
 
-    it('returns only users attached to the site', function () {
+    it('returns only users attached to the site', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create users - some attached to HQ, some not
@@ -497,7 +497,7 @@ describe('users', function () {
         }
     });
 
-    it('filters users by search term', function () {
+    it('filters users by search term', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $john = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
@@ -515,7 +515,7 @@ describe('users', function () {
         expect($names)->not->toContain('Jane Smith');
     });
 
-    it('limits results to 15 users', function () {
+    it('limits results to 15 users', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create 20 users and attach them to the headquarters
@@ -530,7 +530,7 @@ describe('users', function () {
         expect(count($response->json('data')))->toBeLessThanOrEqual(15);
     });
 
-    it('includes user roles for the site', function () {
+    it('includes user roles for the site', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $testRole = Role::create(['name' => 'test-role', 'guard_name' => 'web']);
@@ -550,7 +550,7 @@ describe('users', function () {
         expect($userData['roles'])->toContain('test-role');
     });
 
-    it('denies access for user not on headquarters', function () {
+    it('denies access for user not on headquarters', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
         $response = $this->actingAs($user)
@@ -559,7 +559,7 @@ describe('users', function () {
         $response->assertForbidden();
     });
 
-    it('denies access for user without view permission', function () {
+    it('denies access for user without view permission', function (): void {
         $roleWithoutView = Role::create(['name' => 'limited-users', 'guard_name' => 'web']);
         $user = createUserOnHeadquarters($this->headquarters, $roleWithoutView);
 
@@ -569,7 +569,7 @@ describe('users', function () {
         $response->assertForbidden();
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson("/api/v1/sites/{$this->headquarters->id}/users");
 
         $response->assertUnauthorized();
@@ -580,8 +580,8 @@ describe('users', function () {
 // MANAGERS TESTS
 // ============================================================================
 
-describe('managers', function () {
-    it('creates a site with managers', function () {
+describe('managers', function (): void {
+    it('creates a site with managers', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         // Create users to be managers
@@ -602,7 +602,7 @@ describe('managers', function () {
             ]);
     });
 
-    it('updates a site to add managers', function () {
+    it('updates a site to add managers', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -630,7 +630,7 @@ describe('managers', function () {
         }
     });
 
-    it('updates a site to remove managers', function () {
+    it('updates a site to remove managers', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -656,7 +656,7 @@ describe('managers', function () {
         expect($site->managers()->count())->toBe(0);
     });
 
-    it('updates a site to change managers', function () {
+    it('updates a site to change managers', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -693,7 +693,7 @@ describe('managers', function () {
         }
     });
 
-    it('returns managers in site detail response', function () {
+    it('returns managers in site detail response', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $site = Site::factory()->create(['is_headquarters' => false]);
@@ -718,7 +718,7 @@ describe('managers', function () {
             ]);
     });
 
-    it('validates manager_ids is an array', function () {
+    it('validates manager_ids is an array', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)
@@ -731,7 +731,7 @@ describe('managers', function () {
             ->assertJsonValidationErrors(['manager_ids']);
     });
 
-    it('validates manager_ids contains existing user ids', function () {
+    it('validates manager_ids contains existing user ids', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
         $response = $this->actingAs($user)

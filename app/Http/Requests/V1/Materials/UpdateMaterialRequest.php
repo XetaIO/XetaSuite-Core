@@ -50,7 +50,7 @@ class UpdateMaterialRequest extends FormRequest
             'recipients' => ['sometimes', 'array'],
             'recipients.*' => [
                 'integer',
-                function ($attribute, $value, $fail) use ($currentSiteId) {
+                function ($attribute, $value, $fail) use ($currentSiteId): void {
                     $userHasAccess = User::query()
                         ->where('id', $value)
                         ->whereHas('sites', fn ($query) => $query->where('site_id', $currentSiteId))

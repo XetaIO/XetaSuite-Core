@@ -21,8 +21,8 @@ uses(RefreshDatabase::class);
 // CREATE ITEM TESTS
 // ============================================================================
 
-describe('CreateItem', function () {
-    it('creates an item successfully', function () {
+describe('CreateItem', function (): void {
+    it('creates an item successfully', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $action = app(CreateItem::class);
@@ -39,7 +39,7 @@ describe('CreateItem', function () {
             ->and($item->created_by_id)->toBe($user->id);
     });
 
-    it('creates an item with company', function () {
+    it('creates an item with company', function (): void {
         $site = Site::factory()->create();
         $company = Company::factory()->asItemProvider()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
@@ -55,7 +55,7 @@ describe('CreateItem', function () {
             ->and($item->company_reference)->toBe('COMP-REF-001');
     });
 
-    it('creates an item with current price and creates price history', function () {
+    it('creates an item with current price and creates price history', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $action = app(CreateItem::class);
@@ -70,7 +70,7 @@ describe('CreateItem', function () {
             ->and((float) $item->prices->first()->price)->toBe(99.99);
     });
 
-    it('does not create price history when price is zero', function () {
+    it('does not create price history when price is zero', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $action = app(CreateItem::class);
@@ -84,7 +84,7 @@ describe('CreateItem', function () {
             ->and($item->prices)->toHaveCount(0);
     });
 
-    it('creates an item with materials attached', function () {
+    it('creates an item with materials attached', function (): void {
         $site = Site::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
         $material1 = Material::factory()->forZone($zone)->create();
@@ -100,7 +100,7 @@ describe('CreateItem', function () {
         expect($item->materials)->toHaveCount(2);
     });
 
-    it('creates an item with recipients attached', function () {
+    it('creates an item with recipients attached', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $recipient1 = User::factory()->create();
@@ -115,7 +115,7 @@ describe('CreateItem', function () {
         expect($item->recipients)->toHaveCount(2);
     });
 
-    it('creates an item with stock warnings configured', function () {
+    it('creates an item with stock warnings configured', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $action = app(CreateItem::class);
@@ -139,8 +139,8 @@ describe('CreateItem', function () {
 // UPDATE ITEM TESTS
 // ============================================================================
 
-describe('UpdateItem', function () {
-    it('updates item name', function () {
+describe('UpdateItem', function (): void {
+    it('updates item name', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['name' => 'Old Name']);
@@ -154,7 +154,7 @@ describe('UpdateItem', function () {
             ->and($updatedItem->edited_by_id)->toBe($user->id);
     });
 
-    it('updates item price', function () {
+    it('updates item price', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['current_price' => 50.00]);
@@ -167,7 +167,7 @@ describe('UpdateItem', function () {
         expect((float) $updatedItem->current_price)->toBe(75.0);
     });
 
-    it('updates company', function () {
+    it('updates company', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $oldCompany = Company::factory()->asItemProvider()->create();
@@ -182,7 +182,7 @@ describe('UpdateItem', function () {
         expect($updatedItem->company_id)->toBe($newCompany->id);
     });
 
-    it('syncs materials', function () {
+    it('syncs materials', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
@@ -200,7 +200,7 @@ describe('UpdateItem', function () {
             ->and($updatedItem->materials->first()->id)->toBe($newMaterial->id);
     });
 
-    it('syncs recipients', function () {
+    it('syncs recipients', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $oldRecipient = User::factory()->create();
@@ -217,7 +217,7 @@ describe('UpdateItem', function () {
             ->and($updatedItem->recipients->first()->id)->toBe($newRecipient->id);
     });
 
-    it('clears materials when empty array provided', function () {
+    it('clears materials when empty array provided', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
@@ -233,7 +233,7 @@ describe('UpdateItem', function () {
         expect($updatedItem->materials)->toHaveCount(0);
     });
 
-    it('returns fresh model after update', function () {
+    it('returns fresh model after update', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create(['current_site_id' => $site->id]);
         $item = Item::factory()->forSite($site)->createdBy($user)->create(['name' => 'Original']);
@@ -250,8 +250,8 @@ describe('UpdateItem', function () {
 // DELETE ITEM TESTS
 // ============================================================================
 
-describe('DeleteItem', function () {
-    it('deletes an item successfully', function () {
+describe('DeleteItem', function (): void {
+    it('deletes an item successfully', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create();
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -263,7 +263,7 @@ describe('DeleteItem', function () {
             ->and(Item::find($item->id))->toBeNull();
     });
 
-    it('cannot delete item with movements', function () {
+    it('cannot delete item with movements', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create();
         $item = Item::factory()->forSite($site)->createdBy($user)->create();
@@ -277,7 +277,7 @@ describe('DeleteItem', function () {
             ->and(Item::find($item->id))->not->toBeNull();
     });
 
-    it('detaches materials when deleting', function () {
+    it('detaches materials when deleting', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create();
         $zone = Zone::factory()->forSite($site)->withAllowMaterial()->create();
@@ -293,7 +293,7 @@ describe('DeleteItem', function () {
             ->and($material->fresh()->items)->toHaveCount(0);
     });
 
-    it('detaches recipients when deleting', function () {
+    it('detaches recipients when deleting', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create();
         $recipient = User::factory()->create();
@@ -307,7 +307,7 @@ describe('DeleteItem', function () {
             ->and(User::find($recipient->id))->not->toBeNull();
     });
 
-    it('deletes associated prices when deleting', function () {
+    it('deletes associated prices when deleting', function (): void {
         $site = Site::factory()->create();
         $user = User::factory()->create();
         $item = Item::factory()->forSite($site)->createdBy($user)->create();

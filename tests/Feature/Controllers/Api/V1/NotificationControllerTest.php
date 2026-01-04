@@ -9,7 +9,7 @@ use XetaSuite\Models\User;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->headquarters = Site::factory()->create(['is_headquarters' => true]);
     $this->user = User::factory()->withSite($this->headquarters)->create();
 });
@@ -40,8 +40,8 @@ function createNotification(User $user, array $data = [], bool $read = false): D
 // INDEX TESTS
 // ============================================================================
 
-describe('index', function () {
-    it('returns paginated list of notifications for authenticated user', function () {
+describe('index', function (): void {
+    it('returns paginated list of notifications for authenticated user', function (): void {
         createNotification($this->user);
         createNotification($this->user, ['title' => 'Second Notification']);
         createNotification($this->user, ['title' => 'Third Notification']);
@@ -60,7 +60,7 @@ describe('index', function () {
             ->assertJsonCount(3, 'data');
     });
 
-    it('returns notifications ordered by unread first then by created_at desc', function () {
+    it('returns notifications ordered by unread first then by created_at desc', function (): void {
         // Create read notification first (older)
         $read = createNotification($this->user, ['title' => 'Read'], true);
 
@@ -77,7 +77,7 @@ describe('index', function () {
         expect($data[1]['data']['title'])->toBe('Read');
     });
 
-    it('requires authentication', function () {
+    it('requires authentication', function (): void {
         $response = $this->getJson('/api/v1/notifications');
 
         $response->assertUnauthorized();
@@ -88,8 +88,8 @@ describe('index', function () {
 // UNREAD TESTS
 // ============================================================================
 
-describe('unread', function () {
-    it('returns only unread notifications', function () {
+describe('unread', function (): void {
+    it('returns only unread notifications', function (): void {
         createNotification($this->user, ['title' => 'Unread 1']);
         createNotification($this->user, ['title' => 'Read 1'], true);
         createNotification($this->user, ['title' => 'Unread 2']);
@@ -104,7 +104,7 @@ describe('unread', function () {
         expect($titles->contains('Read 1'))->toBeFalse();
     });
 
-    it('limits to 20 notifications', function () {
+    it('limits to 20 notifications', function (): void {
         for ($i = 0; $i < 25; $i++) {
             createNotification($this->user, ['title' => "Notification $i"]);
         }
@@ -121,8 +121,8 @@ describe('unread', function () {
 // UNREAD COUNT TESTS
 // ============================================================================
 
-describe('unread count', function () {
-    it('returns count of unread notifications', function () {
+describe('unread count', function (): void {
+    it('returns count of unread notifications', function (): void {
         createNotification($this->user);
         createNotification($this->user);
         createNotification($this->user, read: true);
@@ -134,7 +134,7 @@ describe('unread count', function () {
             ->assertJson(['count' => 2]);
     });
 
-    it('returns zero when no unread notifications', function () {
+    it('returns zero when no unread notifications', function (): void {
         createNotification($this->user, read: true);
 
         $response = $this->actingAs($this->user)
@@ -149,8 +149,8 @@ describe('unread count', function () {
 // MARK AS READ TESTS
 // ============================================================================
 
-describe('mark as read', function () {
-    it('marks a notification as read', function () {
+describe('mark as read', function (): void {
+    it('marks a notification as read', function (): void {
         $notification = createNotification($this->user);
 
         expect($notification->read_at)->toBeNull();
@@ -165,7 +165,7 @@ describe('mark as read', function () {
         expect($notification->read_at)->not->toBeNull();
     });
 
-    it('returns 404 for non-existent notification', function () {
+    it('returns 404 for non-existent notification', function (): void {
         $fakeUuid = \Illuminate\Support\Str::uuid()->toString();
 
         $response = $this->actingAs($this->user)
@@ -174,7 +174,7 @@ describe('mark as read', function () {
         $response->assertNotFound();
     });
 
-    it('cannot mark another user notification as read', function () {
+    it('cannot mark another user notification as read', function (): void {
         $otherUser = User::factory()->withSite($this->headquarters)->create();
         $notification = createNotification($otherUser);
 
@@ -189,8 +189,8 @@ describe('mark as read', function () {
 // MARK ALL AS READ TESTS
 // ============================================================================
 
-describe('mark all as read', function () {
-    it('marks all notifications as read', function () {
+describe('mark all as read', function (): void {
+    it('marks all notifications as read', function (): void {
         createNotification($this->user);
         createNotification($this->user);
         createNotification($this->user);
@@ -210,8 +210,8 @@ describe('mark all as read', function () {
 // DELETE TESTS
 // ============================================================================
 
-describe('destroy', function () {
-    it('deletes a notification', function () {
+describe('destroy', function (): void {
+    it('deletes a notification', function (): void {
         $notification = createNotification($this->user);
 
         $response = $this->actingAs($this->user)
@@ -223,7 +223,7 @@ describe('destroy', function () {
         expect(DatabaseNotification::find($notification->id))->toBeNull();
     });
 
-    it('returns 404 for non-existent notification', function () {
+    it('returns 404 for non-existent notification', function (): void {
         $fakeUuid = \Illuminate\Support\Str::uuid()->toString();
 
         $response = $this->actingAs($this->user)
@@ -232,7 +232,7 @@ describe('destroy', function () {
         $response->assertNotFound();
     });
 
-    it('cannot delete another user notification', function () {
+    it('cannot delete another user notification', function (): void {
         $otherUser = User::factory()->withSite($this->headquarters)->create();
         $notification = createNotification($otherUser);
 
@@ -247,8 +247,8 @@ describe('destroy', function () {
 // DELETE ALL TESTS
 // ============================================================================
 
-describe('destroy all', function () {
-    it('deletes all notifications for the user', function () {
+describe('destroy all', function (): void {
+    it('deletes all notifications for the user', function (): void {
         createNotification($this->user);
         createNotification($this->user);
         createNotification($this->user);
