@@ -30,12 +30,6 @@ class ResetDemoDatabase extends Command
             return self::FAILURE;
         }
 
-        if (! $this->option('force') && ! $this->confirm('This will reset ALL data. Are you sure?')) {
-            $this->info('Operation cancelled.');
-
-            return self::SUCCESS;
-        }
-
         $this->info('Resetting demo database...');
 
         // Refresh the database with migrations and seeders
@@ -45,15 +39,6 @@ class ResetDemoDatabase extends Command
         ]);
 
         $this->info('Demo database has been reset successfully!');
-        $this->newLine();
-        $this->table(
-            ['Account', 'Email', 'Password'],
-            [
-                ['Admin', 'admin@xetasuite.demo', 'password'],
-                ['Manager', 'manager@xetasuite.demo', 'password'],
-                ['User', 'user@xetasuite.demo', 'password'],
-            ]
-        );
 
         return self::SUCCESS;
     }
