@@ -131,11 +131,11 @@ XetaSuite is ideal for:
 | Component | Technology | Version |
 |-----------|------------|---------|
 | **Framework** | Laravel | 12.x |
-| **Language** | PHP | 8.2+ |
-| **Database** | PostgreSQL | 16, 17, 18 |
+| **Language** | PHP | 8.4+ |
+| **Database** | PostgreSQL | 18 |
 | **Authentication** | Laravel Sanctum + Fortify | 4.x / 1.x |
 | **Permissions** | spatie/laravel-permission | 6.x |
-| **Testing** | Pest PHP | 3.x / 4.x |
+| **Testing** | Pest PHP | 4.x |
 | **QR Codes** | endroid/qr-code | 6.x |
 | **Activity Log** | spatie/laravel-activitylog | 4.x |
 
@@ -183,10 +183,9 @@ Headquarters (HQ Site)
 
 ### Prerequisites
 
-- PHP 8.2 or higher
+- PHP 8.4 or higher
 - Composer 2.x
-- PostgreSQL 16 or higher
-- Node.js 18+ (for assets)
+- PostgreSQL 18 or higher
 
 ### Setup
 
