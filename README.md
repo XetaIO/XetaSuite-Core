@@ -120,7 +120,6 @@ XetaSuite is ideal for:
 - **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, sites
 - **Permission-aware**: Results filtered based on user's permissions
 - **Site-scoped**: Regular users see only their site's data, HQ users see all
-- **Configurable limits**: Control results per type with `per_type` parameter
 
 ---
 
@@ -132,7 +131,7 @@ XetaSuite is ideal for:
 |-----------|------------|---------|
 | **Framework** | Laravel | 12.x |
 | **Language** | PHP | 8.4+ |
-| **Database** | PostgreSQL | 18 |
+| **Database** | PostgreSQL | 18+ |
 | **Authentication** | Laravel Sanctum + Fortify | 4.x / 1.x |
 | **Permissions** | spatie/laravel-permission | 6.x |
 | **Testing** | Pest PHP | 4.x |
