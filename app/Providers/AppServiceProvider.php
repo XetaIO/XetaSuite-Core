@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register the Settings class
-        $this->app->singleton(function (Application $app): \XetaSuite\Settings\Settings {
+        $this->app->singleton(function (Application $app): Settings {
             return new Settings($app['cache.store']);
         });
     }
@@ -69,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureCommands(): void
     {
         DB::prohibitDestructiveCommands(
-            App::isProduction() && ! config('app.demo_mode')
+            App::isProduction()
         );
     }
 
