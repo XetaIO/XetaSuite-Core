@@ -69,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureCommands(): void
     {
         DB::prohibitDestructiveCommands(
-            App::isProduction()
+            App::isProduction() && ! config('app.demo_mode')
         );
     }
 

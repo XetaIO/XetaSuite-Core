@@ -118,7 +118,7 @@ class CreateItemMovement
                 $item->refresh();
                 $currentStock = $item->item_entry_total - $item->item_exit_total;
                 if ($currentStock <= $item->number_warning_minimum) {
-                    CheckItemWarningStock::dispatch($item->id);
+                    CheckItemWarningStock::dispatch($item->id)->afterCommit();
                 }
             }
 
@@ -127,7 +127,7 @@ class CreateItemMovement
                 $item->refresh();
                 $currentStock = $item->item_entry_total - $item->item_exit_total;
                 if ($currentStock <= $item->number_critical_minimum) {
-                    CheckItemCriticalStock::dispatch($item->id);
+                    CheckItemCriticalStock::dispatch($item->id)->afterCommit();
                 }
             }
 

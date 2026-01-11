@@ -11,8 +11,7 @@ class ResetDemoDatabase extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'demo:reset
-                            {--force : Force the operation without confirmation}';
+    protected $signature = 'demo:reset';
 
     /**
      * The console command description.
