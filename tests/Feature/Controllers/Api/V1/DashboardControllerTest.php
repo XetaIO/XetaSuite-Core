@@ -239,30 +239,94 @@ describe('stats endpoint', function (): void {
 });
 
 describe('charts endpoint', function (): void {
-    it('returns chart data for HQ user with aggregated data', function (): void {
+    it('returns chart data for HQ user with aggregated data from all sites and 12 months', function (): void {
         $user = createUserOnHeadquarters($this->headquarters, $this->role);
 
+        // Create maintenances with different types across sites
+        Maintenance::factory()->corrective()->create([
+            'site_id' => $this->regularSite->id,
+            'started_at' => now(),
+        ]);
+        Maintenance::factory()->preventive()->create([
+            'site_id' => $this->regularSite->id,
+            'started_at' => now(),
+        ]);
+        Maintenance::factory()->inspection()->create([
+            'site_id' => $this->otherSite->id,
+            'started_at' => now(),
+        ]);
+        Maintenance::factory()->improvement()->create([
+            'site_id' => $this->otherSite->id,
+            'started_at' => now()->subMonths(2),
+        ]);
+
         actingAs($user)
             ->getJson('/api/v1/dashboard/charts')
             ->assertOk()
             ->assertJsonStructure([
-                'maintenances_evolution',
-                'incidents_evolution',
+                'maintenances_evolution' => [
+                    'months',
+                    'corrective',
+                    'preventive',
+                    'inspection',
+                    'improvement',
+                ],
+                'incidents_evolution' => [
+                    'months',
+                    'low',
+                    'medium',
+                    'high',
+                    'critical',
+                ],
             ])
-            ->assertJsonCount(6, 'maintenances_evolution')
-            ->assertJsonCount(6, 'incidents_evolution');
+            // Should have 12 months of data
+            ->assertJsonCount(12, 'maintenances_evolution.months')
+            ->assertJsonCount(12, 'maintenances_evolution.corrective')
+            ->assertJsonCount(12, 'maintenances_evolution.preventive')
+            ->assertJsonCount(12, 'maintenances_evolution.inspection')
+            ->assertJsonCount(12, 'maintenances_evolution.improvement')
+            ->assertJsonCount(12, 'incidents_evolution.months')
+            ->assertJsonCount(12, 'incidents_evolution.low')
+            ->assertJsonCount(12, 'incidents_evolution.medium')
+            ->assertJsonCount(12, 'incidents_evolution.high')
+            ->assertJsonCount(12, 'incidents_evolution.critical');
     });
 
-    it('returns chart data for regular site user', function (): void {
+    it('returns chart data for regular site user with site-specific data only', function (): void {
         $user = createUserOnRegularSite($this->regularSite, $this->role);
 
-        actingAs($user)
+        // Create maintenances on current site
+        Maintenance::factory()->corrective()->count(2)->create([
+            'site_id' => $this->regularSite->id,
+            'started_at' => now(),
+        ]);
+
+        // Create maintenances on other site (should NOT be included)
+        Maintenance::factory()->preventive()->count(5)->create([
+            'site_id' => $this->otherSite->id,
+            'started_at' => now(),
+        ]);
+
+        $response = actingAs($user)
             ->getJson('/api/v1/dashboard/charts')
             ->assertOk()
             ->assertJsonStructure([
-                'maintenances_evolution',
-                'incidents_evolution',
+                'maintenances_evolution' => [
+                    'months',
+                    'corrective',
+                    'preventive',
+                    'inspection',
+                    'improvement',
+                ],
             ]);
+
+        // Check that only current site data is included
+        $data = $response->json('maintenances_evolution');
+        $totalCorrective = array_sum($data['corrective']);
+        $totalPreventive = array_sum($data['preventive']);
+
+        expect($totalCorrective)->toBe(2)
+            ->and($totalPreventive)->toBe(0); // Other site's preventive should not be counted
     });
 
     it('requires authentication', function (): void {

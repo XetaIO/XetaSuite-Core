@@ -295,57 +295,79 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get chart data for maintenances evolution (last 6 months).
+     * Get chart data for maintenances evolution (last 12 months) by type & incidents evolution (last 12 months).
      */
     public function chartsData(): JsonResponse
     {
         $user = auth()->user();
         $isHq = isOnHeadquarters();
 
-        $siteFilter = function ($query) use ($isHq, $user): void {
-            if (! $isHq) {
-                $query->where('site_id', $user->current_site_id);
-            }
-        };
-
-        // Maintenances by month (last 6 months)
+        // Maintenances by month and type (last 12 months)
         $months = collect();
-        for ($i = 5; $i >= 0; $i--) {
+        for ($i = 11; $i >= 0; $i--) {
             $months->push(Carbon::now()->subMonths($i)->format('Y-m'));
         }
 
-        $maintenancesByMonth = Maintenance::query()
-            ->tap($siteFilter)
-            ->where('started_at', '>=', Carbon::now()->subMonths(6)->startOfMonth())
+        // Get maintenances grouped by month and type
+        // Using DB::table() to avoid Eloquent's enum casting which breaks groupBy
+        $maintenancesQuery = DB::table('maintenances')
+            ->where('started_at', '>=', Carbon::now()->subMonths(12)->startOfMonth())
             ->select(
                 DB::raw("TO_CHAR(started_at, 'YYYY-MM') as month"),
+                'type',
                 DB::raw('count(*) as count')
             )
-            ->groupBy('month')
-            ->pluck('count', 'month')
+            ->groupBy('month', 'type');
+
+        // Apply site filter if not on HQ
+        if (! $isHq) {
+            $maintenancesQuery->where('site_id', $user->current_site_id);
+        }
+
+        $maintenancesByMonthAndType = $maintenancesQuery
+            ->get()
+            ->groupBy('type')
+            ->map(fn ($items) => $items->pluck('count', 'month')->toArray())
             ->toArray();
 
-        $maintenancesEvolution = $months->map(fn ($month) => [
-            'month' => Carbon::parse($month . '-01')->format('M Y'),
-            'count' => $maintenancesByMonth[$month] ?? 0,
-        ]);
+        // Build evolution data for each maintenance type
+        $maintenancesEvolution = [
+            'months' => $months->map(fn ($month) => Carbon::parse($month . '-01')->format('M'))->values()->toArray(),
+            'corrective' => $months->map(fn ($month) => $maintenancesByMonthAndType['corrective'][$month] ?? 0)->values()->toArray(),
+            'preventive' => $months->map(fn ($month) => $maintenancesByMonthAndType['preventive'][$month] ?? 0)->values()->toArray(),
+            'inspection' => $months->map(fn ($month) => $maintenancesByMonthAndType['inspection'][$month] ?? 0)->values()->toArray(),
+            'improvement' => $months->map(fn ($month) => $maintenancesByMonthAndType['improvement'][$month] ?? 0)->values()->toArray(),
+        ];
 
-        // Incidents by month (last 6 months)
-        $incidentsByMonth = Incident::query()
-            ->tap($siteFilter)
-            ->where('started_at', '>=', Carbon::now()->subMonths(6)->startOfMonth())
+        // Incidents by month and severity (last 12 months)
+        $incidentsQuery = DB::table('incidents')
+            ->where('started_at', '>=', Carbon::now()->subMonths(12)->startOfMonth())
             ->select(
                 DB::raw("TO_CHAR(started_at, 'YYYY-MM') as month"),
+                'severity',
                 DB::raw('count(*) as count')
             )
-            ->groupBy('month')
-            ->pluck('count', 'month')
+            ->groupBy('month', 'severity');
+
+        // Apply site filter if not on HQ
+        if (! $isHq) {
+            $incidentsQuery->where('site_id', $user->current_site_id);
+        }
+
+        $incidentsByMonthAndSeverity = $incidentsQuery
+            ->get()
+            ->groupBy('severity')
+            ->map(fn ($items) => $items->pluck('count', 'month')->toArray())
             ->toArray();
 
-        $incidentsEvolution = $months->map(fn ($month) => [
-            'month' => Carbon::parse($month . '-01')->format('M Y'),
-            'count' => $incidentsByMonth[$month] ?? 0,
-        ]);
+        // Build evolution data for each severity
+        $incidentsEvolution = [
+            'months' => $months->map(fn ($month) => Carbon::parse($month . '-01')->format('M'))->values()->toArray(),
+            'low' => $months->map(fn ($month) => $incidentsByMonthAndSeverity['low'][$month] ?? 0)->values()->toArray(),
+            'medium' => $months->map(fn ($month) => $incidentsByMonthAndSeverity['medium'][$month] ?? 0)->values()->toArray(),
+            'high' => $months->map(fn ($month) => $incidentsByMonthAndSeverity['high'][$month] ?? 0)->values()->toArray(),
+            'critical' => $months->map(fn ($month) => $incidentsByMonthAndSeverity['critical'][$month] ?? 0)->values()->toArray(),
+        ];
 
         return response()->json([
             'maintenances_evolution' => $maintenancesEvolution,
