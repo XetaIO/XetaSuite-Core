@@ -6,7 +6,6 @@ namespace XetaSuite\Http\Resources\V1\Items;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use XetaSuite\Services\ItemService;
 
 class ItemResource extends JsonResource
 {
@@ -15,8 +14,6 @@ class ItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $itemService = app(ItemService::class);
-
         return [
             'id' => $this->id,
             'name' => $this->name,

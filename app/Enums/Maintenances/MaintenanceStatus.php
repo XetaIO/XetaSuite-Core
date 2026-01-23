@@ -20,4 +20,14 @@ enum MaintenanceStatus: string
             self::CANCELLED => __('maintenances.status_canceled'),
         };
     }
+
+    public function color(): string
+    {
+        return match ($this) {
+            self::PLANNED => '#3b82f6',     // Blue
+            self::IN_PROGRESS => '#f59e0b', // Amber
+            self::COMPLETED => '#22c55e',   // Green
+            self::CANCELLED => '#6b7280',   // Gray
+        };
+    }
 }

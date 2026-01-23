@@ -111,6 +111,20 @@ return [
     'company.delete' => 'Delete companies',
     'company.export' => 'Export companies',
 
+    // Calendar Events
+    'calendarEvent.viewAny' => 'View calendar events list',
+    'calendarEvent.view' => 'View calendar events',
+    'calendarEvent.create' => 'Create calendar events',
+    'calendarEvent.update' => 'Update calendar events',
+    'calendarEvent.delete' => 'Delete calendar events',
+
+    // Event Categories
+    'eventCategory.viewAny' => 'View event categories list',
+    'eventCategory.view' => 'View event categories',
+    'eventCategory.create' => 'Create event categories',
+    'eventCategory.update' => 'Update event categories',
+    'eventCategory.delete' => 'Delete event categories',
+
     // Special Permissions
     'bypass.login' => 'Can bypass login when disabled',
 ];

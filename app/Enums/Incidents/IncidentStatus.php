@@ -20,4 +20,14 @@ enum IncidentStatus: string
             self::CLOSED => __('incidents.status_closed'),
         };
     }
+
+    public function color(): string
+    {
+        return match ($this) {
+            self::OPEN => '#ef4444',        // Red
+            self::IN_PROGRESS => '#f59e0b', // Amber
+            self::RESOLVED => '#22c55e',    // Green
+            self::CLOSED => '#6b7280',      // Gray
+        };
+    }
 }
