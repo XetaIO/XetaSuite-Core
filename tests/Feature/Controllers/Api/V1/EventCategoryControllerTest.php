@@ -115,8 +115,8 @@ describe('index', function (): void {
         $response = $this->actingAs($user)
             ->getJson('/api/v1/event-categories');
 
-        // HQ users should be able to viewAny (the policy's before() only blocks create/update/delete)
-        $response->assertOk();
+        // HQ users should not have access
+        $response->assertForbidden();
     });
 });
 
