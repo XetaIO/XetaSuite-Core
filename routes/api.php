@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use XetaSuite\Http\Controllers\Api\V1\CalendarController;
+use XetaSuite\Http\Controllers\Api\V1\CalendarEventController;
 use XetaSuite\Http\Controllers\Api\V1\CleaningController;
 use XetaSuite\Http\Controllers\Api\V1\CompanyController;
 use XetaSuite\Http\Controllers\Api\V1\DashboardController;
+use XetaSuite\Http\Controllers\Api\V1\EventCategoryController;
 use XetaSuite\Http\Controllers\Api\V1\GlobalSearchController;
 use XetaSuite\Http\Controllers\Api\V1\IncidentController;
 use XetaSuite\Http\Controllers\Api\V1\ItemController;
@@ -176,5 +179,17 @@ Route::group(['prefix' => 'v1', 'middleware' => 'auth:sanctum'], function () {
     Route::get('users/{user}/cleanings', [UserController::class, 'cleanings'])->withTrashed();
     Route::get('users/{user}/maintenances', [UserController::class, 'maintenances'])->withTrashed();
     Route::get('users/{user}/incidents', [UserController::class, 'incidents'])->withTrashed();
+
+    // Calendar - Aggregated view (events, maintenances, incidents)
+    Route::get('calendar', [CalendarController::class, 'index']);
+    Route::get('calendar/today', [CalendarController::class, 'today']);
+
+    // Event Categories (site-scoped - enforced by EventCategoryPolicy)
+    Route::apiResource('event-categories', EventCategoryController::class);
+
+    // Calendar Events (site-scoped - enforced by CalendarEventPolicy)
+    Route::get('calendar-events/available-event-categories', [CalendarEventController::class, 'availableEventCategories']);
+    Route::apiResource('calendar-events', CalendarEventController::class);
+    Route::patch('calendar-events/{calendar_event}/dates', [CalendarEventController::class, 'updateDates']);
 
 });

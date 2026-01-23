@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             IncidentsSeeder::class,
             CompaniesSeeder::class,
             CleaningsSeeder::class,
+
+            EventCategoriesSeeder::class,
+            CalendarEventsSeeder::class,
         ]);
     }
 }

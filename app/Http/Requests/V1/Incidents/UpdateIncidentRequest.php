@@ -8,7 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use XetaSuite\Enums\Incidents\IncidentSeverity;
 use XetaSuite\Enums\Incidents\IncidentStatus;
-use XetaSuite\Models\Incident;
 
 class UpdateIncidentRequest extends FormRequest
 {
@@ -17,10 +16,7 @@ class UpdateIncidentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $incident = $this->route('incident');
-
-        return $incident instanceof Incident
-            && $this->user()->can('update', $incident);
+        return $this->user()->can('update', $this->route('incident'));
     }
 
     /**

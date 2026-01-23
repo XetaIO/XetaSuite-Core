@@ -7,7 +7,6 @@ namespace XetaSuite\Http\Requests\V1\Cleanings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use XetaSuite\Enums\Cleanings\CleaningType;
-use XetaSuite\Models\Cleaning;
 
 class UpdateCleaningRequest extends FormRequest
 {
@@ -16,10 +15,7 @@ class UpdateCleaningRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $cleaning = $this->route('cleaning');
-
-        return $cleaning instanceof Cleaning
-            && $this->user()->can('update', $cleaning);
+        return $this->user()->can('update', $this->route('cleaning'));
     }
 
     /**

@@ -114,7 +114,18 @@ XetaSuite is ideal for:
 - **Notification center**: Searchable history
 - **Read/unread marking**: Individual and bulk management
 
-### 🔍 Global Search
+### � Calendar & Event Categories
+
+- **Unified calendar view**: Aggregated view combining calendar events, maintenances, and incidents
+- **Event categories**: Organize events with customizable categories (name, color, description)
+- **Full CRUD**: Create, edit, delete events with drag & drop support
+- **Date range filtering**: Display events within specific time periods
+- **Today's events**: Quick banner showing current day's events
+- **All-day events**: Support for full-day or time-specific events
+- **Custom colors**: Override category color with custom event colors
+- **Status-based colors**: Maintenances and incidents automatically colored by status
+
+### �🔍 Global Search
 
 - **Unified search**: Search across all resources from a single endpoint
 - **Multi-type results**: Materials, zones, items, incidents, maintenances, companies, sites

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use DateInterval;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use XetaSuite\Enums\Incidents\IncidentSeverity;
 use XetaSuite\Enums\Incidents\IncidentStatus;
@@ -23,6 +24,7 @@ class IncidentFactory extends Factory
     public function definition(): array
     {
         $status = fake()->randomElement(IncidentStatus::cases());
+        $startedAt = fake()->dateTimeBetween('-12 months', '-1 day');
 
         return [
             'site_id' => null,
@@ -38,10 +40,10 @@ class IncidentFactory extends Factory
             'started_at' => $status === IncidentStatus::OPEN
                 || $status === IncidentStatus::IN_PROGRESS
                 || $status === IncidentStatus::RESOLVED
-                ? fake()->dateTimeBetween('-3 months', '-1 month')
+                ? $startedAt
                 : null,
             'resolved_at' => $status === IncidentStatus::RESOLVED
-                ? fake()->dateTimeBetween('-1 month', 'now')
+                ? fake()->dateTimeBetween($startedAt, $startedAt->add(new DateInterval('P3D')))
                 : null,
 
             'status' => $status->value,
@@ -103,10 +105,17 @@ class IncidentFactory extends Factory
             : (string) $status;
 
         return $this->state(function (array $attributes) use ($value) {
+            $startedAt = fake()->dateTimeBetween('-12 months', '-1 day');
+
             return [
                 'status' => $value,
+                'started_at' => $value === IncidentStatus::OPEN->value
+                    || $value === IncidentStatus::IN_PROGRESS->value
+                    || $value === IncidentStatus::RESOLVED->value
+                    ? $startedAt
+                    : null,
                 'resolved_at' => $value === IncidentStatus::RESOLVED->value
-                    ? fake()->dateTimeBetween($attributes['started_at'], 'now')
+                    ? fake()->dateTimeBetween($startedAt, $startedAt->add(new DateInterval('P3D')))
                     : null,
             ];
         });

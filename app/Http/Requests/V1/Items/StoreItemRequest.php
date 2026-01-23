@@ -6,6 +6,7 @@ namespace XetaSuite\Http\Requests\V1\Items;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use XetaSuite\Models\Item;
 
 class StoreItemRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class StoreItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', \XetaSuite\Models\Item::class);
+        return $this->user()->can('create', Item::class);
     }
 
     /**

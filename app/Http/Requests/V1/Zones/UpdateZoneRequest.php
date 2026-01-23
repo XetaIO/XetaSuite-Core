@@ -6,7 +6,6 @@ namespace XetaSuite\Http\Requests\V1\Zones;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use XetaSuite\Models\Zone;
 
 class UpdateZoneRequest extends FormRequest
 {
@@ -23,7 +22,6 @@ class UpdateZoneRequest extends FormRequest
      */
     public function rules(): array
     {
-        /** @var Zone $zone */
         $zone = $this->route('zone');
 
         return [
